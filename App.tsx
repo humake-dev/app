@@ -5,126 +5,391 @@
  * @format
  */
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
   View,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Animated,
+  Easing,
+  Dimensions,
+  StatusBar,
+  Text,
+  TouchableWithoutFeedback,
 } from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
+import 'react-native-gesture-handler';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+// Screen components
+const HomeScreen = ({navigation}) => {
+  const windowWidth = Dimensions.get('window').width;
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+    <View style={styles.screenContainer}>
+      <View style={styles.imageContainer}>
+        <Image
+          source={require('./assets/main.jpg')}
+          style={[styles.mainImage, { width: windowWidth }]}
+          resizeMode="cover"
+        />
+      </View>
+      <View style={styles.menuContainer}>
+      <TouchableOpacity
+        style={styles.navButton}
+        onPress={() => navigation.navigate('SubMenu')}>
+        <Text style={styles.navButtonText}>서브메뉴로 이동</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.navButton}
+        onPress={() => navigation.navigate('SubMenu')}>
+        <Text style={styles.navButtonText}>서브메뉴로 이동</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.navButton}
+        onPress={() => navigation.navigate('SubMenu')}>
+        <Text style={styles.navButtonText}>서브메뉴로 이동</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.navButton}
+        onPress={() => navigation.navigate('SubMenu')}>
+        <Text style={styles.navButtonText}>서브메뉴로 이동</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.navButton}
+        onPress={() => navigation.navigate('SubMenu')}>
+        <Text style={styles.navButtonText}>서브메뉴로 이동</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.navButton}
+        onPress={() => navigation.navigate('SubMenu')}>
+        <Text style={styles.navButtonText}>서브메뉴로 이동</Text>
+      </TouchableOpacity>
+      </View>
+
     </View>
   );
-}
+};
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+const SubMenuScreen = ({navigation}) => {
+  return (
+    <View style={styles.screenContainer}>
+      <TouchableOpacity
+        style={styles.navButton}
+        onPress={() => navigation.goBack()}>
+        <Text style={styles.navButtonText}>홈으로 돌아가기</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+const Stack = createStackNavigator();
+
+const App = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const slideAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const toggleMenu = (shouldOpen?: boolean) => {
+    if (isAnimating) return;
+
+    const toValue = shouldOpen !== undefined ? (shouldOpen ? 0 : Dimensions.get('window').width) : (isMenuOpen ? Dimensions.get('window').width : 0);
+    const duration = 300;
+    
+    setIsAnimating(true);
+    
+    if (toValue === 0) {
+      setIsMenuOpen(true);
+    }
+
+    Animated.parallel([
+      Animated.spring(slideAnim, {
+        toValue,
+        useNativeDriver: true,
+        damping: 22,
+        mass: 0.8,
+        stiffness: 150,
+        velocity: toValue === 0 ? 3 : -1,
+        restDisplacementThreshold: 0.1,
+        restSpeedThreshold: 0.1,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: toValue === 0 ? 1 : 0,
+        duration,
+        useNativeDriver: true,
+        easing: Easing.ease
+      }),
+    ]).start(({finished}) => {
+      setIsAnimating(false);
+      if (finished && toValue === Dimensions.get('window').width) {
+        setIsMenuOpen(false);
+      }
+    });
   };
 
-  /*
-   * To keep the template simple and small we're adding padding to prevent view
-   * from rendering under the System UI.
-   * For bigger apps the reccomendation is to use `react-native-safe-area-context`:
-   * https://github.com/AppAndFlow/react-native-safe-area-context
-   *
-   * You can read more about it here:
-   * https://github.com/react-native-community/discussions-and-proposals/discussions/827
-   */
-  const safePadding = '5%';
+  const closeMenu = () => {
+    if (!isAnimating) {
+      toggleMenu(false);
+    }
+  };
+
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
+
+  useEffect(() => {
+    if (isMenuOpen) {
+      setIsMenuVisible(true);
+    } else {
+      const timer = setTimeout(() => {
+        setIsMenuVisible(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isMenuOpen]);
+
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (!isMenuOpen) {
+        slideAnim.setValue(Dimensions.get('window').width);
+      }
+    };
+
+    const subscription = Dimensions.addEventListener('change', updateDimensions);
+    return () => subscription.remove();
+  }, [isMenuOpen]);
 
   return (
-    <View style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        style={backgroundStyle}>
-        <View style={{paddingRight: safePadding}}>
-          <Header/>
-        </View>
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-            paddingHorizontal: safePadding,
-            paddingBottom: safePadding,
+    <GestureHandlerRootView style={styles.container}>
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: '#333',
+              elevation: 0,
+              shadowOpacity: 0,
+            },
+            headerTintColor: '#fff',
           }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </View>
+          <Stack.Screen 
+            name="Home" 
+            component={HomeScreen}
+            options={{
+              headerTitle: '',
+              headerLeft: () => (
+                <Image
+                  source={require('./assets/logo.png')}
+                  style={styles.logo}
+                  resizeMode="contain"
+                />
+              ),
+              headerRight: () => (
+                <TouchableOpacity 
+                  onPress={() => !isAnimating && toggleMenu()} 
+                  style={styles.menuButton}
+                  activeOpacity={0.7}>
+                  <Animated.View 
+                    style={[
+                      styles.hamburgerLine,
+                      {
+                        transform: [
+                          {
+                            rotate: slideAnim.interpolate({
+                              inputRange: [0, Dimensions.get('window').width],
+                              outputRange: ['45deg', '0deg'],
+                            }),
+                          },
+                        ],
+                      },
+                    ]} 
+                  />
+                  <Animated.View 
+                    style={[
+                      styles.hamburgerLine,
+                      {
+                        opacity: slideAnim.interpolate({
+                          inputRange: [0, Dimensions.get('window').width / 2, Dimensions.get('window').width],
+                          outputRange: [0, 0.5, 1],
+                        }),
+                      },
+                    ]} 
+                  />
+                  <Animated.View 
+                    style={[
+                      styles.hamburgerLine,
+                      {
+                        transform: [
+                          {
+                            rotate: slideAnim.interpolate({
+                              inputRange: [0, Dimensions.get('window').width],
+                              outputRange: ['-45deg', '0deg'],
+                            }),
+                          },
+                        ],
+                      },
+                    ]} 
+                  />
+                </TouchableOpacity>
+              ),
+            }}
+          />
+          <Stack.Screen 
+            name="SubMenu" 
+            component={SubMenuScreen}
+            options={{
+              headerTitle: '서브메뉴',
+              headerTitleStyle: {
+                fontSize: 18,
+                fontWeight: 'bold',
+              },
+              headerTitleAlign: 'center',
+            }}
+          />
+        </Stack.Navigator>
+
+        {/* Overlay and Menu */}
+        {isMenuVisible && (
+          <View style={StyleSheet.absoluteFill}>
+            <TouchableWithoutFeedback onPress={closeMenu}>
+              <Animated.View
+                style={[
+                  StyleSheet.absoluteFill,
+                  {
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    opacity: fadeAnim,
+                  },
+                ]}
+              />
+            </TouchableWithoutFeedback>
+
+            <Animated.View
+              style={[
+                styles.slideMenu,
+                {
+                  transform: [
+                    {
+                      translateX: slideAnim,
+                    },
+                  ],
+                },
+              ]}>
+              <View style={styles.menuContent}>
+                <Text style={styles.menuTitle}>메뉴</Text>
+              </View>
+            </Animated.View>
+          </View>
+        )}
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  header: {
+    backgroundColor: '#333',
+    paddingVertical: 15,
   },
-  sectionDescription: {
-    marginTop: 8,
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 15,
+  },
+  headerTitle: {
+    color: '#fff',
     fontSize: 18,
-    fontWeight: '400',
+    fontWeight: 'bold',
   },
-  highlight: {
-    fontWeight: '700',
+  logo: {
+    height: 28,
+    width: 230,
+    marginLeft: 15,
+  },
+  menuButton: {
+    padding: 15,
+    marginRight: 5,
+  },
+  hamburgerLine: {
+    width: 25,
+    height: 3,
+    backgroundColor: '#fff',
+    marginVertical: 3,
+    borderRadius: 1,
+  },
+  slideMenu: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: '70%',
+    height: '100%',
+    backgroundColor: '#808080',
+    zIndex: 2,
+  },
+  menuContent: {
+    padding: 20,
+  },
+
+  menuContainer: {    
+    flex: 1,
+    padding: 10,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'flex-start',
+    alignContent: 'flex-start'
+  },
+
+  menuTitle: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  screenContainer: {
+    flex: 1,
+    justifyContent: 'top',
+    alignItems: 'center',
+    padding: 0,
+
+  },
+  screenTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  navButton: {
+    backgroundColor: '#333',
+    padding: 15,
+    margin: 20,
+    borderRadius: 8,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    alignSelf: 'center',
+  },
+  navButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  subMenuHeader: {
+    height: 60,
+    backgroundColor: '#333',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+  },
+  imageContainer: {
+    width: '100%',
+    height: 200,
+    backgroundColor: '#f0f0f0',
+    overflow: 'hidden',
+  },
+  mainImage: {
+    height: '100%',
   },
 });
 
