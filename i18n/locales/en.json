@@ -1,0 +1,44 @@
+  
+  // i18n/locales/en.json
+  {
+    "common": {
+      "back": "Back",
+      "home": "Back to Home"
+    },
+    "menu": {
+        "trainer": "Trainer",
+        "attendance": "Attendance",
+        "exercise": "Exercise",
+        "message": "Message",
+        "counsel": "Counsel",
+        "stop": "Stop",
+        "pt": "PT"
+      },
+      "counsel": {
+        "add": "상담 추가",
+        "selectDate": "날짜 선택",
+        "selectOption": "옵션 선택",
+        "option1": "옵션 1",
+        "option2": "옵션 2",
+        "content": "상담 내용",
+        "contentPlaceholder": "상담 내용을 입력해주세요"
+      },      
+      "calendar": {
+        "monthNames": [
+          "January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"
+        ],
+        "monthNamesShort": [
+          "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        ],
+        "dayNames": [
+          "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
+        ],
+        "dayNamesShort": [
+          "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
+        ],
+        "today": "Today",
+        "monthFormat": "MMMM yyyy"
+      }
+  }

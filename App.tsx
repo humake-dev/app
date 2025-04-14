@@ -22,9 +22,27 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import 'react-native-gesture-handler';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {I18nextProvider} from 'react-i18next';
+import TrainerScreen from './TrainerScreen';
+import TrainerDetailScreen from './TrainerDetailScreen';
+import AttendanceScreen from './AttendanceScreen';
+import PtScreen from './PtScreen';
+import ExerciseScreen from './ExerciseScreen';
+import MessageScreen from './MessageScreen';
+import MessageDetailScreen from './MessageDetailScreen';
+import CounselScreen from './CounselScreen';
+import CounselDetailScreen from './CounselDetailScreen';
+import CounselFormScreen from './CounselFormScreen';
+import StopScreen from './StopScreen';
+import StopDetailScreen from './StopDetailScreen';
+import StopFormScreen from './StopFormScreen';
+import i18n from './i18n/i18n';
+import { useTranslation } from 'react-i18next'; 
+
 
 // Screen components
 const HomeScreen = ({navigation}) => {
+  const { t } = useTranslation();
   const windowWidth = Dimensions.get('window').width;
 
   return (
@@ -37,50 +55,42 @@ const HomeScreen = ({navigation}) => {
         />
       </View>
       <View style={styles.menuContainer}>
-      <TouchableOpacity
-        style={styles.navButton}
-        onPress={() => navigation.navigate('SubMenu')}>
-        <Text style={styles.navButtonText}>서브메뉴로 이동</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.navButton}
-        onPress={() => navigation.navigate('SubMenu')}>
-        <Text style={styles.navButtonText}>서브메뉴로 이동</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.navButton}
-        onPress={() => navigation.navigate('SubMenu')}>
-        <Text style={styles.navButtonText}>서브메뉴로 이동</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.navButton}
-        onPress={() => navigation.navigate('SubMenu')}>
-        <Text style={styles.navButtonText}>서브메뉴로 이동</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.navButton}
-        onPress={() => navigation.navigate('SubMenu')}>
-        <Text style={styles.navButtonText}>서브메뉴로 이동</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.navButton}
-        onPress={() => navigation.navigate('SubMenu')}>
-        <Text style={styles.navButtonText}>서브메뉴로 이동</Text>
-      </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.navButton, styles.menuItem]}
+            onPress={() => navigation.navigate('Trainer')}>
+            <Text style={styles.navButtonText}>{t('menu.trainer')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.navButton, styles.menuItem]}
+            onPress={() => navigation.navigate('Attendance')}>
+            <Text style={styles.navButtonText}>{t('menu.attendance')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.navButton, styles.menuItem]}
+            onPress={() => navigation.navigate('Exercise')}>
+            <Text style={styles.navButtonText}>{t('menu.exercise')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.navButton, styles.menuItem]}
+            onPress={() => navigation.navigate('Pt')}>
+            <Text style={styles.navButtonText}>{t('menu.pt')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.navButton, styles.menuItem]}
+            onPress={() => navigation.navigate('Message')}>
+            <Text style={styles.navButtonText}>{t('menu.message')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.navButton, styles.menuItem]}
+            onPress={() => navigation.navigate('Stop')}>
+            <Text style={styles.navButtonText}>{t('menu.stop')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.navButton, styles.menuItem]}
+            onPress={() => navigation.navigate('Counsel')}>
+            <Text style={styles.navButtonText}>{t('menu.counsel')}</Text>
+          </TouchableOpacity>
       </View>
-
-    </View>
-  );
-};
-
-const SubMenuScreen = ({navigation}) => {
-  return (
-    <View style={styles.screenContainer}>
-      <TouchableOpacity
-        style={styles.navButton}
-        onPress={() => navigation.goBack()}>
-        <Text style={styles.navButtonText}>홈으로 돌아가기</Text>
-      </TouchableOpacity>
     </View>
   );
 };
@@ -88,10 +98,66 @@ const SubMenuScreen = ({navigation}) => {
 const Stack = createStackNavigator();
 
 const App = () => {
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
+
+  useEffect(() => {
+    const login = async () => {
+      try {
+        const response = await fetch('http://10.0.2.2:8000/login?user_id=11632', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          }
+        });
+
+        if (response.ok) {
+          setIsLoggedIn(true);
+        } else {
+          console.error('Login failed');
+        }
+      } catch (error) {
+        console.error('Error during login:', error);
+      }
+    };
+
+    login();
+  }, []);
+
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (!isMenuOpen) {
+        slideAnim.setValue(Dimensions.get('window').width);
+      }
+    };
+
+    const subscription = Dimensions.addEventListener('change', updateDimensions);
+    return () => subscription.remove();
+  }, [isMenuOpen]);
+
+  useEffect(() => {
+    if (isMenuOpen) {
+      setIsMenuVisible(true);
+    } else {
+      const timer = setTimeout(() => {
+        setIsMenuVisible(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isMenuOpen]);
+
+  if (!isLoggedIn) {
+    return (
+      <View style={styles.screenContainer}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   const toggleMenu = (shouldOpen?: boolean) => {
     if (isAnimating) return;
@@ -136,45 +202,15 @@ const App = () => {
     }
   };
 
-  const [isMenuVisible, setIsMenuVisible] = useState(false);
 
-  useEffect(() => {
-    if (isMenuOpen) {
-      setIsMenuVisible(true);
-    } else {
-      const timer = setTimeout(() => {
-        setIsMenuVisible(false);
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [isMenuOpen]);
-
-  useEffect(() => {
-    const updateDimensions = () => {
-      if (!isMenuOpen) {
-        slideAnim.setValue(Dimensions.get('window').width);
-      }
-    };
-
-    const subscription = Dimensions.addEventListener('change', updateDimensions);
-    return () => subscription.remove();
-  }, [isMenuOpen]);
 
   return (
+<I18nextProvider i18n={i18n}>
     <GestureHandlerRootView style={styles.container}>
+      <StatusBar barStyle="dark-content" />
       <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{
-            headerStyle: {
-              backgroundColor: '#333',
-              elevation: 0,
-              shadowOpacity: 0,
-            },
-            headerTintColor: '#fff',
-          }}>
-          <Stack.Screen 
-            name="Home" 
-            component={HomeScreen}
+        <Stack.Navigator initialRouteName="Home">
+          <Stack.Screen name="Home" component={HomeScreen} 
             options={{
               headerTitle: '',
               headerLeft: () => (
@@ -234,18 +270,19 @@ const App = () => {
               ),
             }}
           />
-          <Stack.Screen 
-            name="SubMenu" 
-            component={SubMenuScreen}
-            options={{
-              headerTitle: '서브메뉴',
-              headerTitleStyle: {
-                fontSize: 18,
-                fontWeight: 'bold',
-              },
-              headerTitleAlign: 'center',
-            }}
-          />
+          <Stack.Screen name="Trainer" component={TrainerScreen} options={{ title: t('menu.trainer') }} />
+          <Stack.Screen name="TrainerDetail" component={TrainerDetailScreen} options={{ title: t('menu.trainer') }}/>
+          <Stack.Screen name="Attendance" component={AttendanceScreen} options={{ title: t('menu.attendance') }}/>
+          <Stack.Screen name="Exercise" component={ExerciseScreen} options={{ title: t('menu.exercise') }}/>
+          <Stack.Screen name="Pt" component={PtScreen} options={{ title: t('menu.pt') }}/>
+          <Stack.Screen name="Message" component={MessageScreen}  options={{ title: t('menu.message') }}/>
+          <Stack.Screen name="MessageDetail" component={MessageDetailScreen} options={{ title: t('menu.message') }}/>
+          <Stack.Screen name="Counsel" component={CounselScreen} options={{ title: t('menu.counsel') }}/>
+          <Stack.Screen name="CounselForm" component={CounselFormScreen} options={{ title: t('counsel.form') }}/>
+          <Stack.Screen name="CounselDetail" component={CounselDetailScreen} options={{ title: t('menu.counsel') }}/>
+          <Stack.Screen name="Stop" component={StopScreen} options={{ title: t('menu.stop') }}/>
+          <Stack.Screen name="StopForm" component={StopFormScreen} options={{ title: t('stop.form') }}/>
+          <Stack.Screen name="StopDetail" component={StopDetailScreen} options={{ title: t('menu.stop') }}/>      
         </Stack.Navigator>
 
         {/* Overlay and Menu */}
@@ -282,6 +319,7 @@ const App = () => {
         )}
       </NavigationContainer>
     </GestureHandlerRootView>
+    </I18nextProvider>
   );
 };
 
@@ -334,27 +372,38 @@ const styles = StyleSheet.create({
     padding: 20,
   },
 
-  menuContainer: {    
+  menuContainer: {
     flex: 1,
-    padding: 10,
-    flexDirection: 'row',
+    paddingTop: 10,
+    paddingHorizontal: 20,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
     flexWrap: 'wrap',
-    alignItems: 'flex-start',
-    alignContent: 'flex-start'
+    flexDirection: 'row',
+    gap : '3.3%'
   },
 
+  menuItem: {
+    width: '30%',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign : 'center',
+    marginBottom: 10,
+  },
   menuTitle: {
     color: '#fff',
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    justifyContent: 'center',
+    textAlign: 'center'
   },
   screenContainer: {
     flex: 1,
-    justifyContent: 'top',
+    justifyContent: 'center',
     alignItems: 'center',
     padding: 0,
-
   },
   screenTitle: {
     fontSize: 24,
@@ -364,16 +413,15 @@ const styles = StyleSheet.create({
   navButton: {
     backgroundColor: '#333',
     padding: 15,
-    margin: 20,
     borderRadius: 8,
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   navButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+    textAlign: 'center'
   },
   subMenuHeader: {
     height: 60,
@@ -391,6 +439,19 @@ const styles = StyleSheet.create({
   mainImage: {
     height: '100%',
   },
+
+placeholderImage: {
+  width: '100%',
+  height: '100%',
+  backgroundColor: '#ccc',
+  borderRadius: 30,
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+placeholderText: {
+  fontSize: 24,
+  fontWeight: 'bold',
+},
 });
 
 export default App;

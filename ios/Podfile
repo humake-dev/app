@@ -14,14 +14,16 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
+pod 'react-native-sqlite-storage', :path => '../node_modules/react-native-sqlite-storage'
+
 target 'humake_app' do
   config = use_native_modules!
 
-  use_react_native!(
-    :path => config[:reactNativePath],
+#  use_react_native!(
+#    :path => config[:reactNativePath],
     # An absolute path to your application root.
-    :app_path => "#{Pod::Config.instance.installation_root}/.."
-  )
+#    :app_path => "#{Pod::Config.instance.installation_root}/.."
+#  )
 
   post_install do |installer|
     # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
