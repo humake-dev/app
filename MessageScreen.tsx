@@ -4,8 +4,7 @@ import {
   Text,
   FlatList,
   StyleSheet,
-  TouchableOpacity,
-  ScrollView,
+  TouchableOpacity
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -42,6 +41,7 @@ const MessageScreen = ({ navigation }) => {
     fetch('http://10.0.2.2:8000/messages')
       .then(response => response.json())
       .then(data => {
+        console.log(data);
         setMessages(data.message_list);
         setLoading(false);
         setTotal(data.total || 0);
@@ -63,7 +63,7 @@ const MessageScreen = ({ navigation }) => {
   if (total === 0) {
     return (
       <View style={styles.screenContainer}>
-        <Text style={styles.noMessagesText}>메시지가 없습니다</Text>
+        <Text style={styles.noMessagesText}>{t('message.no_items')}</Text>
       </View>
     );
   }
@@ -85,7 +85,7 @@ const MessageScreen = ({ navigation }) => {
           style={styles.deleteButton}
           onPress={() => handleDeleteMessage(item.id)}
         >
-          <Text style={styles.deleteButtonText}>삭제</Text>
+          <Text style={styles.deleteButtonText}>{t('common.delete')}</Text>
         </TouchableOpacity>
       </View>
     );

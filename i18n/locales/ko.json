@@ -2,7 +2,9 @@
 {
     "common": {
       "back": "뒤로 가기",
-      "home": "홈으로 돌아가기"
+      "home": "홈으로 돌아가기",
+      "delete": "삭제",
+      "submit": "제출"
     },
     "menu": {
       "trainer": "트레이너",
@@ -14,13 +16,19 @@
       "pt": "PT"
     },
     "counsel": {
-      "add": "상담 추가",
-      "selectDate": "날짜 선택",
-      "selectOption": "옵션 선택",
-      "option1": "옵션 1",
-      "option2": "옵션 2",
+      "form": "상담 내용을 작성해주세요",
+      "add": "상담 작성",
+      "selectCourse": "문의유형",
+      "course1": "기본문의",
+      "course2": "PT문의",
       "content": "상담 내용",
-      "contentPlaceholder": "상담 내용을 입력해주세요"
+      "contentPlaceholder": "상담 내용을 입력해주세요",
+      "no_items": "상담이 없습니다",
+      "default": "default",
+      "pt": "pt"
+    },
+    "message" : {
+      "no_items": "메시지가 없습니다"
     },
     "calendar": {
         "monthNames": ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],

@@ -6,36 +6,57 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Picker,
+  Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-
+import { Picker } from '@react-native-picker/picker';
 
 const CounselFormScreen = ({ navigation }) => {
   const { t } = useTranslation();
-  const [date, setDate] = useState(new Date());
   const [content, setContent] = useState('');
-  const [selectedOption, setSelectedOption] = useState('option1');
+  const [selectedCourse, setSelectedCourse] = useState('default');
 
-  const handleDateConfirm = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setDate(currentDate);
-  };
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch('http://10.0.2.2:8000/counsels', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question_course: selectedCourse,
+          content: content,
+        }),
+      });
 
-  const handleSubmit = () => {
-    // Here you would typically make an API call to submit the form
-    console.log('Submitting form:', {
-      date: date.toISOString(),
-      content,
-      option: selectedOption,
-    });
-    navigation.goBack();
+      if (response.ok) {
+        // Reset form after successful submission
+        setContent('');
+        setSelectedCourse('default');
+        navigation.goBack();
+      } else {
+        throw new Error('Failed to submit form');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      // You might want to show an error message to the user here
+    }
   };
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.formContainer}>
-        <Text style={styles.label}>{t('counsel.selectDate')}</Text>
+        <Text style={styles.label}>{t('counsel.selectCourse')}</Text>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={selectedCourse}
+            onValueChange={(itemValue) => setSelectedCourse(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label={t('counsel.course1')} value="default" />
+            <Picker.Item label={t('counsel.course2')} value="pt" />
+          </Picker>
+        </View>
 
         <Text style={styles.label}>{t('counsel.content')}</Text>
         <TextInput
@@ -68,6 +89,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 8,
   },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    marginBottom: 20,
+    backgroundColor: '#fff',
+
+  },
+  picker: {
+    height: 55,
+    width: '100%',
+    fontSize: 16,
+    color: '#333',
+  },
   dateButton: {
     backgroundColor: '#f0f0f0',
     padding: 12,
@@ -76,10 +111,6 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 16,
-  },
-  picker: {
-    height: 50,
-    marginBottom: 20,
   },
   input: {
     backgroundColor: '#f0f0f0',

@@ -18,11 +18,11 @@ const StopScreen = ({ navigation }) => {
     fetch('http://10.0.2.2:8000/stops')
       .then(response => response.json())
       .then(data => {
-        setCounsels(data.counsel_list);
+        setStops(data.counsel_list);
         setLoading(false);
       })
       .catch(error => {
-        console.error('Error fetching counsels:', error);
+        console.error('Error fetching stops:', error);
         setLoading(false);
       });
   }, []);
@@ -30,12 +30,12 @@ const StopScreen = ({ navigation }) => {
   if (loading) {
     return (
       <View style={styles.screenContainer}>
-        <Text>Loading Counsels...</Text>
+        <Text>Loading Stops...</Text>
       </View>
     );
   }
 
-  const renderCounselItem = ({ item }) => {
+  const renderStopItem = ({ item }) => {
     const handlePress = () => {
       navigation.navigate('StopDetail', { stop: item });
     };
@@ -56,16 +56,16 @@ const StopScreen = ({ navigation }) => {
     <View style={styles.container}>
       <FlatList
         data={stops}
-        renderItem={renderCounselItem}
+        renderItem={renderStopItem}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.counselList}
+        contentContainerStyle={styles.stopList}
         style={{ flexGrow: 1 }} 
       />
       <TouchableOpacity 
         style={styles.addButton}
-        onPress={() => navigation.navigate('CounselForm')}
+        onPress={() => navigation.navigate('StopForm')}
       >
-        <Text style={styles.addButtonText}>{t('counsel.add')}</Text>
+        <Text style={styles.addButtonText}>{t('stop.add')}</Text>
       </TouchableOpacity>
     </View>
   );

@@ -3,7 +3,8 @@
   {
     "common": {
       "back": "Back",
-      "home": "Back to Home"
+      "home": "Back to Home",
+      "delete": "Delete"          
     },
     "menu": {
         "trainer": "Trainer",
@@ -21,8 +22,12 @@
         "option1": "옵션 1",
         "option2": "옵션 2",
         "content": "상담 내용",
-        "contentPlaceholder": "상담 내용을 입력해주세요"
-      },      
+        "contentPlaceholder": "상담 내용을 입력해주세요",
+        "no_items": "No Counsel"
+      },
+      "message" : {
+        "no_items": "No Message"
+      },   
       "calendar": {
         "monthNames": [
           "January", "February", "March", "April", "May", "June",
