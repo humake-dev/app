@@ -4,7 +4,9 @@
       "back": "뒤로 가기",
       "home": "홈으로 돌아가기",
       "delete": "삭제",
-      "submit": "제출"
+      "submit": "제출",
+      "ok": "확인",
+      "backToList" : "목록으로"
     },
     "menu": {
       "trainer": "트레이너",
@@ -26,6 +28,15 @@
       "no_items": "상담이 없습니다",
       "default": "default",
       "pt": "pt"
+    },
+    "stop": {
+      "form": "휴회신청을 작성해주세요",
+      "stopPeriod": "휴회기간",
+      "add": "휴회 추가",
+      "selectDate": "날짜 선택",
+      "content": "휴회 사유",
+      "contentPlaceholder": "휴회 사유 간단히 한 줄로 써주세요",
+      "no_items": "휴회가 없습니다"
     },
     "message" : {
       "no_items": "메시지가 없습니다"

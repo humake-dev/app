@@ -43,7 +43,6 @@ const CounselScreen = ({ navigation }) => {
     try {
       const response = await fetch('http://10.0.2.2:8000/counsels');
       const data = await response.json();
-      console.log(data);
       setCounsels(data.counsel_list);
       setLoading(false);
       setTotal(data.total || 0);
@@ -89,7 +88,7 @@ const CounselScreen = ({ navigation }) => {
 
   const renderCounselItem = ({ item }) => {
     const handlePress = () => {
-      navigation.navigate('CounselDetail', { counsel: item });
+      navigation.navigate('CounselDetail', { id: item.id });
     };
 
     return (

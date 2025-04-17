@@ -38,7 +38,7 @@ const TrainerScreen = ({navigation}) => {
   
     const renderTrainerItem = ({item}) => {
       const handlePress = () => {
-        navigation.navigate('TrainerDetail', { trainer: item });
+        navigation.navigate('TrainerDetail', { id: item.id });
       };
 
       return (

@@ -4,7 +4,10 @@
     "common": {
       "back": "Back",
       "home": "Back to Home",
-      "delete": "Delete"          
+      "delete": "Delete",          
+      "submit": "제출",
+      "ok": "확인",
+      "backToList" : "목록으로"   
     },
     "menu": {
         "trainer": "Trainer",
@@ -24,6 +27,15 @@
         "content": "상담 내용",
         "contentPlaceholder": "상담 내용을 입력해주세요",
         "no_items": "No Counsel"
+      },
+      "stop": {
+        "form": "휴회신청을 작성해주세요",
+        "stopPeriod": "휴회기간",
+        "add": "Stop Add",
+        "selectDate": "날짜 선택",
+        "content": "휴회 사유",
+        "contentPlaceholder": "휴회 사유 간단히 한 줄로 써주세요",
+        "no_items": "No Stop"
       },
       "message" : {
         "no_items": "No Message"
