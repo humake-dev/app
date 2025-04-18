@@ -22,7 +22,7 @@ import {
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import 'react-native-gesture-handler';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {GestureHandlerRootView, ScrollView} from 'react-native-gesture-handler';
 import {I18nextProvider} from 'react-i18next';
 import LoginScreen from './LoginScreen';
 import TrainerScreen from './TrainerScreen';
@@ -57,41 +57,72 @@ const HomeScreen = ({navigation}) => {
         />
       </View>
       <View style={styles.menuContainer}>
-          <TouchableOpacity
-            style={[styles.navButton, styles.menuItem]}
-            onPress={() => navigation.navigate('Trainer')}>
-            <Text style={styles.navButtonText}>{t('menu.trainer')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.navButton, styles.menuItem]}
-            onPress={() => navigation.navigate('Attendance')}>
-            <Text style={styles.navButtonText}>{t('menu.attendance')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.navButton, styles.menuItem]}
-            onPress={() => navigation.navigate('Exercise')}>
-            <Text style={styles.navButtonText}>{t('menu.exercise')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.navButton, styles.menuItem]}
-            onPress={() => navigation.navigate('Pt')}>
-            <Text style={styles.navButtonText}>{t('menu.pt')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.navButton, styles.menuItem]}
-            onPress={() => navigation.navigate('Message')}>
-            <Text style={styles.navButtonText}>{t('menu.message')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.navButton, styles.menuItem]}
-            onPress={() => navigation.navigate('Stop')}>
-            <Text style={styles.navButtonText}>{t('menu.stop')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.navButton, styles.menuItem]}
-            onPress={() => navigation.navigate('Counsel')}>
-            <Text style={styles.navButtonText}>{t('menu.counsel')}</Text>
-          </TouchableOpacity>
+      <TouchableOpacity
+          style={styles.imageButton}
+          onPress={() => navigation.navigate('Trainer')}>
+          <Image
+            source={require('./assets/photo_none.gif')}
+            style={styles.imageIcon}
+          />
+          <Text style={styles.imageButtonText}>{t('menu.trainer')}</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={styles.imageButton}
+          onPress={() => navigation.navigate('Attendance')}>
+          <Image
+            source={require('./assets/attendance.png')}
+            style={styles.imageIcon}
+          />
+          <Text style={styles.imageButtonText}>{t('menu.attendance')}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.imageButton}
+          onPress={() => navigation.navigate('Exercise')}>
+          <Image
+            source={require('./assets/exercise.png')}
+            style={styles.imageIcon}
+          />
+          <Text style={styles.imageButtonText}>{t('menu.exercise')}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.imageButton}
+          onPress={() => navigation.navigate('Pt')}>
+          <Image
+            source={require('./assets/pt.png')}
+            style={styles.imageIcon}
+          />
+          <Text style={styles.imageButtonText}>{t('menu.pt')}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.imageButton}
+          onPress={() => navigation.navigate('Message')}>
+          <Image
+            source={require('./assets/message.png')}
+            style={styles.imageIcon}
+          />
+          <Text style={styles.imageButtonText}>{t('menu.message')}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.imageButton}
+          onPress={() => navigation.navigate('Stop')}>
+          <Image
+            source={require('./assets/stop.png')}
+            style={styles.imageIcon}
+          />
+          <Text style={styles.imageButtonText}>{t('menu.stop')}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.imageButton}
+          onPress={() => navigation.navigate('Counsel')}>
+          <Image
+            source={require('./assets/counsel.png')}
+            style={styles.imageIcon}
+          />
+          <Text style={styles.imageButtonText}>{t('menu.counsel')}</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -474,14 +505,6 @@ const styles = StyleSheet.create({
     gap : '3.3%'
   },
 
-  menuItem: {
-    width: '30%',
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    alignItems: 'center',
-    textAlign : 'center',
-    marginBottom: 10,
-  },
   menuTitle: {
     color: '#fff',
     fontSize: 24,
@@ -509,7 +532,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   navButtonText: {
-    color: '#fff',
+    color: '#000',
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center'
@@ -575,6 +598,28 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     textAlign: 'center',
+  },
+  imageButton: {
+    width: '30%',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign : 'center',
+    marginBottom: 10,
+    padding: 10,
+    backgroundColor: 'transparent',
+  },
+  imageIcon: {
+    width: 48,
+    height: 48,
+    marginBottom: 8,
+    resizeMode: 'contain',
+  },
+  imageButtonText: {
+    color: '#000',
+    fontSize: 16,
+    fontWeight: 'bold',
+    backgroundColor: 'transparent',
   },
 });
 
