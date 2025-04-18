@@ -33,12 +33,14 @@ const TrainerDetailScreen = () => {
 
   const fetchTrainer = async () => {
     try {
-      console.log('asdg');
       const response = await fetch(`http://10.0.2.2:8000/trainers/${route.params.id}`);
-      if (response.ok) {
+      
+      if (response.status === 401) {
+        navigation.navigate('Login');
+        return;
+      }
 
-        console.log('???');
-        console.log(data);
+      if (response.ok) {
         const data = await response.json();
         setTrainer(data);
       } else {
@@ -53,7 +55,7 @@ const TrainerDetailScreen = () => {
 
   useEffect(() => {
     fetchTrainer();
-  }, []);
+  }, [navigation, route.params.id]);
 
   if (loading) {
     return (
@@ -81,20 +83,22 @@ const TrainerDetailScreen = () => {
         <View style={styles.content}>
           <View style={styles.contentContainer}>
             <View style={styles.header}>
-              {trainer.picture && trainer.picture.picture_url ? (
-                <Image
-                  source={{ uri: `http://10.0.2.2:8000/${trainer.picture.picture_url}` }}
-                  style={styles.profileImage}
-                />
-              ) : (
-                <View style={styles.placeholderImage}>
-                  <Text style={styles.placeholderText}>{trainer.name[0]}</Text>
-                </View>
-              )}
+              <View style={styles.profileContainer}>
+                {trainer.picture && trainer.picture.picture_url ? (
+                  <Image
+                    source={{uri: `https://humake.blob.core.windows.net/humake/employee/${trainer.branch_id}/${trainer.picture.picture_url}`}}
+                    style={styles.profileImage}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <Image
+                    source={require('./assets/photo_none.gif')}
+                    style={styles.profileImage}
+                    resizeMode="cover"
+                  />
+                )}
+              </View>
               <Text style={styles.name}>{trainer.name}</Text>
-              <Text style={styles.createdAt}>
-                {t('common.joined')} {new Date(trainer.created_at).toLocaleDateString()}
-              </Text>
             </View>
           </View>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
@@ -136,23 +140,16 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
   },
-  profileImage: {
+  profileContainer: {
     width: 120,
     height: 120,
     borderRadius: 60,
     marginBottom: 10,
+    overflow: 'hidden',
   },
-  placeholderImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  placeholderText: {
-    fontSize: 48,
-    fontWeight: 'bold',
+  profileImage: {
+    width: '100%',
+    height: '100%',
   },
   name: {
     fontSize: 24,

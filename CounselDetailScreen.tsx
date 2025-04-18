@@ -33,6 +33,12 @@ const CounselDetailScreen = () => {
   const fetchCounsel = async () => {
     try {
       const response = await fetch(`http://10.0.2.2:8000/counsels/${route.params.id}`);
+      
+      if (response.status === 401) {
+        navigation.navigate('Login');
+        return;
+      }
+
       if (response.ok) {
         const data = await response.json();
         setCounsel(data);
@@ -48,7 +54,7 @@ const CounselDetailScreen = () => {
 
   useEffect(() => {
     fetchCounsel();
-  }, []);
+  }, [navigation, route.params.id]);
 
   if (loading) {
     return (

@@ -4,10 +4,32 @@ import { useTranslation } from 'react-i18next';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 
 const AttendanceScreen = ({ navigation }) => {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = String(now.getMonth() + 1)
+
   const { t } = useTranslation();
   const [selectedDate, setSelectedDate] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+  const [selectedYear, setSelectedYear] = useState(currentYear);
   const [attendanceCount, setAttendanceCount] = useState(0);
   const [ptCount, setPtCount] = useState(0);
+  const [markedDates, setMarkedDates] = useState({});
+
+  const fetchCounts = async () => {
+    try {
+      const today = new Date();
+      const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+      // Replace with actual API calls
+      // Example: await fetchAttendanceCounts(firstDayOfMonth, lastDayOfMonth)
+      setAttendanceCount(12); // Replace with actual count
+      setPtCount(5); // Replace with actual count
+    } catch (error) {
+      console.error('Error fetching counts:', error);
+    }
+  };
 
   useEffect(() => {
     LocaleConfig.locales['ko'] = {
@@ -21,23 +43,35 @@ const AttendanceScreen = ({ navigation }) => {
     LocaleConfig.defaultLocale = 'ko';
 
     // Fetch attendance and PT counts for the current month
-    const fetchCounts = async () => {
-      try {
-        const today = new Date();
-        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-        const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
-        // Replace with actual API calls
-        // Example: await fetchAttendanceCounts(firstDayOfMonth, lastDayOfMonth)
-        setAttendanceCount(12); // Replace with actual count
-        setPtCount(5); // Replace with actual count
-      } catch (error) {
-        console.error('Error fetching counts:', error);
-      }
-    };
 
     fetchCounts();
   }, []);
+
+  useEffect(() => {
+    fetch('http://10.0.2.2:8000/entrances?month=' + selectedMonth + '&year=' + selectedYear)
+    .then(response => response.json())
+    .then(data => {
+      setAttendanceCount(data.total);
+      
+      if(data.total > 0) {
+      // Create marked dates object for calendar
+      const markedDates = {};
+      data.entrance_list.forEach(dateStr => {
+        markedDates[dateStr.in_time.split('T')[0]]= {
+          marked: true,
+           dotColor: '#FF69B4'// Blue dot for marked dates
+        };
+      });
+      
+      // Update calendar with marked dates
+      setMarkedDates(markedDates);
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching messages:', error);
+    });
+  }, [selectedMonth, selectedYear]);
 
   const today = new Date();
   const formatDate = (d) => d.toISOString().split('T')[0];
@@ -73,29 +107,26 @@ const month = today.getMonth() + 1;
 const lastDayOfMonth = new Date(year, month, 0).getDate();
 const maxDate = `${year}-${String(month).padStart(2, '0')}-${lastDayOfMonth}`;
 
-console.log(maxDate)
   return (
     <View style={styles.container}>
       <View style={styles.statsContainer}>
         <View style={styles.statsItem}>
-          <Text style={styles.statsLabel}>{t('attendance.currentMonthAttendance')}</Text>
+          <Text style={styles.statsLabel}>{selectedMonth}{t('common.month')} {t('attendance.count')}  <View style={styles.attendanceCircle} /></Text>         
           <Text style={styles.statsValue}>{attendanceCount}</Text>
         </View>
         <View style={styles.statsItem}>
-          <Text style={styles.statsLabel}>{t('attendance.currentMonthPT')}</Text>
+          <Text style={styles.statsLabel}>{selectedMonth}{t('common.month')} {t('attendance.PTcount')} <View style={styles.attendanceCircle} /></Text>
           <Text style={styles.statsValue}>{ptCount}</Text>
         </View>
       </View>
       <Calendar 
               maxDate={maxDate}
         onDayPress={onDayPress}
-        markedDates={{
-            ...disabledFutureDates,
-          [selectedDate]: { selected: true, marked: true }
-        }}
+        markedDates={markedDates} 
         onVisibleMonthsChange={(months) => {
-    const currentMonth = months[0]; 
-    console.log('현재 달:', currentMonth.month, currentMonth.year);
+
+    setSelectedMonth(months[0].month);
+    setSelectedYear(months[0].year);
   }}
         monthFormat={t('calendar.monthFormat')}
         enableSwipeMonths={true}
@@ -114,18 +145,13 @@ console.log(maxDate)
             const dayOfWeek = new Date(date.dateString).getDay();
             const isTodayOrPast = new Date(date.dateString) <= today;
           
-            // 색상 지정
             let textColor = '#000'; // 평일
             if (dayOfWeek === 0) textColor = '#FF3B30'; // 일
             else if (dayOfWeek === 6) textColor = '#007AFF'; // 토
+            if (!isTodayOrPast) textColor = '#C7C7CD';
           
-            // 비활성 처리
-            if (!isTodayOrPast) {
-              textColor = '#C7C7CD'; // 흐리게
-            }
-          
-            // 선택된 날짜
             const isSelected = date.dateString === selectedDate;
+            const isMarked = markedDates[date.dateString]?.marked;
           
             return (
               <View
@@ -133,13 +159,28 @@ console.log(maxDate)
                   backgroundColor: isSelected ? '#007AFF' : 'transparent',
                   borderRadius: 20,
                   padding: 8,
-                }}>
-                <Text style={{
-                  color: isSelected ? '#fff' : textColor,
-                  fontWeight: isSelected ? 'bold' : 'normal'
-                }}>
+                  alignItems: 'center',
+                }}
+              >
+                <Text
+                  style={{
+                    color: isSelected ? '#fff' : textColor,
+                    fontWeight: isSelected ? 'bold' : 'normal',
+                  }}
+                >
                   {date.day}
                 </Text>
+                {isMarked && (
+                  <View
+                    style={{
+                      width: 7,
+                      height: 7,
+                      borderRadius:  3.5,
+                      backgroundColor: markedDates[date.dateString].dotColor ||  '#FF69B4',
+                      marginTop: 2,
+                    }}
+                  />
+                )}
               </View>
             );
           }}
@@ -156,21 +197,31 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     marginBottom: 20,
   },
   statsItem: {
     alignItems: 'center',
+    flexDirection: 'column',
+    justifyContent: 'center',
   },
   statsLabel: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#666',
-    marginBottom: 4,
+    marginBottom: 8,
   },
   statsValue: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#000',
+  },
+  attendanceCircle: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: '#FF69B4',
+    alignSelf: 'center',
+    marginTop: 8,
   },
 });
 

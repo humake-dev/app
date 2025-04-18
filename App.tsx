@@ -17,12 +17,14 @@ import {
   StatusBar,
   Text,
   TouchableWithoutFeedback,
+  Alert,
 } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import 'react-native-gesture-handler';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {I18nextProvider} from 'react-i18next';
+import LoginScreen from './LoginScreen';
 import TrainerScreen from './TrainerScreen';
 import TrainerDetailScreen from './TrainerDetailScreen';
 import AttendanceScreen from './AttendanceScreen';
@@ -38,7 +40,7 @@ import StopDetailScreen from './StopDetailScreen';
 import StopFormScreen from './StopFormScreen';
 import i18n from './i18n/i18n';
 import { useTranslation } from 'react-i18next'; 
-
+import {Icon} from 'react-native-elements';
 
 // Screen components
 const HomeScreen = ({navigation}) => {
@@ -105,6 +107,7 @@ const App = () => {
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const navigation = useRef(null);
 
   useEffect(() => {
     const login = async () => {
@@ -160,7 +163,6 @@ const App = () => {
   }
 
   const toggleMenu = (shouldOpen?: boolean) => {
-    if (isAnimating) return;
 
     const toValue = shouldOpen !== undefined ? (shouldOpen ? 0 : Dimensions.get('window').width) : (isMenuOpen ? Dimensions.get('window').width : 0);
     const duration = 300;
@@ -202,16 +204,59 @@ const App = () => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('http://10.0.2.2:8000/logout', {
+        method: 'POST',
+      });
 
+      if (response.ok) {
+        // Reset menu animation
+        Animated.timing(slideAnim, {
+          toValue: Dimensions.get('window').width,
+          duration: 250,
+          useNativeDriver: true,
+        }).start();
+
+        // Reset fade animation
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: true,
+        }).start();
+
+        // Reset menu state
+        setIsMenuVisible(false);
+        
+        // Navigate to login
+        navigation.current.navigate('Login');
+      } else {
+        Alert.alert('Error', 'Logout failed');
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      Alert.alert('Error', 'An error occurred during logout');
+    }
+  };
 
   return (
 <I18nextProvider i18n={i18n}>
     <GestureHandlerRootView style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home">
-          <Stack.Screen name="Home" component={HomeScreen} 
-            options={{
+      <NavigationContainer ref={navigation}>
+        <Stack.Navigator 
+          initialRouteName="Home"
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: '#333',
+            },
+            headerTintColor: '#fff',
+          }}
+        >
+          <Stack.Screen 
+            name="Home" 
+            component={HomeScreen} 
+            options={{ 
               headerTitle: '',
               headerLeft: () => (
                 <Image
@@ -268,8 +313,9 @@ const App = () => {
                   />
                 </TouchableOpacity>
               ),
-            }}
+            }} 
           />
+          <Stack.Screen name="Login" component={LoginScreen} options={{ title: t('menu.login') }} />      
           <Stack.Screen name="Trainer" component={TrainerScreen} options={{ title: t('menu.trainer') }} />
           <Stack.Screen name="TrainerDetail" component={TrainerDetailScreen} options={{ title: t('menu.trainer') }}/>
           <Stack.Screen name="Attendance" component={AttendanceScreen} options={{ title: t('menu.attendance') }}/>
@@ -313,6 +359,51 @@ const App = () => {
               ]}>
               <View style={styles.menuContent}>
                 <Text style={styles.menuTitle}>메뉴</Text>
+                
+                <View style={styles.sideMenuItems}>
+                  <TouchableOpacity 
+                    style={styles.sideMenuItem}
+                    onPress={() => {
+                      closeMenu();
+                      navigation.current.navigate('Trainer');
+                    }}>
+                    <Text style={styles.sideMenuItemText}>트레이너</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity 
+                    style={styles.sideMenuItem}
+                    onPress={() => {
+                      closeMenu();
+                      navigation.current.navigate('Message');
+                    }}>
+                    <Text style={styles.menuItemText}>메시지</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity 
+                    style={styles.sideMenuItem}
+                    onPress={() => {
+                      closeMenu();
+                      navigation.current.navigate('Counsel');
+                    }}>
+                    <Text style={styles.menuItemText}>상담</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity 
+                    style={[styles.sideMenuItem, styles.logoutItem]}
+                    onPress={handleLogout}
+                  >
+                    <View style={styles.logoutContent}>
+                      <Icon 
+                        name="sign-out-alt" 
+                        type="font-awesome-5" 
+                        color="#fff" 
+                        size={16}
+                        style={styles.logoutIcon}
+                      />
+                      <Text style={styles.logoutText}>로그아웃</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
               </View>
             </Animated.View>
           </View>
@@ -440,18 +531,51 @@ const styles = StyleSheet.create({
     height: '100%',
   },
 
-placeholderImage: {
-  width: '100%',
-  height: '100%',
-  backgroundColor: '#ccc',
-  borderRadius: 30,
-  justifyContent: 'center',
-  alignItems: 'center',
-},
-placeholderText: {
-  fontSize: 24,
-  fontWeight: 'bold',
-},
+  placeholderImage: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#ccc',
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  placeholderText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  sideMenuItems: {
+    marginTop: 20,
+  },
+  sideMenuItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
+  },
+  sideMenuItemText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  logoutItem: {
+    marginTop: 20,
+    backgroundColor: '#ccc',
+    borderRadius: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logoutContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoutIcon: {
+    marginRight: 8,
+  },
+  logoutText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+  },
 });
 
 export default App;

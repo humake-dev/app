@@ -22,17 +22,14 @@ const CounselScreen = ({ navigation }) => {
         method: 'POST',
       });
       
+      if (response.status === 401) {
+        navigation.navigate('Login');
+        return;
+      }
+      
       if (response.ok) {
         // Refresh the messages list after successful deletion
-        fetch('http://10.0.2.2:8000/counsels')
-          .then(response => response.json())
-          .then(data => {
-            setCounsels(data.counsel_list);
-            setTotal(data.total || 0);
-          })
-          .catch(error => {
-            console.error('Error refreshing counsels:', error);
-          });
+        fetchCounsels();
       }
     } catch (error) {
       console.error('Error deleting counsel:', error);
@@ -42,6 +39,12 @@ const CounselScreen = ({ navigation }) => {
   const fetchCounsels = useCallback(async () => {
     try {
       const response = await fetch('http://10.0.2.2:8000/counsels');
+      
+      if (response.status === 401) {
+        navigation.navigate('Login');
+        return;
+      }
+
       const data = await response.json();
       setCounsels(data.counsel_list);
       setLoading(false);
@@ -50,7 +53,7 @@ const CounselScreen = ({ navigation }) => {
       console.error('Error fetching counsels:', error);
       setLoading(false);
     }
-  }, []);
+  }, [navigation]);
 
   // Initial fetch
   useEffect(() => {

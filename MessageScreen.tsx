@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -20,37 +20,43 @@ const MessageScreen = ({ navigation }) => {
         method: 'POST',
       });
       
+      if (response.status === 401) {
+        navigation.navigate('Login');
+        return;
+      }
+      
       if (response.ok) {
         // Refresh the messages list after successful deletion
-        fetch('http://10.0.2.2:8000/messages')
-          .then(response => response.json())
-          .then(data => {
-            setMessages(data.message_list);
-            setTotal(data.total || 0);
-          })
-          .catch(error => {
-            console.error('Error refreshing messages:', error);
-          });
+        fetchMessages();
       }
     } catch (error) {
       console.error('Error deleting message:', error);
     }
   };
 
+  const fetchMessages = useCallback(async () => {
+    try {
+      const response = await fetch('http://10.0.2.2:8000/messages');
+      
+      if (response.status === 401) {
+        navigation.navigate('Login');
+        return;
+      }
+
+      const data = await response.json();
+      console.log(data);
+      setMessages(data.message_list);
+      setLoading(false);
+      setTotal(data.total || 0);
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      setLoading(false);
+    }
+  }, [navigation]);
+
   useEffect(() => {
-    fetch('http://10.0.2.2:8000/messages')
-      .then(response => response.json())
-      .then(data => {
-        console.log(data);
-        setMessages(data.message_list);
-        setLoading(false);
-        setTotal(data.total || 0);
-      })
-      .catch(error => {
-        console.error('Error fetching messages:', error);
-        setLoading(false);
-      });
-  }, []);
+    fetchMessages();
+  }, [fetchMessages]);
 
   if (loading) {
     return (
