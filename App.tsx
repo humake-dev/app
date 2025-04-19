@@ -62,7 +62,7 @@ const HomeScreen = ({navigation}) => {
           onPress={() => navigation.navigate('Trainer')}>
           <Image
             source={require('./assets/photo_none.gif')}
-            style={styles.imageIcon}
+            style={[styles.imageIcon, { borderRadius: 24 }]}
           />
           <Text style={styles.imageButtonText}>{t('menu.trainer')}</Text>
         </TouchableOpacity>
