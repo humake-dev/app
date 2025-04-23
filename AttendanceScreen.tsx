@@ -24,8 +24,8 @@ const AttendanceScreen = ({ navigation }) => {
 
       // Replace with actual API calls
       // Example: await fetchAttendanceCounts(firstDayOfMonth, lastDayOfMonth)
-      setAttendanceCount(12); // Replace with actual count
-      setPtCount(5); // Replace with actual count
+      setAttendanceCount(0); // Replace with actual count
+      setPtCount(0); // Replace with actual count
     } catch (error) {
       console.error('Error fetching counts:', error);
     }
@@ -71,6 +71,30 @@ const AttendanceScreen = ({ navigation }) => {
     .catch(error => {
       console.error('Error fetching messages:', error);
     });
+
+    fetch('http://10.0.2.2:8000/reservations?month=' + selectedMonth + '&year=' + selectedYear)
+    .then(response => response.json())
+    .then(data => {
+      setPtCount(data.total);
+      
+      if(data.total > 0) {
+      // Create marked dates object for calendar
+      const markedDates = {};
+      data.reservation_list.forEach(dateStr => {
+        markedDates[dateStr.in_time.split('T')[0]]= {
+          marked: true,
+           dotColor: 'red'// Blue dot for marked dates
+        };
+      });
+      
+      // Update calendar with marked dates
+      setMarkedDates(markedDates);
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching messages:', error);
+    });
+
   }, [selectedMonth, selectedYear]);
 
   const today = new Date();
@@ -115,7 +139,7 @@ const maxDate = `${year}-${String(month).padStart(2, '0')}-${lastDayOfMonth}`;
           <Text style={styles.statsValue}>{attendanceCount}</Text>
         </View>
         <View style={styles.statsItem}>
-          <Text style={styles.statsLabel}>{selectedMonth}{t('common.month')} {t('attendance.PTcount')} <View style={styles.attendanceCircle} /></Text>
+          <Text style={styles.statsLabel}>{selectedMonth}{t('common.month')} {t('attendance.PTcount')} <View style={[styles.attendanceCircle, { backgroundColor: 'blue' }]} /></Text>
           <Text style={styles.statsValue}>{ptCount}</Text>
         </View>
       </View>

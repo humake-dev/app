@@ -41,6 +41,8 @@ import StopFormScreen from './StopFormScreen';
 import i18n from './i18n/i18n';
 import { useTranslation } from 'react-i18next'; 
 import {Icon} from 'react-native-elements';
+import DeviceBrightness from '@adrianso/react-native-device-brightness';
+
 
 // Screen components
 const HomeScreen = ({navigation}) => {
@@ -138,7 +140,63 @@ const App = () => {
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [brightness, setBrightness] = useState();
+  const [fcmToken, setFcmToken] = useState(false);
   const navigation = useRef(null);
+
+  const requestIOSPermission = async () => {
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  
+    if (enabled) {
+      fetchFcmToken(getFcmToken());
+
+      messaging().onMessage(async remoteMessage => {
+        Alert.alert(remoteMessage.notification.title, remoteMessage.notification.body);
+      });
+    }
+  }
+
+  const requestAndroidPermission = async () => {
+    const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      fetchFcmToken(getFcmToken());
+
+      messaging().onMessage(async remoteMessage => {
+        Alert.alert(remoteMessage.notification.title, remoteMessage.notification.body);
+      });
+    }
+  }
+
+  const getFcmToken = async () => {
+    const fcmFToken = await messaging().getToken();
+    setFcmToken(fcmFToken);
+    return fcmFToken;
+  };
+
+  useEffect(() => {
+    
+    if(Platform.OS==='android') {
+      requestAndroidPermission();
+    } else {
+      requestIOSPermission();
+    }
+
+  }, []);
+
+  useEffect(() => {
+    if(Platform.OS == 'ios') {
+      DeviceBrightness.getBrightnessLevel().then((luminous) =>  {
+        setBrightness(luminous);
+      });
+    } else {
+      DeviceBrightness.getSystemBrightnessLevel().then((luminous) =>  {
+        setBrightness(luminous);
+      });
+    }
+}, [brightness]);
 
   useEffect(() => {
     const login = async () => {

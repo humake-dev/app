@@ -44,7 +44,6 @@ const MessageScreen = ({ navigation }) => {
       }
 
       const data = await response.json();
-      console.log(data);
       setMessages(data.message_list);
       setLoading(false);
       setTotal(data.total || 0);
@@ -76,7 +75,7 @@ const MessageScreen = ({ navigation }) => {
 
   const renderMessageItem = ({ item }) => {
     const handlePress = () => {
-      navigation.navigate('MessageDetail', { message: item });
+      navigation.navigate('MessageDetail', { id: item.id });
     };
 
     return (

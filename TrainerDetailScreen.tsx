@@ -7,9 +7,11 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import Lightbox from 'react-native-lightbox-v2';
 
 const TrainerDetailScreen = () => {
   const { t } = useTranslation();
@@ -85,11 +87,17 @@ const TrainerDetailScreen = () => {
             <View style={styles.header}>
               <View style={styles.profileContainer}>
                 {trainer.picture && trainer.picture.picture_url ? (
-                  <Image
-                    source={{uri: `https://humake.blob.core.windows.net/humake/employee/${trainer.branch_id}/${trainer.picture.picture_url}`}}
-                    style={styles.profileImage}
-                    resizeMode="cover"
-                  />
+                  <Lightbox 
+                    activeProps={{
+                      style: styles.fullScreenImage
+                    }}
+                  >
+                    <Image
+                      source={{uri: `https://humake.blob.core.windows.net/humake/employee/${trainer.branch_id}/${trainer.picture.picture_url}`}}
+                      style={styles.profileImage}
+                      resizeMode="cover"
+                    />
+                  </Lightbox>
                 ) : (
                   <Image
                     source={require('./assets/photo_none.gif')}
@@ -196,6 +204,11 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     marginBottom: 32,
+  },
+  fullScreenImage: {
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
+    resizeMode: 'contain',
   },
 });
 

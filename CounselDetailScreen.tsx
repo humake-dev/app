@@ -81,10 +81,9 @@ const CounselDetailScreen = () => {
       <ScrollView style={styles.scrollView}>
         <View style={styles.content}>
           <View style={styles.contentContainer}>
-            <Text style={styles.title}>{counsel.title}</Text>
-            <Text style={styles.date}>
-              {t('common.sent')} {new Date(counsel.created_at).toLocaleDateString()}
-            </Text>
+              <Text style={styles.date}>
+                {new Date(counsel.created_at).toLocaleDateString()}
+              </Text>
             <Text style={styles.contentText}>{counsel.content}</Text>
           </View>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
@@ -109,15 +108,10 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
   date: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#666',
-    marginBottom: 20,
+    alignSelf: 'flex-end',
   },
   contentContainer: {
     backgroundColor: '#f8f9fa',
@@ -174,7 +168,7 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     marginBottom: 32,
-  },
+  }
 });
 
 export default CounselDetailScreen;

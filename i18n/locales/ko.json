@@ -16,7 +16,8 @@
       "message": "메시지",
       "counsel": "상담",
       "stop": "휴회",
-      "pt": "PT"
+      "pt": "PT",
+      "login" : "로그인"
     },
     "counsel": {
       "form": "상담 내용을 작성해주세요",
@@ -40,7 +41,7 @@
       "no_items": "휴회가 없습니다"
     },
     "attendance": {
-      "PTcount": "PT출석",
+      "PTcount": "PT횟수",
       "count": "출석"
     },
     "message" : {
