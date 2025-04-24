@@ -10,10 +10,9 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
-const CounselDetailScreen = () => {
+const CounselDetailScreen = ({ navigation }) => {
   const { t } = useTranslation();
   const route = useRoute();
-  const navigation = useNavigation();
   const [counsel, setCounsel] = useState(null);
   const [loading, setLoading] = useState(true);
 

@@ -20,6 +20,17 @@ const PtScreen = ({ navigation }) => {
   const today = new Date();
   const formatDate = (d) => d.toISOString().split('T')[0];
 
+  const convertTime = (dateStr) => {
+    const date = new Date(dateStr);
+
+    const hourStr = date.toLocaleTimeString('ko-KR', {
+      hour: 'numeric',
+      hour12: false  // 24시간제, 원하면 true로 바꿔도 됨
+    });
+
+    return hourStr;
+  }
+
   const fetchReservations = async (date) => {
     try {
       console.log('Fetching reservations for date:', date);
@@ -35,7 +46,7 @@ const PtScreen = ({ navigation }) => {
       if (data.reservation_list) {
         const formattedSchedules = data.reservation_list.map((item, index) => ({
           id: item.id.toString(),
-          start_time: item.start_time,
+          start_time: convertTime(item.start_time),
           trainer_name: item.trainer_name,
           complete: item.complete
         }));

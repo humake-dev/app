@@ -9,11 +9,11 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const MessageDetailScreen = () => {
+const MessageDetailScreen = ({ navigation }) => {
   const { t } = useTranslation();
   const route = useRoute();
-  const navigation = useNavigation();
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -30,6 +30,26 @@ const MessageDetailScreen = () => {
     );
   }
 
+  const fetchMessageRead = async () => {
+    try {
+      const response = await fetch(`http://10.0.2.2:8000/messages/read/${route.params.id}`, {
+        method: 'POST',
+      });
+
+      if (response.status === 401) {
+        navigation.navigate('Login');
+        return;
+      }
+
+      if (response.ok) {
+      } else {
+        throw new Error('Failed to fetch message data');
+      }
+    } catch (error) {
+      console.error('Error fetching message:', error);
+    }
+  };
+
   const fetchMessage = async () => {
     try {
       const response = await fetch(`http://10.0.2.2:8000/messages/${route.params.id}`);
@@ -41,6 +61,11 @@ const MessageDetailScreen = () => {
 
       if (response.ok) {
         const data = await response.json();
+
+        if(data.readtime !== null) {
+          fetchMessageRead();
+        }
+
         setMessage(data);
       } else {
         throw new Error('Failed to fetch counsel data');
@@ -52,8 +77,32 @@ const MessageDetailScreen = () => {
     }
   };
 
+  const hideMessage = async () => {
+    try {
+      const response = await fetch(`http://10.0.2.2:8000/messages/hide/${route.params.id}`, {
+        method: 'POST',
+      });
+
+      if (response.status === 401) {
+        navigation.navigate('Login');
+        return;
+      }
+
+      if (response.ok) {
+        // Refresh the previous screen before going back
+        navigation.setParams({ refresh: true });
+        navigation.goBack();
+      } else {
+        throw new Error('Failed to hide message');
+      }
+    } catch (error) {
+      console.error('Error hiding message:', error);
+    }
+  };
+
   useEffect(() => {
     fetchMessage();
+    fetchMessageRead();
   }, [navigation, route.params.id]);
 
   if (loading) {
@@ -78,6 +127,15 @@ const MessageDetailScreen = () => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <Ionicons 
+          name="close-circle" 
+          size={24} 
+          color="#666"
+          style={styles.closeButton}
+          onPress={hideMessage}
+        />
+      </View>
       <ScrollView style={styles.scrollView}>
         <View style={styles.content}>
           <View style={styles.contentContainer}>
@@ -102,6 +160,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  header: {
+    height: 50,
+    justifyContent: 'flex-end',
+    paddingRight: 16,
+  },
+  closeButton: {
+    position: 'absolute',
+    right: 16,
+    top: 55,
+    zIndex: 99,
   },
   scrollView: {
     flex: 1,
