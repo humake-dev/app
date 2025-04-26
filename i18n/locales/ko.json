@@ -7,7 +7,8 @@
       "submit": "제출",
       "ok": "확인",
       "backToList" : "목록으로",
-      "month" : "월"
+      "month" : "월",
+      "download_barcode" : "바코드다운로드"
     },
     "menu": {
       "trainer": "트레이너",

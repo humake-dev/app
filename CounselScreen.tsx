@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from '@react-navigation/native';
+import { BASE_URL } from './Config';
 
 const CounselScreen = ({ navigation }) => {
   const { t } = useTranslation();

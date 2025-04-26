@@ -12,6 +12,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import Lightbox from 'react-native-lightbox-v2';
+import { BASE_URL } from './Config';
 
 const TrainerDetailScreen = () => {
   const { t } = useTranslation();

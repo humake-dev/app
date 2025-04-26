@@ -8,12 +8,14 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRoute } from '@react-navigation/native';
+import { BASE_URL } from './Config';
 
 const MessageScreen = ({ navigation }) => {
   const { t } = useTranslation();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
+
 
   // Handle refresh parameter from navigation
   const route = useRoute();

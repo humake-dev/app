@@ -9,6 +9,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { BASE_URL } from './Config';
 
 const TrainerScreen = ({navigation}) => {
     const { t } = useTranslation();

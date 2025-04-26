@@ -16,13 +16,15 @@ import {
   Dimensions,
   StatusBar,
   Text,
+  ScrollView,
   TouchableWithoutFeedback,
-  Alert,
+  Alert
 } from 'react-native';
+
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import 'react-native-gesture-handler';
-import {GestureHandlerRootView, ScrollView} from 'react-native-gesture-handler';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {I18nextProvider} from 'react-i18next';
 import LoginScreen from './LoginScreen';
 import TrainerScreen from './TrainerScreen';
@@ -42,24 +44,22 @@ import i18n from './i18n/i18n';
 import { useTranslation } from 'react-i18next'; 
 import {Icon} from 'react-native-elements';
 import DeviceBrightness from '@adrianso/react-native-device-brightness';
+import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import Barcode from '@kichiyaki/react-native-barcode-generator';
+import ViewShot from 'react-native-view-shot';
+import CameraRoll from '@react-native-camera-roll/camera-roll'; // 사진 저장용
+import { BASE_URL } from './Config';
 
 
-// Screen components
-const HomeScreen = ({navigation}) => {
-  const { t } = useTranslation();
-  const windowWidth = Dimensions.get('window').width;
-
-  return (
-    <View style={styles.screenContainer}>
-      <View style={styles.imageContainer}>
-        <Image
-          source={require('./assets/main.jpg')}
-          style={[styles.mainImage, { width: windowWidth }]}
-          resizeMode="cover"
-        />
-      </View>
+// Tab screens
+const FirstRoute = ({navigation, t}) => (
+  <View style={styles.tabContent}>
+    <ScrollView 
+      contentContainerStyle={styles.menuScrollContainer}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.menuContainer}>
-      <TouchableOpacity
+        <TouchableOpacity
           style={styles.imageButton}
           onPress={() => navigation.navigate('Trainer')}>
           <Image
@@ -81,16 +81,6 @@ const HomeScreen = ({navigation}) => {
 
         <TouchableOpacity
           style={styles.imageButton}
-          onPress={() => navigation.navigate('Exercise')}>
-          <Image
-            source={require('./assets/exercise.png')}
-            style={styles.imageIcon}
-          />
-          <Text style={styles.imageButtonText}>{t('menu.exercise')}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.imageButton}
           onPress={() => navigation.navigate('Pt')}>
           <Image
             source={require('./assets/pt.png')}
@@ -98,6 +88,7 @@ const HomeScreen = ({navigation}) => {
           />
           <Text style={styles.imageButtonText}>{t('menu.pt')}</Text>
         </TouchableOpacity>
+        
         <TouchableOpacity
           style={styles.imageButton}
           onPress={() => navigation.navigate('Message')}>
@@ -107,6 +98,7 @@ const HomeScreen = ({navigation}) => {
           />
           <Text style={styles.imageButtonText}>{t('menu.message')}</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.imageButton}
           onPress={() => navigation.navigate('Stop')}>
@@ -116,6 +108,7 @@ const HomeScreen = ({navigation}) => {
           />
           <Text style={styles.imageButtonText}>{t('menu.stop')}</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.imageButton}
           onPress={() => navigation.navigate('Counsel')}>
@@ -126,9 +119,161 @@ const HomeScreen = ({navigation}) => {
           <Text style={styles.imageButtonText}>{t('menu.counsel')}</Text>
         </TouchableOpacity>
       </View>
+    </ScrollView>
+  </View>
+);
+
+const SecondRoute = ({user, t}) => {
+  const viewShotRef = useRef();
+
+  const downloadBarcode = async () => {
+    try {
+      const uri = await viewShotRef.current.capture();
+      console.log('Captured barcode URI:', uri);
+
+      console.log(CameraRoll);
+
+      // 사진첩에 저장
+      await CameraRoll.save(uri, { type: 'photo' });
+      Alert.alert('Success', 'Barcode saved to Photos!');
+    } catch (error) {
+      console.error('Error saving barcode:', error);
+      Alert.alert('Error', 'Failed to save barcode');
+    }
+  };
+
+  return (
+    <View style={styles.tabContent}>
+      <View style={{ 
+        alignItems: 'center', 
+        marginTop: 30, 
+        flex: 1,
+        justifyContent: 'flex-start'
+      }}>
+        {user && user.access_card && user.access_card.card_no ? (
+          <View style={{ 
+            alignItems: 'center', 
+            padding: 30,
+            backgroundColor: '#fff',
+            borderRadius: 10,
+            elevation: 5,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+            width: '90%', 
+            maxWidth: 400
+          }}>
+            <ViewShot ref={viewShotRef}>
+            <Barcode 
+              value={user.access_card.card_no} 
+              format="CODE128" 
+              options={{
+                width: 3, 
+                height: 150, 
+                margin: 20,
+                displayValue: true,
+                fontSize: 24, 
+                fontOptions: "bold",
+                font: "Arial",
+                textMargin: 10,
+                textColor: '#000'
+              }}
+            />
+            </ViewShot>
+            <Text style={{ 
+              marginTop: 15, 
+              fontSize: 20, 
+              color: '#333',
+              fontWeight: 'bold'
+            }}>
+              {user.access_card.card_no}
+            </Text>
+            <TouchableOpacity 
+              style={{
+                marginTop: 20,
+                padding: 10,
+                backgroundColor: '#007AFF',
+                borderRadius: 5,
+                paddingHorizontal: 20
+              }}
+              onPress={downloadBarcode}
+            >
+              <Text style={{
+                color: '#fff',
+                fontSize: 16,
+                fontWeight: 'bold'
+              }}>
+                {t('common.download_barcode')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <Text style={{ 
+            color: '#666',
+            fontSize: 18,
+            marginTop: 20
+          }}>Loading...</Text>
+        )}
+      </View>
     </View>
   );
 };
+
+// Screen components
+const HomeScreen = ({navigation, route}) => {
+  const { t } = useTranslation();
+  const windowWidth = Dimensions.get('window').width;
+  const [index, setIndex] = useState(0);
+  const [routes] = useState([
+    { key: 'first', title: '메뉴' },
+    { key: 'second', title: '입장바코드' },
+  ]);
+
+  const renderScene = SceneMap({
+    first: () => <FirstRoute navigation={navigation} t={t} />,
+    second: () => <SecondRoute user={route.params?.user} t={t} />,
+  });
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.imageContainer}>
+        <Image
+          source={require('./assets/main.jpg')}
+          style={[styles.mainImage, { width: windowWidth }]}
+          resizeMode="cover"
+        />
+      </View>
+
+      {/* Tab View */}
+      <View style={styles.tabContainer}>
+        <TabView
+          navigationState={{ index, routes }}
+          renderScene={renderScene}
+          onIndexChange={setIndex}
+          initialLayout={{ width: windowWidth }}
+          style={styles.tabView}
+          renderTabBar={props => (
+            <TabBar
+              {...props}
+              indicatorStyle={styles.tabIndicator}
+              style={styles.tabBar}
+              tabStyle={styles.tab}
+              labelStyle={styles.tabLabel}
+              renderLabel={({ route, focused }) => (
+                <Text style={[styles.tabLabel, { opacity: focused ? 1 : 0.7 }]}>
+                  {route.title}
+                </Text>
+              )}
+            />
+          )}
+        />
+      </View>
+    </View>
+  );
+};
+
+
 
 const Stack = createStackNavigator();
 
@@ -143,6 +288,41 @@ const App = () => {
   const [brightness, setBrightness] = useState();
   const [fcmToken, setFcmToken] = useState(false);
   const navigation = useRef(null);
+  const messaging = useRef(null);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    if (user) {
+      console.log('User data received:', user);
+    }
+  }, [user]);
+
+  const fetchUser = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/user`);
+
+      if (response.status === 401) {
+        navigation.current?.navigate('Login');
+        return;
+      }
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('User data fetched:', data);
+        setUser(data);
+        // Pass user data to HomeScreen
+        navigation.current?.navigate('Home', { user: data });
+      } else {
+        throw new Error('Failed to fetch user data');
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   const requestIOSPermission = async () => {
     const authStatus = await messaging().requestPermission();
@@ -201,7 +381,7 @@ const App = () => {
   useEffect(() => {
     const login = async () => {
       try {
-        const response = await fetch('http://10.0.2.2:8000/login?user_id=11632', {
+        const response = await fetch(`${BASE_URL}/login?user_id=11632`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -295,7 +475,7 @@ const App = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('http://10.0.2.2:8000/logout', {
+      const response = await fetch(`${BASE_URL}0/logout`, {
         method: 'POST',
       });
 
@@ -341,6 +521,7 @@ const App = () => {
             },
             headerTintColor: '#fff',
           }}
+          screenProps={{ navigation, user }}
         >
           <Stack.Screen 
             name="Home" 
@@ -609,7 +790,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   mainImage: {
-    height: '100%',
+    height: 200,
   },
 
   placeholderImage: {
@@ -678,6 +859,54 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     backgroundColor: 'transparent',
+  },
+  tabContainer: {
+    flex: 1,
+    height: '100%',
+    backgroundColor: '#fff',
+  },
+  tabView: {
+    flex: 1,
+    height: '100%',
+  },
+  tabBar: {
+    backgroundColor: '#333',
+    elevation: 0,
+    shadowOpacity: 0,
+    borderBottomWidth: 0,
+    height: 50,
+    width: '100%',
+  },
+  tabIndicator: {
+    backgroundColor: '#007AFF',
+    height: 3,
+  },
+  tab: {
+    flex: 1,
+    minWidth: 0,
+    paddingHorizontal: 16,
+  },
+  tabLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#000'
+  },
+  tabContent: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#f3f3f3',
+  },
+  menuScrollContainer: {
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+  },
+  tabText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
 });
 

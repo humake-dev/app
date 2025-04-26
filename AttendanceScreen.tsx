@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
+import { BASE_URL } from './Config';
 
 const AttendanceScreen = ({ navigation }) => {
   const now = new Date();
@@ -49,7 +50,7 @@ const AttendanceScreen = ({ navigation }) => {
   }, []);
 
   useEffect(() => {
-    fetch('http://10.0.2.2:8000/entrances?month=' + selectedMonth + '&year=' + selectedYear)
+    fetch(`${BASE_URL}/entrances?month=${selectedMonth}&year=${selectedYear}`)
     .then(response => response.json())
     .then(data => {
       setAttendanceCount(data.total);
@@ -58,10 +59,12 @@ const AttendanceScreen = ({ navigation }) => {
       // Create marked dates object for calendar
       const markedDates = {};
       data.entrance_list.forEach(dateStr => {
-        markedDates[dateStr.in_time.split('T')[0]]= {
-          marked: true,
-           dotColor: '#FF69B4'// Blue dot for marked dates
-        };
+        if(dateStr.in_time) {
+          markedDates[dateStr.in_time.split('T')[0]]= {
+            marked: true,
+             dotColor: '#FF69B4'// Blue dot for marked dates
+          };
+        }
       });
       
       // Update calendar with marked dates
@@ -72,7 +75,7 @@ const AttendanceScreen = ({ navigation }) => {
       console.error('Error fetching messages:', error);
     });
 
-    fetch('http://10.0.2.2:8000/reservations?month=' + selectedMonth + '&year=' + selectedYear)
+    fetch(`${BASE_URL}/reservations?month=${selectedMonth}&year=${selectedYear}`)
     .then(response => response.json())
     .then(data => {
       setPtCount(data.total);
@@ -81,10 +84,12 @@ const AttendanceScreen = ({ navigation }) => {
       // Create marked dates object for calendar
       const markedDates = {};
       data.reservation_list.forEach(dateStr => {
+        if(dateStr.in_time) {
         markedDates[dateStr.in_time.split('T')[0]]= {
           marked: true,
            dotColor: 'red'// Blue dot for marked dates
         };
+        }
       });
       
       // Update calendar with marked dates

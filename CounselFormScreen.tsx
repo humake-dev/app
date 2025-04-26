@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Picker } from '@react-native-picker/picker';
+import { BASE_URL } from './Config';
 
 const CounselFormScreen = ({ navigation }) => {
   const { t } = useTranslation();

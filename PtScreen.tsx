@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
+import { BASE_URL } from './Config';
 
 const PtScreen = ({ navigation }) => {
   const { t } = useTranslation();

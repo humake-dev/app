@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import { BASE_URL } from './Config';
 
 const CounselDetailScreen = ({ navigation }) => {
   const { t } = useTranslation();

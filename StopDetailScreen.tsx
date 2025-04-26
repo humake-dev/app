@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRoute } from '@react-navigation/native';
+import { BASE_URL } from './Config';
 
 const StopDetailScreen = () => {
   const { t } = useTranslation();
