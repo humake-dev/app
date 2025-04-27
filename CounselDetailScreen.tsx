@@ -32,7 +32,7 @@ const CounselDetailScreen = ({ navigation }) => {
 
   const fetchCounsel = async () => {
     try {
-      const response = await fetch(`http://10.0.2.2:8000/counsels/${route.params.id}`);
+      const response = await fetch(`${BASE_URL}/counsels/${route.params.id}`);
       
       if (response.status === 401) {
         navigation.navigate('Login');

@@ -11,7 +11,7 @@ const LoginScreen = () => {
 
   const handleLogin = async () => {
           /*try {
-        const response = await fetch('http://10.0.2.2:8000/login', {
+        const response = await fetch(`${BASE_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -22,7 +22,7 @@ const LoginScreen = () => {
         }),
       }); */
       try {
-        const response = await fetch('http://10.0.2.2:8000/login?user_id=11632', {
+        const response = await fetch(`${BASE_URL}/login?user_id=11632`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',

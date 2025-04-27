@@ -19,7 +19,7 @@ const CounselScreen = ({ navigation }) => {
 
   const handleDeleteCounsel = async (counselId) => {
     try {
-      const response = await fetch(`http://10.0.2.2:8000/counsels/hide/${counselId}`, {
+      const response = await fetch(`${BASE_URL}/counsels/hide/${counselId}`, {
         method: 'POST',
       });
       
@@ -39,7 +39,7 @@ const CounselScreen = ({ navigation }) => {
 
   const fetchCounsels = useCallback(async () => {
     try {
-      const response = await fetch('http://10.0.2.2:8000/counsels');
+      const response = await fetch(`${BASE_URL}/counsels`);
       
       if (response.status === 401) {
         navigation.navigate('Login');

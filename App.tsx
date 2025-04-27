@@ -45,7 +45,7 @@ import i18n from './i18n/i18n';
 import { useTranslation } from 'react-i18next'; 
 import {Icon} from 'react-native-elements';
 import { BASE_URL } from './Config';
-import { UserProvider } from './UserContext';
+import UserContext, { UserProvider } from './UserContext';
 
 
 const Stack = createStackNavigator();
@@ -58,35 +58,36 @@ const App = () => {
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [isMenuVisible, setIsMenuVisible] = useState(false);
-  const [brightness, setBrightness] = useState();
   const [fcmToken, setFcmToken] = useState(false);
   const navigation = useRef(null);
   const messaging = useRef(null);
+  const [user, setUser] = useState(null);
 
-const fetchUser = async () => {
-  try {
-    const response = await fetch(`${BASE_URL}/user`);
-
-    if (response.status === 401) {
-      return;
+  const fetchUser = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/user`);
+  
+      if (response.status === 401) {
+        return;
+      }
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('User data fetched:', data);
+        setUser(data);
+        // 데이터가 잘 저장되었는지 확인
+        console.log('User data after set:', user);
+      } else {
+        throw new Error('Failed to fetch user data');
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
     }
+  };
 
-    if (response.ok) {
-      const data = await response.json();
-      console.log('User data fetched:', data);
-      const { setUser } = useUser();
-      setUser(data);
-    } else {
-      throw new Error('Failed to fetch user data');
-    }
-  } catch (error) {
-    console.error('Error fetching user:', error);
-  }
-};
-
-useEffect(() => {
-  fetchUser();
-}, []);
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   const requestIOSPermission = async () => {
     const authStatus = await messaging().requestPermission();
@@ -130,17 +131,6 @@ useEffect(() => {
 
   }, []);
 
-  useEffect(() => {
-    if(Platform.OS == 'ios') {
-      DeviceBrightness.getBrightnessLevel().then((luminous) =>  {
-        setBrightness(luminous);
-      });
-    } else {
-      DeviceBrightness.getSystemBrightnessLevel().then((luminous) =>  {
-        setBrightness(luminous);
-      });
-    }
-}, [brightness]);
 
   useEffect(() => {
     const login = async () => {
@@ -274,7 +264,7 @@ useEffect(() => {
 
   return (
 <I18nextProvider i18n={i18n}>
-<UserProvider>
+<UserProvider value={{ user, setUser }}>
     <GestureHandlerRootView style={styles.container}>
       <StatusBar barStyle="dark-content" />
       <NavigationContainer ref={navigation}>
@@ -450,10 +440,7 @@ useEffect(() => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
+
   header: {
     backgroundColor: '#333',
     paddingVertical: 15,

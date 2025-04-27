@@ -37,7 +37,7 @@ const PtScreen = ({ navigation }) => {
       console.log('Fetching reservations for date:', date);
       setLoading(true);
 
-      const response = await fetch('http://10.0.2.2:8000/reservations?day=' + date);
+      const response = await fetch(`${BASE_URL}/reservations?day=${date}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

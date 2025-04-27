@@ -47,7 +47,7 @@ const StopFormScreen = ({ navigation }) => {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch('http://10.0.2.2:8000/stops', {
+      const response = await fetch(`${BASE_URL}/stops`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

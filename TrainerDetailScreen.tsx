@@ -36,7 +36,7 @@ const TrainerDetailScreen = () => {
 
   const fetchTrainer = async () => {
     try {
-      const response = await fetch(`http://10.0.2.2:8000/trainers/${route.params.id}`);
+      const response = await fetch(`${BASE_URL}/trainers/${route.params.id}`);
       
       if (response.status === 401) {
         navigation.navigate('Login');

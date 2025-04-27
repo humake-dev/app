@@ -10,6 +10,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { BASE_URL } from './Config';
 
 const MessageDetailScreen = ({ navigation }) => {
   const { t } = useTranslation();
@@ -32,7 +33,7 @@ const MessageDetailScreen = ({ navigation }) => {
 
   const fetchMessageRead = async () => {
     try {
-      const response = await fetch(`http://10.0.2.2:8000/messages/read/${route.params.id}`, {
+      const response = await fetch(`${BASE_URL}/messages/read/${route.params.id}`, {
         method: 'POST',
       });
 
@@ -52,7 +53,7 @@ const MessageDetailScreen = ({ navigation }) => {
 
   const fetchMessage = async () => {
     try {
-      const response = await fetch(`http://10.0.2.2:8000/messages/${route.params.id}`);
+      const response = await fetch(`${BASE_URL}/messages/${route.params.id}`);
       
       if (response.status === 401) {
         navigation.navigate('Login');
@@ -79,7 +80,7 @@ const MessageDetailScreen = ({ navigation }) => {
 
   const hideMessage = async () => {
     try {
-      const response = await fetch(`http://10.0.2.2:8000/messages/hide/${route.params.id}`, {
+      const response = await fetch(`${BASE_URL}/messages/hide/${route.params.id}`, {
         method: 'POST',
       });
 

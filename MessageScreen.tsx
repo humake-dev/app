@@ -27,7 +27,7 @@ const MessageScreen = ({ navigation }) => {
 
   const handleDeleteMessage = async (messageId) => {
     try {
-      const response = await fetch(`http://10.0.2.2:8000/messages/hide/${messageId}`, {
+      const response = await fetch(`${BASE_URL}/messages/hide/${messageId}`, {
         method: 'POST',
       });
       
@@ -47,7 +47,7 @@ const MessageScreen = ({ navigation }) => {
 
   const fetchMessages = useCallback(async () => {
     try {
-      const response = await fetch('http://10.0.2.2:8000/messages');
+      const response = await fetch(`${BASE_URL}/messages`);
       
       if (response.status === 401) {
         navigation.navigate('Login');

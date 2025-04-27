@@ -22,7 +22,7 @@ const TrainerScreen = ({navigation}) => {
 
     const fetchTrainers = useCallback(async () => {
       try {
-        const response = await fetch('http://10.0.2.2:8000/trainers');
+        const response = await fetch(`${BASE_URL}/trainers`);
         
         if (response.status === 401) {
           navigation.navigate('Login');

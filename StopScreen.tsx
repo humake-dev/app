@@ -16,7 +16,7 @@ const StopScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://10.0.2.2:8000/stops')
+    fetch(`${BASE_URL}/stops`)
       .then(response => response.json())
       .then(data => {
         setStops(data.counsel_list);
