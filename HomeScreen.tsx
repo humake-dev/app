@@ -32,6 +32,9 @@ const HomeScreen = ({navigation, route}) => {
     const [changeBrightness, setChangeBrightness] = useState(false);
     const windowWidth = Dimensions.get('window').width;
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const userContext = useUser();
+    const user = userContext?.user;
     
     useEffect(() => {
         if (index === 0) {
@@ -55,8 +58,8 @@ const HomeScreen = ({navigation, route}) => {
       }, [index]);
 
     const renderScene = SceneMap({
-        first: () => <FirstRoute navigation={navigation} t={t} />,
-        second: () => <SecondRoute t={t} />,
+        first: () => <FirstRoute navigation={navigation} t={t} user={user} />,
+        second: () => <SecondRoute t={t} user={user} />,
       });
 
       useEffect(() => {
@@ -129,12 +132,34 @@ const HomeScreen = ({navigation, route}) => {
 
 
 // Tab screens
-const FirstRoute = ({navigation, t}) => (
+const FirstRoute = ({navigation, t, user}) => {
+  console.log(`https://humake.blob.core.windows.net/humake/user/${user.branch_id}/${user.picture.picture_url}`);
+  return (
     <View style={styles.tabContent}>
       <ScrollView 
         contentContainerStyle={styles.menuScrollContainer}
         showsVerticalScrollIndicator={false}
       >
+        <View style={styles.memberCard}>
+          <View style={styles.memberImageContainer}>
+        {user.picture && user.picture.picture_url ? (
+              <Image
+                source={{uri: `https://humake.blob.core.windows.net/humake/user/${user.branch_id}/${user.picture.picture_url}`}}
+                style={styles.memberImage}
+                resizeMode="cover"
+              />
+            ) : (
+              <Image
+                source={require('./assets/photo_none.gif')}
+                style={styles.memberImage}
+                resizeMode="cover"
+              />
+            )}
+            </View>
+            <View style={styles.memberInfoContainer}>
+          <Text style={styles.memberText}>{user.name}</Text>
+          </View>
+        </View>
         <View style={styles.menuContainer}>
           <TouchableOpacity
             style={styles.imageButton}
@@ -199,11 +224,10 @@ const FirstRoute = ({navigation, t}) => (
       </ScrollView>
     </View>
   );
+};
   
   // SecondRoute.tsx
-  const SecondRoute = ({t}) => {
-    const userContext = useUser();
-    const user = userContext?.user;
+  const SecondRoute = ({t, user}) => {
   
     useEffect(() => {
       console.log('SecondRoute user:', user);
@@ -311,29 +335,7 @@ const FirstRoute = ({navigation, t}) => (
         flex: 1,
         backgroundColor: '#fff',
       },
-    menuButton: {
-        padding: 15,
-        marginRight: 5,
-      },
-      hamburgerLine: {
-        width: 25,
-        height: 3,
-        backgroundColor: '#fff',
-        marginVertical: 3,
-        borderRadius: 1,
-      },
-      slideMenu: {
-        position: 'absolute',
-        top: 0,
-        right: 0,
-        width: '70%',
-        height: '100%',
-        backgroundColor: '#808080',
-        zIndex: 2,
-      },
-      menuContent: {
-        padding: 20,
-      },
+
     
       menuContainer: {
         flex: 1,
@@ -365,26 +367,6 @@ const FirstRoute = ({navigation, t}) => (
         fontWeight: 'bold',
         marginBottom: 20,
       },
-      navButton: {
-        backgroundColor: '#333',
-        padding: 15,
-        borderRadius: 8,
-        justifyContent: 'center',
-        alignItems: 'center',
-      },
-      navButtonText: {
-        color: '#000',
-        fontSize: 16,
-        fontWeight: 'bold',
-        textAlign: 'center'
-      },
-      subMenuHeader: {
-        height: 60,
-        backgroundColor: '#333',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 15,
-      },
       imageContainer: {
         width: '100%',
         height: 200,
@@ -406,39 +388,6 @@ const FirstRoute = ({navigation, t}) => (
       placeholderText: {
         fontSize: 24,
         fontWeight: 'bold',
-      },
-      sideMenuItems: {
-        marginTop: 20,
-      },
-      sideMenuItem: {
-        padding: 15,
-        borderBottomWidth: 1,
-        borderBottomColor: '#444',
-      },
-      sideMenuItemText: {
-        color: '#fff',
-        fontSize: 16,
-      },
-      logoutItem: {
-        marginTop: 20,
-        backgroundColor: '#ccc',
-        borderRadius: 5,
-        flexDirection: 'row',
-        alignItems: 'center',
-      },
-      logoutContent: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-      },
-      logoutIcon: {
-        marginRight: 8,
-      },
-      logoutText: {
-        color: '#fff',
-        fontSize: 16,
-        textAlign: 'center',
       },
       imageButton: {
         width: '30%',
@@ -510,7 +459,32 @@ const FirstRoute = ({navigation, t}) => (
         fontWeight: 'bold',
         marginBottom: 20,
       },
-
+      memberCard: {
+        display: 'flex',
+        flexDirection: 'row',
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        elevation:2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        width: '90%',
+        padding: 15,
+        alignItems: 'flex-start',
+        justifyContent: 'flex-start',
+      },
+      memberImageContainer: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        marginRight: 12,
+        overflow: 'hidden',
+      },
+      memberImage: {
+        width: '100%',
+        height: '100%',
+      },
   });
 
 

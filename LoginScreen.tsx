@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import { BASE_URL } from './Config';
+import UserContext, { UserProvider } from './UserContext';
 
 const LoginScreen = () => {
   const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigation = useNavigation();
+  const [user, setUser] = useState(null);
+
 
   const handleLogin = async () => {
           /*try {
@@ -32,8 +36,8 @@ const LoginScreen = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Handle successful login
         navigation.navigate('Home');
+        setUser(data);
       } else {
         Alert.alert('Error', data.message || 'Login failed');
       }

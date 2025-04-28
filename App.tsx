@@ -16,7 +16,8 @@ import {
   Dimensions,
   StatusBar,
   Text,
-  ScrollView,
+  Platform,
+  PermissionsAndroid,
   TouchableWithoutFeedback,
   Alert
 } from 'react-native';
@@ -62,6 +63,35 @@ const App = () => {
   const navigation = useRef(null);
   const messaging = useRef(null);
   const [user, setUser] = useState(null);
+
+  const fetchFcmToken = async () => {
+    if(!fcmToken) {
+      return false;
+    }
+
+    if(!isLoggedIn) {
+      return false;
+    }
+
+    const formData = new FormData();
+    formData.append('token', Buffer.from(fcmToken).toString('base64'));
+    formData.append('os',Platform.OS);
+    formData.append('format','json');
+
+    return fetch(`${BASE_URL}/user-devices/add`,{
+      method : 'POST',
+      body : formData
+    }).then((response) => response.json())
+    .then((responseJson) => {
+      console.log('fetcFcmTokenComplete');
+      console.log(JSON.stringify(responseJson));
+    })
+    .catch((error) => {
+      console.log(JSON.stringify(error));
+      //console.error(error);
+    });
+  }  
+
 
   const fetchUser = async () => {
     try {
@@ -133,7 +163,7 @@ const App = () => {
 
 
   useEffect(() => {
-    const login = async () => {
+    const loginCheck = async () => {
       try {
         const response = await fetch(`${BASE_URL}/login?user_id=11632`, {
           method: 'POST',
@@ -142,8 +172,11 @@ const App = () => {
           }
         });
 
+        const data = await response.json();
+
         if (response.ok) {
           setIsLoggedIn(true);
+         // setUser(data);
         } else {
           console.error('Login failed');
         }
@@ -152,7 +185,7 @@ const App = () => {
       }
     };
 
-    login();
+    loginCheck();
   }, []);
 
   useEffect(() => {
@@ -222,14 +255,12 @@ const App = () => {
   };
 
   const closeMenu = () => {
-    if (!isAnimating) {
       toggleMenu(false);
-    }
   };
 
   const handleLogout = async () => {
     try {
-      const response = await fetch(`${BASE_URL}0/logout`, {
+      const response = await fetch(`${BASE_URL}/logout`, {
         method: 'POST',
       });
 
@@ -291,7 +322,7 @@ const App = () => {
               ),
               headerRight: () => (
                 <TouchableOpacity 
-                  onPress={() => !isAnimating && toggleMenu()} 
+                  onPress={() => toggleMenu()} 
                   style={styles.menuButton}
                   activeOpacity={0.7}>
                   <Animated.View 
@@ -460,7 +491,83 @@ const styles = StyleSheet.create({
     height: 28,
     width: 230,
     marginLeft: 15,
-  }
+  },
+  menuButton: {
+    padding: 15,
+    marginRight: 5,
+  },
+  hamburgerLine: {
+    width: 25,
+    height: 3,
+    backgroundColor: '#fff',
+    marginVertical: 3,
+    borderRadius: 1,
+  },
+  slideMenu: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: '70%',
+    height: '100%',
+    backgroundColor: '#808080',
+    zIndex: 2,
+  },
+  menuContent: {
+    padding: 20,
+  },
+  navButton: {
+    backgroundColor: '#333',
+    padding: 15,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  navButtonText: {
+    color: '#000',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center'
+  },
+  subMenuHeader: {
+    height: 60,
+    backgroundColor: '#333',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+  },
+  sideMenuItems: {
+    marginTop: 20,
+  },
+  sideMenuItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
+  },
+  sideMenuItemText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  logoutItem: {
+    marginTop: 20,
+    backgroundColor: '#ccc',
+    borderRadius: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logoutContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoutIcon: {
+    marginRight: 8,
+  },
+  logoutText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+  },
 });
 
 export default App;

@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { BASE_URL } from './Config';
 
 const CounselDetailScreen = ({ navigation }) => {
@@ -52,6 +53,29 @@ const CounselDetailScreen = ({ navigation }) => {
     }
   };
 
+  const hideCounsel = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/counsels/hide/${route.params.id}`, {
+        method: 'POST',
+      });
+
+      if (response.status === 401) {
+        navigation.navigate('Login');
+        return;
+      }
+
+      if (response.ok) {
+        // Refresh the previous screen before going back
+        navigation.setParams({ refresh: true });
+        navigation.goBack();
+      } else {
+        throw new Error('Failed to hide message');
+      }
+    } catch (error) {
+      console.error('Error hiding message:', error);
+    }
+  };
+
   useEffect(() => {
     fetchCounsel();
   }, [navigation, route.params.id]);
@@ -78,6 +102,15 @@ const CounselDetailScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <Ionicons 
+          name="close-circle" 
+          size={24} 
+          color="#666"
+          style={styles.closeButton}
+          onPress={hideCounsel}
+        />
+      </View>
       <ScrollView style={styles.scrollView}>
         <View style={styles.content}>
           <View style={styles.contentContainer}>
@@ -101,6 +134,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  header: {
+    height: 50,
+    justifyContent: 'flex-end',
+    paddingRight: 16,
+  },
+  closeButton: {
+    position: 'absolute',
+    right: 8,
+    top: 55,
+    zIndex: 99,
   },
   scrollView: {
     flex: 1,

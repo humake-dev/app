@@ -66,7 +66,7 @@ const StopScreen = ({ navigation }) => {
         style={styles.addButton}
         onPress={() => navigation.navigate('StopForm')}
       >
-        <Text style={styles.addButtonText}>{t('stop.add')}</Text>
+        <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
     </View>
   );
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   },
   addButton: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 30,
     right: 20,
     backgroundColor: '#007AFF',
     width: 60,
@@ -125,8 +125,9 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     color: '#fff',
-    fontSize: 24,
+    fontSize: 45,  
     fontWeight: 'bold',
+    bottom: 3
   },
 });
 
