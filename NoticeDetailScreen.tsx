@@ -84,7 +84,7 @@ const NoticeDetailScreen = ({ navigation }) => {
       <View style={styles.errorContainer}>
         <Text style={styles.errorTitle}>{t('common.error')}</Text>
         <Text style={styles.errorMessage}>{t('message.noMessage')}</Text>
-        <TouchableOpacity style={styles.backButton} onPress={goBackToList}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Text style={styles.buttonText}>{t('common.backToList')}</Text>
         </TouchableOpacity>
       </View>

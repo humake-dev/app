@@ -586,7 +586,7 @@ const SecondRoute = ({navigation, t, user}) => {
       },
       categoryContainer: { 
         paddingHorizontal: 0,
-        marginBottom: 0 
+         marginBottom: 15 
       },
       categoryScroll: { paddingVertical: 0 },
       categoryButton: {

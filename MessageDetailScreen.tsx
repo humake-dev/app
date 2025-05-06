@@ -53,6 +53,7 @@ const MessageDetailScreen = ({ navigation }) => {
 
   const fetchMessage = async () => {
     try {
+      console.log(route.params.id);
       const response = await fetch(`${BASE_URL}/messages/${route.params.id}`);
       
       if (response.status === 401) {
@@ -67,6 +68,8 @@ const MessageDetailScreen = ({ navigation }) => {
         if(data.readtime === null){
           fetchMessageRead();
         }
+
+        console.log(data);
 
         setMessage(data);
       } else {
@@ -93,7 +96,7 @@ const MessageDetailScreen = ({ navigation }) => {
       if (response.ok) {
         // Refresh the previous screen before going back
         navigation.setParams({ refresh: true });
-        navigation.goBack();
+        goBackToList();
       } else {
         throw new Error('Failed to hide message');
       }
@@ -123,7 +126,7 @@ const MessageDetailScreen = ({ navigation }) => {
       <View style={styles.errorContainer}>
         <Text style={styles.errorTitle}>{t('common.error')}</Text>
         <Text style={styles.errorMessage}>{t('message.noData')}</Text>
-        <TouchableOpacity style={styles.backButton} onPress={goBackToList}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Text style={styles.buttonText}>{t('common.backToList')}</Text>
         </TouchableOpacity>
       </View>
