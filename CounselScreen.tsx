@@ -134,7 +134,6 @@ const CounselScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   screenContainer: {
     flex: 1,

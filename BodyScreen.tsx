@@ -7,39 +7,23 @@ import {
   TouchableOpacity
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useRoute } from '@react-navigation/native';
 import { BASE_URL } from './Config';
 
-const MessageScreen = ({ navigation, route }) => {
+const BodyScreen = ({ navigation }) => {
   const { t } = useTranslation();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
 
-  const fetchMessages = useCallback(async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/messages`);
-      
-      if (response.status === 401) {
-        navigation.navigate('Login');
-        return;
-      }
 
-      const data = await response.json();
-      setMessages(data.message_list);
-      setLoading(false);
-      setTotal(data.total || 0);
-    } catch (error) {
-      console.error('Error fetching messages:', error);
-      setLoading(false);
-    }
-  }, [navigation]);
-
-
-
+  // Handle refresh parameter from navigation
+  const route = useRoute();
   useEffect(() => {
-    fetchMessages();
-  }, [fetchMessages]);
-
+    if (route.params?.refresh) {
+      fetchMessages();
+    }
+  }, [route.params]);
 
   const handleDeleteMessage = async (messageId) => {
     try {
@@ -61,9 +45,32 @@ const MessageScreen = ({ navigation, route }) => {
     }
   };
 
+  const fetchMessages = useCallback(async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/messages`);
+      
+      if (response.status === 401) {
+        navigation.navigate('Login');
+        return;
+      }
+
+      const data = await response.json();
+      setMessages(data.message_list);
+      setLoading(false);
+      setTotal(data.total || 0);
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      setLoading(false);
+    }
+  }, [navigation]);
+
+  useEffect(() => {
+    fetchMessages();
+  }, [fetchMessages]);
+
   if (loading) {
     return (
-      <View>
+      <View style={styles.screenContainer}>
         <Text>Loading Messages...</Text>
       </View>
     );
@@ -71,7 +78,7 @@ const MessageScreen = ({ navigation, route }) => {
 
   if (total === 0) {
     return (
-      <View >
+      <View style={styles.screenContainer}>
         <Text style={styles.noMessagesText}>{t('message.no_items')}</Text>
       </View>
     );
@@ -79,7 +86,7 @@ const MessageScreen = ({ navigation, route }) => {
 
   const renderMessageItem = ({ item }) => {
     const handlePress = () => {
-      navigation.navigate('MessageDetail', { id: item.id});
+      navigation.navigate('MessageDetail', { id: item.id });
     };
 
     return (
@@ -114,6 +121,12 @@ const MessageScreen = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
+  screenContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 0,
+  },
   noMessagesText: {
     fontSize: 16,
     color: '#666',
@@ -131,6 +144,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
     marginBottom: 8,
+    alignItems: 'center',
   },
   messageInfo: {
     flex: 1,
@@ -150,4 +164,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MessageScreen;
+export default BodyScreen;

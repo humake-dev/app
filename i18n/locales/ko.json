@@ -10,15 +10,22 @@
       "month" : "월",
       "download_barcode" : "바코드다운로드"
     },
+    "tabMenu": {
+      "message": "알림",
+      "menu": "메뉴",
+      "barcode": "입장바코드"
+    },
     "menu": {
       "trainer": "트레이너",
       "attendance": "출석",
       "exercise": "운동",
-      "message": "메시지",
       "counsel": "상담",
       "stop": "휴회",
       "pt": "PT",
-      "login" : "로그인"
+      "body": "체중",
+      "login" : "로그인",
+      "notice" : "공지사항",
+      "message" : "알림"
     },
     "counsel": {
       "form": "상담 내용을 작성해주세요",

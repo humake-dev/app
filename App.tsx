@@ -34,14 +34,15 @@ import TrainerDetailScreen from './TrainerDetailScreen';
 import AttendanceScreen from './AttendanceScreen';
 import PtScreen from './PtScreen';
 import ExerciseScreen from './ExerciseScreen';
-import MessageScreen from './MessageScreen';
-import MessageDetailScreen from './MessageDetailScreen';
 import CounselScreen from './CounselScreen';
 import CounselDetailScreen from './CounselDetailScreen';
 import CounselFormScreen from './CounselFormScreen';
 import StopScreen from './StopScreen';
 import StopDetailScreen from './StopDetailScreen';
 import StopFormScreen from './StopFormScreen';
+import NoticeDetailScreen from './NoticeDetailScreen';
+import MessageDetailScreen from './MessageDetailScreen';
+import BodyScreen from './BodyScreen';
 import i18n from './i18n/i18n';
 import { useTranslation } from 'react-i18next'; 
 import {Icon} from 'react-native-elements';
@@ -98,6 +99,7 @@ const App = () => {
       const response = await fetch(`${BASE_URL}/user`);
   
       if (response.status === 401) {
+        navigation.current?.navigate('Login');
         return;
       }
   
@@ -107,6 +109,7 @@ const App = () => {
         setUser(data);
         // 데이터가 잘 저장되었는지 확인
         console.log('User data after set:', user);
+        navigation.current?.navigate('Home');
       } else {
         throw new Error('Failed to fetch user data');
       }
@@ -298,9 +301,9 @@ const App = () => {
 <UserProvider value={{ user, setUser }}>
     <GestureHandlerRootView style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      <NavigationContainer ref={navigation}>
+      <NavigationContainer ref={navigation}>  
         <Stack.Navigator 
-          initialRouteName="Home"
+          initialRouteName="Login"
           screenOptions={{
             headerStyle: {
               backgroundColor: '#333',
@@ -308,6 +311,7 @@ const App = () => {
             headerTintColor: '#fff',
           }}
         >
+          <Stack.Screen name="Login" component={LoginScreen} options={{ title: t('menu.login') }} />    
           <Stack.Screen 
             name="Home" 
             component={HomeScreen} 
@@ -370,20 +374,20 @@ const App = () => {
               ),
             }} 
           />
-          <Stack.Screen name="Login" component={LoginScreen} options={{ title: t('menu.login') }} />      
           <Stack.Screen name="Trainer" component={TrainerScreen} options={{ title: t('menu.trainer') }} />
           <Stack.Screen name="TrainerDetail" component={TrainerDetailScreen} options={{ title: t('menu.trainer') }}/>
           <Stack.Screen name="Attendance" component={AttendanceScreen} options={{ title: t('menu.attendance') }}/>
           <Stack.Screen name="Exercise" component={ExerciseScreen} options={{ title: t('menu.exercise') }}/>
           <Stack.Screen name="Pt" component={PtScreen} options={{ title: t('menu.pt') }}/>
-          <Stack.Screen name="Message" component={MessageScreen}  options={{ title: t('menu.message') }}/>
-          <Stack.Screen name="MessageDetail" component={MessageDetailScreen} options={{ title: t('menu.message') }}/>
+          <Stack.Screen name="Body" component={BodyScreen} options={{ title: t('menu.body') }}/>
           <Stack.Screen name="Counsel" component={CounselScreen} options={{ title: t('menu.counsel') }}/>
           <Stack.Screen name="CounselForm" component={CounselFormScreen} options={{ title: t('counsel.form') }}/>
           <Stack.Screen name="CounselDetail" component={CounselDetailScreen} options={{ title: t('menu.counsel') }}/>
           <Stack.Screen name="Stop" component={StopScreen} options={{ title: t('menu.stop') }}/>
           <Stack.Screen name="StopForm" component={StopFormScreen} options={{ title: t('stop.form') }}/>
           <Stack.Screen name="StopDetail" component={StopDetailScreen} options={{ title: t('menu.stop') }}/>      
+          <Stack.Screen name="NoticeDetail" component={NoticeDetailScreen} options={{ title: t('menu.notice') }}/>
+          <Stack.Screen name="MessageDetail" component={MessageDetailScreen} options={{ title: t('menu.message') }}/>          
         </Stack.Navigator>
 
         {/* Overlay and Menu */}
@@ -422,7 +426,7 @@ const App = () => {
                       closeMenu();
                       navigation.current.navigate('Trainer');
                     }}>
-                    <Text style={styles.sideMenuItemText}>트레이너</Text>
+                    <Text style={styles.sideMenuItemText}>{t('menu.trainer')}</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity 
@@ -431,16 +435,16 @@ const App = () => {
                       closeMenu();
                       navigation.current.navigate('Message');
                     }}>
-                    <Text style={styles.menuItemText}>메시지</Text>
+                    <Text style={styles.sideMenuItemText}>{t('menu.message')}</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity 
                     style={styles.sideMenuItem}
                     onPress={() => {
                       closeMenu();
-                      navigation.current.navigate('Counsel');
+                      navigation.current.navigate('Exercise');
                     }}>
-                    <Text style={styles.menuItemText}>상담</Text>
+                    <Text style={styles.sideMenuItemText}>{t('menu.exercise')}</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity 

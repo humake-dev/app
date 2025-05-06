@@ -133,7 +133,6 @@ const CounselDetailScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   header: {
     height: 50,

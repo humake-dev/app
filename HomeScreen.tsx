@@ -19,14 +19,21 @@ import ViewShot from 'react-native-view-shot';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll'; // 사진 저장용
 import DeviceBrightness from '@adrianso/react-native-device-brightness';
 import { useUser } from './UserContext';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Lightbox from 'react-native-lightbox-v2';
+import MessageScreen from './MessageScreen';
+import MessageDetailScreen from './MessageDetailScreen';
+import NoticeScreen from './NoticeScreen';
+import NoticeDetailScreen from './NoticeDetailScreen';
+import { createStackNavigator } from '@react-navigation/stack';
 
 const HomeScreen = ({navigation, route}) => {
     const { t } = useTranslation();
-    const [index, setIndex] = useState(0);
+    const [index, setIndex] = useState(1);
     const [routes] = useState([
-      { key: 'first', title: '메뉴' },
-      { key: 'second', title: '입장바코드' },
+      { key: 'first', title: t('tabMenu.message') },
+      { key: 'second', title: t('tabMenu.menu') },
+      { key: 'third', title: t('tabMenu.barcode') },
     ]);
     const [brightness, setBrightness] = useState();
     const [changeBrightness, setChangeBrightness] = useState(false);
@@ -35,6 +42,23 @@ const HomeScreen = ({navigation, route}) => {
 
     const userContext = useUser();
     const user = userContext?.user;
+    const LAST_TAB_KEY = 'lastTab';
+
+
+      // 앱 시작 시 저장된 탭 인덱스 로딩
+  useEffect(() => {
+    const loadLastTab = async () => {
+      const saved = await AsyncStorage.getItem(LAST_TAB_KEY);
+      if (saved !== null) setIndex(Number(saved));
+    };
+    loadLastTab();
+  }, []);
+
+  // 탭 변경 시 저장
+  const handleIndexChange = async (newIndex: number) => {
+    setIndex(newIndex);
+    await AsyncStorage.setItem(LAST_TAB_KEY, newIndex.toString());
+  };
     
     useEffect(() => {
         if (index === 0) {
@@ -58,8 +82,9 @@ const HomeScreen = ({navigation, route}) => {
       }, [index]);
 
     const renderScene = SceneMap({
-        first: () => <FirstRoute navigation={navigation} t={t} user={user} />,
-        second: () => <SecondRoute t={t} user={user} />,
+      first: () => <FirstRoute navigation={navigation} t={t} user={user} />,
+      second: () => <SecondRoute navigation={navigation} t={t} user={user} />,
+      third: () => <ThirdRoute t={t} user={user} />,
       });
 
       useEffect(() => {
@@ -106,7 +131,7 @@ const HomeScreen = ({navigation, route}) => {
       <TabView
           navigationState={{ index, routes }}
           renderScene={renderScene}
-          onIndexChange={setIndex}
+          onIndexChange={handleIndexChange}
           initialLayout={{ width: windowWidth }}
           style={styles.tabView}
           renderTabBar={props => (
@@ -130,10 +155,73 @@ const HomeScreen = ({navigation, route}) => {
 };
 
 
+const FirstRoute = ({navigation, t, user}) => {
+  const [category, setCategory] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState(1);
+  const Stack = createStackNavigator();
+
+  return (
+    <View style={styles.tabContent}>
+      <View style={styles.categoryContainer}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.categoryScroll}
+        >
+          <TouchableOpacity
+            style={[
+              styles.categoryButton,
+              selectedCategory === 1 && styles.categoryButtonActive,
+            ]}
+            onPress={() => {
+              setSelectedCategory(1)
+            }}
+          >
+            <Text
+              style={[
+                styles.categoryText,
+                selectedCategory === 1 && styles.categoryTextActive,
+              ]}
+            >
+            알림
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[
+              styles.categoryButton,
+              selectedCategory === 2 && styles.categoryButtonActive,
+            ]}
+            onPress={() =>{
+              setSelectedCategory(2)
+            }}
+          >
+            <Text
+              style={[
+                styles.categoryText,
+                selectedCategory === 2 && styles.categoryTextActive,
+              ]}
+            >
+            공지사항
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
+      
+      <View style={styles.listContent}>
+{ selectedCategory === 1 ? (
+<MessageScreen navigation={navigation} ></MessageScreen>
+) : (
+<NoticeScreen navigation={navigation}></NoticeScreen>
+)}
+      </View>
+    </View>
+  );
+};
+
+
 
 // Tab screens
-const FirstRoute = ({navigation, t, user}) => {
-  console.log(`https://humake.blob.core.windows.net/humake/user/${user.branch_id}/${user.picture.picture_url}`);
+const SecondRoute = ({navigation, t, user}) => {
   return (
     <View style={styles.tabContent}>
       <ScrollView 
@@ -143,11 +231,17 @@ const FirstRoute = ({navigation, t, user}) => {
         <View style={styles.memberCard}>
           <View style={styles.memberImageContainer}>
         {user.picture && user.picture.picture_url ? (
+                            <Lightbox 
+                            activeProps={{
+                              style: styles.fullScreenImage
+                            }}
+                          >
               <Image
                 source={{uri: `https://humake.blob.core.windows.net/humake/user/${user.branch_id}/${user.picture.picture_url}`}}
                 style={styles.memberImage}
                 resizeMode="cover"
               />
+            </Lightbox>
             ) : (
               <Image
                 source={require('./assets/photo_none.gif')}
@@ -193,12 +287,12 @@ const FirstRoute = ({navigation, t, user}) => {
           
           <TouchableOpacity
             style={styles.imageButton}
-            onPress={() => navigation.navigate('Message')}>
+            onPress={() => navigation.navigate('Body')}>
             <Image
-              source={require('./assets/message.png')}
+              source={require('./assets/body.png')}
               style={styles.imageIcon}
             />
-            <Text style={styles.imageButtonText}>{t('menu.message')}</Text>
+            <Text style={styles.imageButtonText}>{t('menu.body')}</Text>
           </TouchableOpacity>
   
           <TouchableOpacity
@@ -227,11 +321,11 @@ const FirstRoute = ({navigation, t, user}) => {
 };
   
   // SecondRoute.tsx
-  const SecondRoute = ({t, user}) => {
+  const ThirdRoute = ({t, user}) => {
   
     useEffect(() => {
-      console.log('SecondRoute user:', user);
-      console.log('SecondRoute user access_card:', user?.access_card);
+      console.log('ThirdRoute user:', user);
+      console.log('ThirdRoute user access_card:', user?.access_card);
     }, [user]);
     
     const viewShotRef = useRef();
@@ -484,6 +578,55 @@ const FirstRoute = ({navigation, t, user}) => {
       memberImage: {
         width: '100%',
         height: '100%',
+      },
+      fullScreenImage: {
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height,
+        resizeMode: 'contain',
+      },
+      categoryContainer: { 
+        paddingHorizontal: 0,
+        marginBottom: 0 
+      },
+      categoryScroll: { paddingVertical: 0 },
+      categoryButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        backgroundColor: '#eee',
+        borderRadius: 16,
+        marginRight: 8,
+        minWidth: 70,
+        maxWidth: 100,
+        height: 36,
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+      },
+      categoryButtonActive: {
+        backgroundColor: '#007AFF',
+      },
+      categoryText: {
+        color: '#333',
+        textAlign: 'center',
+        fontSize: 14,
+        lineHeight: 18,
+      },
+      categoryTextActive: {
+        color: '#fff',
+        textAlign: 'center',
+        fontSize: 14,
+        lineHeight: 18,
+      },
+      listContent: {
+        flex: 1,
+        padding: 0,
+        marginTop: 0,
+      },
+      itemBox: {
+        padding: 2,
+        borderBottomWidth: 1,
+        borderColor: '#ddd',
+        alignItems: 'flex-start',
+        justifyContent: 'flex-start',
       },
   });
 

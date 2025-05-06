@@ -9,31 +9,17 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { BASE_URL } from './Config';
 
-const MessageDetailScreen = ({ navigation }) => {
+const NoticeDetailScreen = ({ navigation }) => {
   const { t } = useTranslation();
   const route = useRoute();
-  const [message, setMessage] = useState(null);
+  const [notice, setNotice] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 상담 ID가 없을 때
-  if (!route.params?.id) {
-    return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorTitle}>{t('common.error')}</Text>
-        <Text style={styles.errorMessage}>{t('message.noMessage')}</Text>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Text style={styles.buttonText}>{t('common.backToList')}</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  const fetchMessageRead = async () => {
+  /*const fetchNoticeRead = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/messages/read/${route.params.id}`, {
+      const response = await fetch(`${BASE_URL}/notices/read/${route.params.id}`, {
         method: 'POST',
       });
 
@@ -49,11 +35,11 @@ const MessageDetailScreen = ({ navigation }) => {
     } catch (error) {
       console.error('Error fetching message:', error);
     }
-  };
+  }; */
 
-  const fetchMessage = async () => {
+  const fetchNotice= async () => {
     try {
-      const response = await fetch(`${BASE_URL}/messages/${route.params.id}`);
+      const response = await fetch(`${BASE_URL}/notices/${route.params.id}`);
       
       if (response.status === 401) {
         navigation.navigate('Login');
@@ -64,41 +50,16 @@ const MessageDetailScreen = ({ navigation }) => {
         const data = await response.json();
 
         // Always mark as read when viewing the message
-        if(data.readtime === null){
-          fetchMessageRead();
-        }
+        // fetchNoticeRead();
 
-        setMessage(data);
+        setNotice(data);
       } else {
-        throw new Error('Failed to fetch message data');
+        throw new Error('Failed to fetch notice data');
       }
     } catch (error) {
-      console.error('Error fetching message:', error);
+      console.error('Error fetching notice:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const hideMessage = async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/messages/hide/${route.params.id}`, {
-        method: 'POST',
-      });
-
-      if (response.status === 401) {
-        navigation.navigate('Login');
-        return;
-      }
-
-      if (response.ok) {
-        // Refresh the previous screen before going back
-        navigation.setParams({ refresh: true });
-        navigation.goBack();
-      } else {
-        throw new Error('Failed to hide message');
-      }
-    } catch (error) {
-      console.error('Error hiding message:', error);
     }
   };
 
@@ -107,22 +68,22 @@ const MessageDetailScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
-    fetchMessage();
+    fetchNotice();
   }, [navigation, route.params.id]);
 
   if (loading) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color="#000" />
       </View>
     );
   }
 
-  if (!message) {
+  if (!notice) {
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorTitle}>{t('common.error')}</Text>
-        <Text style={styles.errorMessage}>{t('message.noData')}</Text>
+        <Text style={styles.errorMessage}>{t('message.noMessage')}</Text>
         <TouchableOpacity style={styles.backButton} onPress={goBackToList}>
           <Text style={styles.buttonText}>{t('common.backToList')}</Text>
         </TouchableOpacity>
@@ -132,23 +93,11 @@ const MessageDetailScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Ionicons 
-          name="close-circle" 
-          size={24} 
-          color="#666"
-          style={styles.closeButton}
-          onPress={hideMessage}
-        />
-      </View>
       <ScrollView style={styles.scrollView}>
         <View style={styles.content}>
           <View style={styles.contentContainer}>
-            <Text style={styles.date}>
-              {new Date(message.created_at).toLocaleDateString()}
-            </Text>
-            <Text style={styles.title}>{message.title}</Text>
-            <Text style={styles.contentText}>{message.content}</Text>
+            <Text style={styles.title}>{notice.title}</Text>
+            <Text style={styles.contentText}>{notice.content}</Text>
           </View>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <View style={styles.buttonContent}>
@@ -165,57 +114,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1
   },
-  header: {
-    height: 50,
-    justifyContent: 'flex-end',
-    paddingRight: 16,
-  },
-  closeButton: {
-    position: 'absolute',
-    right: 8,
-    top: 55,
-    zIndex: 99,
-  },
-  categoryContainer: {
-    height: 40,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  categoryScroll: {
-    paddingVertical: 8,
-  },
-  categoryButton: {
-    marginRight: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  categoryButtonActive: {
-    backgroundColor: '#007AFF',
-  },
-  categoryText: {
-    fontSize: 16,
-    color: '#666',
-  },
-  categoryTextActive: {
-    color: '#fff',
-  },
   scrollView: {
     flex: 1,
   },
   content: {
     padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  date: {
-    fontSize: 14,
-    color: '#666',
-    alignSelf: 'flex-end',
   },
   contentContainer: {
     backgroundColor: '#f8f9fa',
@@ -272,7 +175,7 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     marginBottom: 32,
-  },
+  }
 });
 
-export default MessageDetailScreen;
+export default NoticeDetailScreen;
