@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { useRoute } from '@react-navigation/native';
 import { BASE_URL } from './Config';
 
-const BodyScreen = ({ navigation }) => {
+const UserWeightScreen = ({ navigation }) => {
   const { t } = useTranslation();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -116,6 +116,12 @@ const BodyScreen = ({ navigation }) => {
         contentContainerStyle={styles.messageList}
         style={{ flexGrow: 1 }}
       />
+            <TouchableOpacity 
+              style={styles.addButton}
+              onPress={() => navigation.navigate('UserWeightForm')}
+            >
+              <Text style={styles.addButtonText}>+</Text>
+            </TouchableOpacity>
     </View>
   );
 };
@@ -162,6 +168,31 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 14,
   },
+  addButton: {
+    position: 'absolute',
+    bottom: 30,
+    right: 20,
+    backgroundColor: '#007AFF',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 45,  
+    fontWeight: 'bold',
+    bottom: 3
+  },
 });
 
-export default BodyScreen;
+export default UserWeightScreen;

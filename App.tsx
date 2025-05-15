@@ -42,7 +42,8 @@ import StopDetailScreen from './StopDetailScreen';
 import StopFormScreen from './StopFormScreen';
 import NoticeDetailScreen from './NoticeDetailScreen';
 import MessageDetailScreen from './MessageDetailScreen';
-import BodyScreen from './BodyScreen';
+import UserWeightScreen from './UserWeightScreen';
+import UserWeightFormScreen from './UserWeightFormScreen';
 import i18n from './i18n/i18n';
 import { useTranslation } from 'react-i18next'; 
 import {Icon} from 'react-native-elements';
@@ -61,7 +62,7 @@ const App = () => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [fcmToken, setFcmToken] = useState(false);
-  const navigation = useRef(null);
+  const navigation = useRef();
   const messaging = useRef(null);
   const [user, setUser] = useState(null);
 
@@ -92,35 +93,6 @@ const App = () => {
       //console.error(error);
     });
   }  
-
-
-  const fetchUser = async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/user`);
-  
-      if (response.status === 401) {
-        navigation.current?.navigate('Login');
-        return;
-      }
-  
-      if (response.ok) {
-        const data = await response.json();
-        console.log('User data fetched:', data);
-        setUser(data);
-        // 데이터가 잘 저장되었는지 확인
-        console.log('User data after set:', user);
-        navigation.current?.navigate('Home');
-      } else {
-        throw new Error('Failed to fetch user data');
-      }
-    } catch (error) {
-      console.error('Error fetching user:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchUser();
-  }, []);
 
   const requestIOSPermission = async () => {
     const authStatus = await messaging().requestPermission();
@@ -164,33 +136,6 @@ const App = () => {
 
   }, []);
 
-
-  useEffect(() => {
-    const loginCheck = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/login?user_id=11632`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          }
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          setIsLoggedIn(true);
-         // setUser(data);
-        } else {
-          console.error('Login failed');
-        }
-      } catch (error) {
-        console.error('Error during login:', error);
-      }
-    };
-
-    loginCheck();
-  }, []);
-
   useEffect(() => {
     const updateDimensions = () => {
       if (!isMenuOpen) {
@@ -213,13 +158,6 @@ const App = () => {
     }
   }, [isMenuOpen]);
 
-  if (!isLoggedIn) {
-    return (
-      <View style={styles.screenContainer}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
 
   const toggleMenu = (shouldOpen?: boolean) => {
 
@@ -296,12 +234,36 @@ const App = () => {
     }
   };
 
+  const loginCheck = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/login?user_id=11632`, {
+        method: 'POST'
+      });
+
+      console.log('User data fetched:', response);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('User data fetched:', data);
+        setIsLoggedIn(true);
+        setUser(data);
+        // 데이터가 잘 저장되었는지 확인
+        console.log('User data after set:', user);
+        navigation.current.navigate('Home');
+      } else {
+        throw new Error('Failed to fetch user data');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+    }
+  };
+
   return (
 <I18nextProvider i18n={i18n}>
 <UserProvider value={{ user, setUser }}>
     <GestureHandlerRootView style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      <NavigationContainer ref={navigation}>  
+      <NavigationContainer ref={navigation} onReady={loginCheck}>  
         <Stack.Navigator 
           initialRouteName="Login"
           screenOptions={{
@@ -379,7 +341,8 @@ const App = () => {
           <Stack.Screen name="Attendance" component={AttendanceScreen} options={{ title: t('menu.attendance') }}/>
           <Stack.Screen name="Exercise" component={ExerciseScreen} options={{ title: t('menu.exercise') }}/>
           <Stack.Screen name="Pt" component={PtScreen} options={{ title: t('menu.pt') }}/>
-          <Stack.Screen name="Body" component={BodyScreen} options={{ title: t('menu.body') }}/>
+          <Stack.Screen name="UserWeight" component={UserWeightScreen} options={{ title: t('menu.body') }}/>
+          <Stack.Screen name="UserWeightForm" component={UserWeightFormScreen} options={{ title: t('menu.body') }}/>
           <Stack.Screen name="Counsel" component={CounselScreen} options={{ title: t('menu.counsel') }}/>
           <Stack.Screen name="CounselForm" component={CounselFormScreen} options={{ title: t('counsel.form') }}/>
           <Stack.Screen name="CounselDetail" component={CounselDetailScreen} options={{ title: t('menu.counsel') }}/>

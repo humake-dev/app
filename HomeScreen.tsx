@@ -22,9 +22,7 @@ import { useUser } from './UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Lightbox from 'react-native-lightbox-v2';
 import MessageScreen from './MessageScreen';
-import MessageDetailScreen from './MessageDetailScreen';
 import NoticeScreen from './NoticeScreen';
-import NoticeDetailScreen from './NoticeDetailScreen';
 import { createStackNavigator } from '@react-navigation/stack';
 
 const HomeScreen = ({navigation, route}) => {
@@ -287,7 +285,7 @@ const SecondRoute = ({navigation, t, user}) => {
           
           <TouchableOpacity
             style={styles.imageButton}
-            onPress={() => navigation.navigate('Body')}>
+            onPress={() => navigation.navigate('UserWeight')}>
             <Image
               source={require('./assets/body.png')}
               style={styles.imageIcon}
