@@ -249,7 +249,10 @@ const SecondRoute = ({navigation, t, user}) => {
             )}
             </View>
             <View style={styles.memberInfoContainer}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('User')}>
           <Text style={styles.memberText}>{user.name}</Text>
+          </TouchableOpacity>
           </View>
         </View>
         <View style={styles.menuContainer}>

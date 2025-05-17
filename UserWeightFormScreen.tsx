@@ -9,13 +9,45 @@ import {
   Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Picker } from '@react-native-picker/picker';
 import { BASE_URL } from './Config';
 
 const UserWeightFormScreen = ({ navigation }) => {
   const { t } = useTranslation();
-  const [content, setContent] = useState('');
-  const [selectedCourse, setSelectedCourse] = useState('default');
+  const [value, setValue] = useState('');
+  const [error, setError] = useState('');
+
+  const handleChange = (text: string) => {
+    // 숫자와 소수점만 허용
+    let formatted = text.replace(/[^0-9.]/g, '');
+
+    // 소수점은 1개만 허용
+    const parts = formatted.split('.');
+    if (parts.length > 2) {
+      setError('잘못된 숫자 형식');
+      return;
+    }
+
+    // 소수점 이하 한자리만 허용
+    if (parts[1]?.length > 1) {
+      setError('소수점은 한 자리까지만 입력하세요');
+      return;
+    }
+
+    // 유효한 숫자로 파싱
+    const num = parseFloat(formatted);
+    if (!isNaN(num)) {
+      if (num < 30 || num > 150) {
+        setError('30 이상 150 이하의 숫자를 입력하세요');
+      } else {
+        setError('');
+      }
+    } else {
+      setError('');
+    }
+
+    setValue(formatted);
+  };
+
 
   const handleSubmit = async () => {
     try {
@@ -25,13 +57,13 @@ const UserWeightFormScreen = ({ navigation }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          content: content,
+          weight: value,
         }),
       });
 
       if (response.ok) {
         // Reset form after successful submission
-        setContent('');
+        setValue('');
         navigation.goBack();
       } else {
         throw new Error('Failed to submit form');
@@ -45,27 +77,14 @@ const UserWeightFormScreen = ({ navigation }) => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.formContainer}>
-        <Text style={styles.label}>{t('counsel.selectCourse')}</Text>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={selectedCourse}
-            onValueChange={(itemValue) => setSelectedCourse(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item label={t('counsel.course1')} value="default" />
-            <Picker.Item label={t('counsel.course2')} value="pt" />
-          </Picker>
-        </View>
-
-        <Text style={styles.label}>{t('counsel.content')}</Text>
+        <Text style={styles.label}>{t('user_weight.weight')}</Text>
         <TextInput
-          style={styles.input}
-          multiline={true}
-          numberOfLines={4}
-          value={content}
-          onChangeText={setContent}
-          placeholder={t('counsel.contentPlaceholder')}
-        />
+        style={[styles.input, error ? styles.inputError : null]}
+        keyboardType="numeric"
+        placeholder="숫자 입력 (예: 62.5)"
+        value={value}
+        onChangeText={handleChange}
+      />
 
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.submitButtonText}>{t('common.submit')}</Text>
@@ -88,35 +107,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 8,
   },
-  pickerContainer: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    marginBottom: 20,
-    backgroundColor: '#fff',
-
-  },
-  picker: {
-    height: 55,
-    width: '100%',
-    fontSize: 16,
-    color: '#333',
-  },
-  dateButton: {
-    backgroundColor: '#f0f0f0',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  dateText: {
-    fontSize: 16,
-  },
   input: {
-    backgroundColor: '#f0f0f0',
+    borderColor: 'gray',
+    borderWidth: 1,
     padding: 12,
     borderRadius: 8,
-    marginBottom: 20,
-    minHeight: 100,
+  },
+  inputError: {
+    borderColor: 'red',
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 8,
   },
   submitButton: {
     backgroundColor: '#007AFF',

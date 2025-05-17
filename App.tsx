@@ -44,6 +44,7 @@ import NoticeDetailScreen from './NoticeDetailScreen';
 import MessageDetailScreen from './MessageDetailScreen';
 import UserWeightScreen from './UserWeightScreen';
 import UserWeightFormScreen from './UserWeightFormScreen';
+import UserScreen from './UserScreen';
 import i18n from './i18n/i18n';
 import { useTranslation } from 'react-i18next'; 
 import {Icon} from 'react-native-elements';
@@ -350,7 +351,8 @@ const App = () => {
           <Stack.Screen name="StopForm" component={StopFormScreen} options={{ title: t('stop.form') }}/>
           <Stack.Screen name="StopDetail" component={StopDetailScreen} options={{ title: t('menu.stop') }}/>      
           <Stack.Screen name="NoticeDetail" component={NoticeDetailScreen} options={{ title: t('menu.notice') }}/>
-          <Stack.Screen name="MessageDetail" component={MessageDetailScreen} options={{ title: t('menu.message') }}/>          
+          <Stack.Screen name="MessageDetail" component={MessageDetailScreen} options={{ title: t('menu.message') }}/>     
+          <Stack.Screen name="User" component={UserScreen} options={{ title: t('menu.user') }}/>
         </Stack.Navigator>
 
         {/* Overlay and Menu */}

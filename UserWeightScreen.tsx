@@ -12,7 +12,7 @@ import { BASE_URL } from './Config';
 
 const UserWeightScreen = ({ navigation }) => {
   const { t } = useTranslation();
-  const [messages, setMessages] = useState([]);
+  const [userWeights, setUserWeights] = useState([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
 
@@ -21,13 +21,13 @@ const UserWeightScreen = ({ navigation }) => {
   const route = useRoute();
   useEffect(() => {
     if (route.params?.refresh) {
-      fetchMessages();
+      fetchUserWeights();
     }
   }, [route.params]);
 
   const handleDeleteMessage = async (messageId) => {
     try {
-      const response = await fetch(`${BASE_URL}/messages/hide/${messageId}`, {
+      const response = await fetch(`${BASE_URL}/user_weights/delete/${messageId}`, {
         method: 'POST',
       });
       
@@ -38,16 +38,16 @@ const UserWeightScreen = ({ navigation }) => {
       
       if (response.ok) {
         // Refresh the messages list after successful deletion
-        fetchMessages();
+        fetchUserWeights();
       }
     } catch (error) {
       console.error('Error deleting message:', error);
     }
   };
 
-  const fetchMessages = useCallback(async () => {
+  const fetchUserWeights = useCallback(async () => {
     try {
-      const response = await fetch(`${BASE_URL}/messages`);
+      const response = await fetch(`${BASE_URL}/user_weights`);
       
       if (response.status === 401) {
         navigation.navigate('Login');
@@ -55,7 +55,7 @@ const UserWeightScreen = ({ navigation }) => {
       }
 
       const data = await response.json();
-      setMessages(data.message_list);
+      setUserWeights(data.user_weights);
       setLoading(false);
       setTotal(data.total || 0);
     } catch (error) {
@@ -65,8 +65,8 @@ const UserWeightScreen = ({ navigation }) => {
   }, [navigation]);
 
   useEffect(() => {
-    fetchMessages();
-  }, [fetchMessages]);
+    fetchUserWeights();
+  }, [fetchUserWeights]);
 
   if (loading) {
     return (
@@ -80,13 +80,19 @@ const UserWeightScreen = ({ navigation }) => {
     return (
       <View style={styles.screenContainer}>
         <Text style={styles.noMessagesText}>{t('message.no_items')}</Text>
+        <TouchableOpacity 
+              style={styles.addButton}
+              onPress={() => navigation.navigate('UserWeightForm')}
+            >
+              <Text style={styles.addButtonText}>+</Text>
+            </TouchableOpacity>
       </View>
     );
   }
 
-  const renderMessageItem = ({ item }) => {
+  const renderUserWeightItem = ({ item }) => {
     const handlePress = () => {
-      navigation.navigate('MessageDetail', { id: item.id });
+      navigation.navigate('UserWeightDetail', { id: item.id });
     };
 
     return (
@@ -110,8 +116,8 @@ const UserWeightScreen = ({ navigation }) => {
   return (
     <View style={{ flex: 1 }}>
       <FlatList
-        data={messages}
-        renderItem={renderMessageItem}
+        data={userWeights}
+        renderItem={renderUserWeightItem}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.messageList}
         style={{ flexGrow: 1 }}
