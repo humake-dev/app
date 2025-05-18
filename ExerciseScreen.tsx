@@ -21,34 +21,18 @@ const openDatabase = async () => {
       createFromLocation: 1,
       assetFilename: 'exercise.db'
     });
-    console.log('DB 열기 성공');
+    console.log('✅ DB 연결 성공');
     return db;
   } catch (error) {
-    console.error('DB 열기 실패:', error);
+    console.error('❌ DB 연결 실패:', error);
     throw error;
   }
 };
 
-const getCategories = async () => {
+const fetchCategories = async () => {
   try {
     const db = await openDatabase();
-    
-    // Check if table exists
-    let tableExists = false;
-    await db.transaction(tx => {
-      tx.executeSql(
-        'SELECT name FROM sqlite_master WHERE type="table" AND name="exercise_categories"',
-        [],
-        (tx, results) => {
-          tableExists = results.rows.length > 0;
-        }
-      );
-    });
-
-    if (!tableExists) {
-      console.error('exercise_categories 테이블이 없습니다');
-      return [];
-    }
+    console.log(db);
 
     return new Promise((resolve, reject) => {
       db.transaction(tx => {
@@ -80,19 +64,11 @@ const getCategories = async () => {
 
 
 const ExerciseScreen = () => {
-  const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [filteredData, setFilteredData] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-
-    const fetchCategories = async () => {
-      const categoriesData = await getCategories();
-      console.log(categoriesData);
-      setCategories(categoriesData);
-    };
-
-    fetchCategories();
+    fetchCategories().then(setCategories);
   }, []);
 
 

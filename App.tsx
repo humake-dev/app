@@ -50,7 +50,7 @@ import { useTranslation } from 'react-i18next';
 import {Icon} from 'react-native-elements';
 import { BASE_URL } from './Config';
 import UserContext, { UserProvider } from './UserContext';
-
+import BarcodeScreen from './BarcodeScreen';
 
 const Stack = createStackNavigator();
 
@@ -260,182 +260,182 @@ const App = () => {
   };
 
   return (
-<I18nextProvider i18n={i18n}>
-<UserProvider value={{ user, setUser }}>
-    <GestureHandlerRootView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <NavigationContainer ref={navigation} onReady={loginCheck}>  
-        <Stack.Navigator 
-          initialRouteName="Login"
-          screenOptions={{
-            headerStyle: {
-              backgroundColor: '#333',
-            },
-            headerTintColor: '#fff',
-          }}
-        >
-          <Stack.Screen name="Login" component={LoginScreen} options={{ title: t('menu.login') }} />    
-          <Stack.Screen 
-            name="Home" 
-            component={HomeScreen} 
-            options={{ 
-              headerTitle: '',
-              headerLeft: () => (
-                <Image
-                  source={require('./assets/logo.png')}
-                  style={styles.logo}
-                  resizeMode="contain"
-                />
-              ),
-              headerRight: () => (
-                <TouchableOpacity 
-                  onPress={() => toggleMenu()} 
-                  style={styles.menuButton}
-                  activeOpacity={0.7}>
-                  <Animated.View 
-                    style={[
-                      styles.hamburgerLine,
-                      {
-                        transform: [
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <I18nextProvider i18n={i18n}>
+        <UserProvider value={{ user, setUser }}>
+          <StatusBar barStyle="dark-content" />
+          <NavigationContainer ref={(container) => navigation.current = container} onReady={loginCheck}>  
+            <Stack.Navigator 
+              initialRouteName={isLoggedIn ? 'Home' : 'Login'}
+              screenOptions={{
+                headerStyle: { backgroundColor: '#333' },
+                headerTintColor: '#fff',
+                headerTitleStyle: { fontWeight: 'bold' },
+              }}
+            >
+              <Stack.Screen name="Login" component={LoginScreen} options={{ title: t('menu.login') }} />    
+              <Stack.Screen 
+                name="Home" 
+                component={HomeScreen} 
+                options={{ 
+                  headerTitle: '',
+                  headerLeft: () => (
+                    <Image
+                      source={require('./assets/logo.png')}
+                      style={styles.logo}
+                      resizeMode="contain"
+                    />
+                  ),
+                  headerRight: () => (
+                    <TouchableOpacity 
+                      onPress={() => toggleMenu()} 
+                      style={styles.menuButton}
+                      activeOpacity={0.7}>
+                      <Animated.View 
+                        style={[
+                          styles.hamburgerLine,
                           {
-                            rotate: slideAnim.interpolate({
-                              inputRange: [0, Dimensions.get('window').width],
-                              outputRange: ['45deg', '0deg'],
-                            }),
+                            transform: [
+                              {
+                                rotate: slideAnim.interpolate({
+                                  inputRange: [0, Dimensions.get('window').width],
+                                  outputRange: ['45deg', '0deg'],
+                                }),
+                              },
+                            ],
                           },
-                        ],
-                      },
-                    ]} 
-                  />
-                  <Animated.View 
-                    style={[
-                      styles.hamburgerLine,
-                      {
-                        opacity: slideAnim.interpolate({
-                          inputRange: [0, Dimensions.get('window').width / 2, Dimensions.get('window').width],
-                          outputRange: [0, 0.5, 1],
-                        }),
-                      },
-                    ]} 
-                  />
-                  <Animated.View 
-                    style={[
-                      styles.hamburgerLine,
-                      {
-                        transform: [
-                          {
-                            rotate: slideAnim.interpolate({
-                              inputRange: [0, Dimensions.get('window').width],
-                              outputRange: ['-45deg', '0deg'],
-                            }),
-                          },
-                        ],
-                      },
-                    ]} 
-                  />
-                </TouchableOpacity>
-              ),
-            }} 
-          />
-          <Stack.Screen name="Trainer" component={TrainerScreen} options={{ title: t('menu.trainer') }} />
-          <Stack.Screen name="TrainerDetail" component={TrainerDetailScreen} options={{ title: t('menu.trainer') }}/>
-          <Stack.Screen name="Attendance" component={AttendanceScreen} options={{ title: t('menu.attendance') }}/>
-          <Stack.Screen name="Exercise" component={ExerciseScreen} options={{ title: t('menu.exercise') }}/>
-          <Stack.Screen name="Pt" component={PtScreen} options={{ title: t('menu.pt') }}/>
-          <Stack.Screen name="UserWeight" component={UserWeightScreen} options={{ title: t('menu.body') }}/>
-          <Stack.Screen name="UserWeightForm" component={UserWeightFormScreen} options={{ title: t('menu.body') }}/>
-          <Stack.Screen name="Counsel" component={CounselScreen} options={{ title: t('menu.counsel') }}/>
-          <Stack.Screen name="CounselForm" component={CounselFormScreen} options={{ title: t('counsel.form') }}/>
-          <Stack.Screen name="CounselDetail" component={CounselDetailScreen} options={{ title: t('menu.counsel') }}/>
-          <Stack.Screen name="Stop" component={StopScreen} options={{ title: t('menu.stop') }}/>
-          <Stack.Screen name="StopForm" component={StopFormScreen} options={{ title: t('stop.form') }}/>
-          <Stack.Screen name="StopDetail" component={StopDetailScreen} options={{ title: t('menu.stop') }}/>      
-          <Stack.Screen name="NoticeDetail" component={NoticeDetailScreen} options={{ title: t('menu.notice') }}/>
-          <Stack.Screen name="MessageDetail" component={MessageDetailScreen} options={{ title: t('menu.message') }}/>     
-          <Stack.Screen name="User" component={UserScreen} options={{ title: t('menu.user') }}/>
-        </Stack.Navigator>
-
-        {/* Overlay and Menu */}
-        {isMenuVisible && (
-          <View style={StyleSheet.absoluteFill}>
-            <TouchableWithoutFeedback onPress={closeMenu}>
-              <Animated.View
-                style={[
-                  StyleSheet.absoluteFill,
-                  {
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    opacity: fadeAnim,
-                  },
-                ]}
-              />
-            </TouchableWithoutFeedback>
-
-            <Animated.View
-              style={[
-                styles.slideMenu,
-                {
-                  transform: [
-                    {
-                      translateX: slideAnim,
-                    },
-                  ],
-                },
-              ]}>
-              <View style={styles.menuContent}>
-                <Text style={styles.menuTitle}>메뉴</Text>
-                
-                <View style={styles.sideMenuItems}>
-                  <TouchableOpacity 
-                    style={styles.sideMenuItem}
-                    onPress={() => {
-                      closeMenu();
-                      navigation.current.navigate('Trainer');
-                    }}>
-                    <Text style={styles.sideMenuItemText}>{t('menu.trainer')}</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity 
-                    style={styles.sideMenuItem}
-                    onPress={() => {
-                      closeMenu();
-                      navigation.current.navigate('Message');
-                    }}>
-                    <Text style={styles.sideMenuItemText}>{t('menu.message')}</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity 
-                    style={styles.sideMenuItem}
-                    onPress={() => {
-                      closeMenu();
-                      navigation.current.navigate('Exercise');
-                    }}>
-                    <Text style={styles.sideMenuItemText}>{t('menu.exercise')}</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity 
-                    style={[styles.sideMenuItem, styles.logoutItem]}
-                    onPress={handleLogout}
-                  >
-                    <View style={styles.logoutContent}>
-                      <Icon 
-                        name="sign-out-alt" 
-                        type="font-awesome-5" 
-                        color="#fff" 
-                        size={16}
-                        style={styles.logoutIcon}
+                        ]} 
                       />
-                      <Text style={styles.logoutText}>로그아웃</Text>
+                      <Animated.View 
+                        style={[
+                          styles.hamburgerLine,
+                          {
+                            opacity: slideAnim.interpolate({
+                              inputRange: [0, Dimensions.get('window').width / 2, Dimensions.get('window').width],
+                              outputRange: [0, 0.5, 1],
+                            }),
+                          },
+                        ]} 
+                      />
+                      <Animated.View 
+                        style={[
+                          styles.hamburgerLine,
+                          {
+                            transform: [
+                              {
+                                rotate: slideAnim.interpolate({
+                                  inputRange: [0, Dimensions.get('window').width],
+                                  outputRange: ['-45deg', '0deg'],
+                                }),
+                              },
+                            ],
+                          },
+                        ]} 
+                      />
+                    </TouchableOpacity>
+                  ),
+                }} 
+              />
+              <Stack.Screen name="Trainer" component={TrainerScreen} options={{ title: t('menu.trainer') }} />
+              <Stack.Screen name="TrainerDetail" component={TrainerDetailScreen} options={{ title: t('menu.trainer') }}/>
+              <Stack.Screen name="Attendance" component={AttendanceScreen} options={{ title: t('menu.attendance') }}/>
+              <Stack.Screen name="Exercise" component={ExerciseScreen} options={{ title: t('menu.exercise') }}/>
+              <Stack.Screen name="Pt" component={PtScreen} options={{ title: t('menu.pt') }}/>
+              <Stack.Screen name="UserWeight" component={UserWeightScreen} options={{ title: t('menu.body') }}/>
+              <Stack.Screen name="UserWeightForm" component={UserWeightFormScreen} options={{ title: t('menu.body') }}/>
+              <Stack.Screen name="Counsel" component={CounselScreen} options={{ title: t('menu.counsel') }}/>
+              <Stack.Screen name="CounselForm" component={CounselFormScreen} options={{ title: t('counsel.form') }}/>
+              <Stack.Screen name="CounselDetail" component={CounselDetailScreen} options={{ title: t('menu.counsel') }}/>
+              <Stack.Screen name="Stop" component={StopScreen} options={{ title: t('menu.stop') }}/>
+              <Stack.Screen name="StopForm" component={StopFormScreen} options={{ title: t('stop.form') }}/>
+              <Stack.Screen name="StopDetail" component={StopDetailScreen} options={{ title: t('menu.stop') }}/>      
+              <Stack.Screen name="NoticeDetail" component={NoticeDetailScreen} options={{ title: t('menu.notice') }}/>
+              <Stack.Screen name="MessageDetail" component={MessageDetailScreen} options={{ title: t('menu.message') }}/>     
+              <Stack.Screen name="User" component={UserScreen} options={{ title: t('menu.user') }}/>
+              <Stack.Screen name="BarcodeScreen" component={BarcodeScreen}  options={{ title: t('tabMenu.barcode') }}/>
+            </Stack.Navigator>
+
+            {/* Overlay and Menu */}
+            {isMenuVisible && (
+              <View style={StyleSheet.absoluteFill}>
+                <TouchableWithoutFeedback onPress={closeMenu}>
+                  <Animated.View
+                    style={[
+                      StyleSheet.absoluteFill,
+                      {
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        opacity: fadeAnim,
+                      },
+                    ]}
+                  />
+                </TouchableWithoutFeedback>
+
+                <Animated.View
+                  style={[
+                    styles.slideMenu,
+                    {
+                      transform: [
+                        {
+                          translateX: slideAnim,
+                        },
+                      ],
+                    },
+                  ]}>
+                  <View style={styles.menuContent}>
+                    <Text style={styles.menuTitle}>메뉴</Text>
+                    
+                    <View style={styles.sideMenuItems}>
+                      <TouchableOpacity 
+                        style={styles.sideMenuItem}
+                        onPress={() => {
+                          closeMenu();
+                          navigation.current.navigate('Trainer');
+                        }}>
+                        <Text style={styles.sideMenuItemText}>{t('menu.trainer')}</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity 
+                        style={styles.sideMenuItem}
+                        onPress={() => {
+                          closeMenu();
+                          navigation.current.navigate('Message');
+                        }}>
+                        <Text style={styles.sideMenuItemText}>{t('menu.message')}</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity 
+                        style={styles.sideMenuItem}
+                        onPress={() => {
+                          closeMenu();
+                          navigation.current.navigate('Exercise');
+                        }}>
+                        <Text style={styles.sideMenuItemText}>{t('menu.exercise')}</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity 
+                        style={[styles.sideMenuItem, styles.logoutItem]}
+                        onPress={handleLogout}
+                      >
+                        <View style={styles.logoutContent}>
+                          <Icon 
+                            name="sign-out-alt" 
+                            type="font-awesome-5" 
+                            color="#fff" 
+                            size={16}
+                            style={styles.logoutIcon}
+                          />
+                          <Text style={styles.logoutText}>로그아웃</Text>
+                        </View>
+                      </TouchableOpacity>
                     </View>
-                  </TouchableOpacity>
-                </View>
+                  </View>
+                </Animated.View>
               </View>
-            </Animated.View>
-          </View>
-        )}
-      </NavigationContainer>
+            )}
+          </NavigationContainer>
+        </UserProvider>
+      </I18nextProvider>
     </GestureHandlerRootView>
-    </UserProvider>
-    </I18nextProvider>
   );
 };
 

@@ -25,7 +25,8 @@
       "body": "체중",
       "login" : "로그인",
       "notice" : "공지사항",
-      "message" : "알림"
+      "message" : "알림",
+      "user" : "내 정보"
     },
     "counsel": {
       "form": "상담 내용을 작성해주세요",

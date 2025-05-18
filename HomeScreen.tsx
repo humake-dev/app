@@ -24,6 +24,7 @@ import Lightbox from 'react-native-lightbox-v2';
 import MessageScreen from './MessageScreen';
 import NoticeScreen from './NoticeScreen';
 import { createStackNavigator } from '@react-navigation/stack';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const HomeScreen = ({navigation, route}) => {
     const { t } = useTranslation();
@@ -82,7 +83,7 @@ const HomeScreen = ({navigation, route}) => {
     const renderScene = SceneMap({
       first: () => <FirstRoute navigation={navigation} t={t} user={user} />,
       second: () => <SecondRoute navigation={navigation} t={t} user={user} />,
-      third: () => <ThirdRoute t={t} user={user} />,
+      third: () => <ThirdRoute navigation={navigation} t={t} user={user} />
       });
 
       useEffect(() => {
@@ -181,7 +182,7 @@ const FirstRoute = ({navigation, t, user}) => {
                 selectedCategory === 1 && styles.categoryTextActive,
               ]}
             >
-            알림
+            {t('menu.message')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity 
@@ -199,7 +200,7 @@ const FirstRoute = ({navigation, t, user}) => {
                 selectedCategory === 2 && styles.categoryTextActive,
               ]}
             >
-            공지사항
+            {t('menu.notice')}
             </Text>
           </TouchableOpacity>
         </ScrollView>
@@ -322,7 +323,7 @@ const SecondRoute = ({navigation, t, user}) => {
 };
   
   // SecondRoute.tsx
-  const ThirdRoute = ({t, user}) => {
+  const ThirdRoute = ({navigation, t, user}) => {
   
     useEffect(() => {
       console.log('ThirdRoute user:', user);
@@ -349,6 +350,12 @@ const SecondRoute = ({navigation, t, user}) => {
 
     return (
       <View style={styles.tabContent}>
+                <TouchableOpacity 
+            style={styles.fullScreenButton}
+            onPress={() => navigation.navigate('BarcodeScreen')}
+          >
+<Ionicons name="expand" size={24} color="#fff" />
+          </TouchableOpacity>
         <View style={{ 
           alignItems: 'center', 
           marginTop: 30, 
@@ -421,6 +428,7 @@ const SecondRoute = ({navigation, t, user}) => {
             }}>Loading...</Text>
           )}
         </View>
+
       </View>
     );
   };
@@ -628,6 +636,18 @@ const SecondRoute = ({navigation, t, user}) => {
         borderColor: '#ddd',
         alignItems: 'flex-start',
         justifyContent: 'flex-start',
+      },
+      scene: {
+        flex: 1,
+      },
+      fullScreenButton: {
+        position: 'absolute',
+        right: 16,
+        top: 16,
+        padding: 8,
+        borderRadius: 8,
+        backgroundColor: '#333',
+        zIndex: 100,
       },
   });
 

@@ -1,4 +1,4 @@
-package com.humake_app
+package kr.co.humake;
 
 import android.app.Application
 import com.facebook.react.PackageList

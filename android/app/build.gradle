@@ -77,14 +77,15 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.humake_app"
+    namespace "kr.co.humake"
     defaultConfig {
-        applicationId "com.humake_app"
+        applicationId "kr.co.humake"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         vectorDrawables.useSupportLibrary = true
         versionCode 1
         versionName "1.0"
+              
     }
     signingConfigs {
         debug {
@@ -112,13 +113,11 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
-
-
-sourceSets {
-    main {
-        assets.srcDirs = ['src/main/assets']
+    sourceSets {
+        main {
+      assets.srcDirs = ['src/main/assets']
     }
-}
+  }
 }
 
 
