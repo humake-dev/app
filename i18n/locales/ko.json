@@ -8,7 +8,8 @@
       "ok": "확인",
       "backToList" : "목록으로",
       "month" : "월",
-      "download_barcode" : "바코드다운로드"
+      "download_barcode" : "바코드다운로드",
+      "none" : "없음"
     },
     "tabMenu": {
       "message": "알림",
@@ -16,7 +17,8 @@
       "barcode": "입장바코드"
     },
     "menu": {
-      "trainer": "트레이너",
+      "my_trainer": "담당강사",
+      "trainer": "강사",
       "attendance": "출석",
       "exercise": "운동",
       "counsel": "상담",

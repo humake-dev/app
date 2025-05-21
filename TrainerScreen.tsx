@@ -10,11 +10,15 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { BASE_URL } from './Config';
+import { useUser } from './UserContext';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const TrainerScreen = ({navigation}) => {
     const { t } = useTranslation();
     const [trainers, setTrainers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const userContext = useUser();
+    const user = userContext?.user;
   
     useEffect(() => {
       fetchTrainers();
@@ -51,8 +55,10 @@ const TrainerScreen = ({navigation}) => {
         navigation.navigate('TrainerDetail', { id: item.id });
       };
 
+      const isUserTrainer = user?.trainer?.id === item.id;
+      
       return (
-        <TouchableOpacity onPress={handlePress} style={styles.trainerItem}>
+        <TouchableOpacity onPress={handlePress} style={[styles.trainerItem,isUserTrainer && styles.highlightedTrainerItem]}>
           <View style={styles.trainerImageContainer}>
             {item.picture && item.picture.picture_url ? (
               <Image
@@ -69,8 +75,16 @@ const TrainerScreen = ({navigation}) => {
             )}
           </View>
           <View style={styles.trainerInfo}>
-            <Text style={styles.trainerName}>{item.name}</Text>
+            <Text style={[styles.trainerName,isUserTrainer && { color : '#ff8d1d', fontWeight: 'bold'}]}>{item.name}</Text>
           </View>
+          {isUserTrainer && (
+            <Ionicons 
+              name="checkmark-circle" 
+              size={24} 
+              color="green" 
+              style={styles.checkIcon}
+            />
+          )}
         </TouchableOpacity>
       );
     };
@@ -106,6 +120,7 @@ trainerItem: {
   borderBottomWidth: 1,
   borderBottomColor: '#ccc',
   marginBottom: 8,
+  position: 'relative', // Add position relative to make space for icon
 },
 trainerImageContainer: {
   width: 60,
@@ -120,15 +135,26 @@ trainerImage: {
 },
 trainerInfo: {
     flex: 1,
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginRight: 8, // Add margin to make space for icon
   },
   trainerName: {
     fontSize: 16,
-    fontWeight: 'bold',
+    color : '#333'
   },
   trainerCreatedAt: {
     fontSize: 12,
     color: '#666',
+  },
+  highlightedTrainerItem: {
+    backgroundColor: '#fff',
+    borderRadius : 5
+  },
+  checkIcon: {
+    position: 'absolute',
+    right: 10,
+    top: '50%',
+    transform: [{ translateY: -12 }],
   },
 });
 

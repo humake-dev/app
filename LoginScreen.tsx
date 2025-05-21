@@ -33,11 +33,13 @@ const LoginScreen = () => {
           }
         });
 
-      const data = await response.json();
+      console.log('Login response:', response);
 
       if (response.ok) {
-        navigation.navigate('Home');
+        const data = await response.json();
+
         setUser(data);
+        navigation.navigate('Home');
       } else {
         Alert.alert('Error', data.message || 'Login failed');
       }

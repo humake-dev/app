@@ -4,42 +4,43 @@
       "back": "Back",
       "home": "Back to Home",
       "delete": "Delete",          
-      "submit": "제출",
-      "ok": "확인",
-      "backToList" : "목록으로",
-      "month" : "월"
+      "submit": "Submit",
+      "ok": "OK",
+      "backToList" : "Back to List",
+      "month" : "Month",
+      "none" : "None"
     },
     "menu": {
-        "trainer": "Trainer",
-        "attendance": "Attendance",
-        "exercise": "Exercise",
-        "message": "Message",
-        "counsel": "Counsel",
-        "stop": "Stop",
-        "pt": "PT"
+      "my_trainer": "My Trainer",
+      "trainer": "Trainer",
+      "attendance": "Attendance",
+      "exercise": "Exercise",
+      "counsel": "Counsel",
+      "stop": "Stop",
+      "pt": "PT"
       },
-      "counsel": {
-        "add": "상담 추가",
-        "selectDate": "날짜 선택",
-        "selectOption": "옵션 선택",
-        "option1": "옵션 1",
-        "option2": "옵션 2",
-        "content": "상담 내용",
-        "contentPlaceholder": "상담 내용을 입력해주세요",
+      "counsel":   {
+        "add": "Counsel Add",
+        "selectDate": "Select Date",
+        "selectOption": "Select Option",
+        "option1": "Option 1",
+        "option2": "Option 2",
+        "content": "Counsel Content",
+        "contentPlaceholder": "Counsel Content",
         "no_items": "No Counsel"
       },
       "stop": {
-        "form": "휴회신청을 작성해주세요",
-        "stopPeriod": "휴회기간",
+        "form": "Stop Form",
+        "stopPeriod": "Stop Period",
         "add": "Stop Add",
-        "selectDate": "날짜 선택",
-        "content": "휴회 사유",
-        "contentPlaceholder": "휴회 사유 간단히 한 줄로 써주세요",
+        "selectDate": "Select Date",
+        "content": "Stop Content",
+        "contentPlaceholder": "Stop Content",
         "no_items": "No Stop"
       },
       "attendance": {
-        "PTcount": "PT출석",
-        "count": "출석"
+        "PTcount": "PT Attendance",
+        "count": "Attendance"
       },
       "message" : {
         "no_items": "No Message"

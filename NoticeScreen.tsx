@@ -24,10 +24,16 @@ const NoticeScreen = ({ navigation, route }) => {
         return;
       }
 
-      const data = await response.json();
-      setNotices(data.notice_list);
-      setLoading(false);
-      setTotal(data.total || 0);
+      if(response.ok){
+        const data = await response.json();
+
+        setTotal(data.total);
+
+        if(data.total) {
+          setNotices(data.notice_list);
+        }
+        setLoading(false);
+      }
     } catch (error) {
       console.error('Error fetching notices:', error);
       setLoading(false);

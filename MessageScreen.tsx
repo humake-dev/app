@@ -24,10 +24,17 @@ const MessageScreen = ({ navigation, route }) => {
         return;
       }
 
-      const data = await response.json();
-      setMessages(data.message_list);
-      setLoading(false);
-      setTotal(data.total || 0);
+      if(response.ok){
+        const data = await response.json();
+
+        setTotal(data.total);
+
+        if(data.total) {
+          setMessages(data.message_list);
+        }
+        setLoading(false);
+      }
+
     } catch (error) {
       console.error('Error fetching messages:', error);
       setLoading(false);

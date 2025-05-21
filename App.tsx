@@ -66,6 +66,7 @@ const App = () => {
   const navigation = useRef();
   const messaging = useRef(null);
   const [user, setUser] = useState(null);
+  const [attendanceTotal, setAttendanceTotal] = useState(0);
 
   const fetchFcmToken = async () => {
     if(!fcmToken) {
@@ -235,6 +236,29 @@ const App = () => {
     }
   };
 
+  const getEntrance = async () => {
+    try {
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+
+      console.log(`${BASE_URL}/entrances?year=${year}&month=${month}`);
+
+      const response = await fetch(`${BASE_URL}/entrances?year=${year}&month=${month}`, {
+        method: 'GET'
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setAttendanceTotal(data.total);
+      } else {
+        throw new Error('Failed to fetch entrance data');
+      }
+    } catch (error) {
+      console.error('Error during entrance fetch:', error);
+    }
+  };
+
   const loginCheck = async () => {
     try {
       const response = await fetch(`${BASE_URL}/login?user_id=11632`, {
@@ -264,7 +288,10 @@ const App = () => {
       <I18nextProvider i18n={i18n}>
         <UserProvider value={{ user, setUser }}>
           <StatusBar barStyle="dark-content" />
-          <NavigationContainer ref={(container) => navigation.current = container} onReady={loginCheck}>  
+          <NavigationContainer ref={(container) => navigation.current = container} onReady={async () => {
+    await loginCheck();
+    await getEntrance();
+  }}>  
             <Stack.Navigator 
               initialRouteName={isLoggedIn ? 'Home' : 'Login'}
               screenOptions={{
@@ -276,7 +303,6 @@ const App = () => {
               <Stack.Screen name="Login" component={LoginScreen} options={{ title: t('menu.login') }} />    
               <Stack.Screen 
                 name="Home" 
-                component={HomeScreen} 
                 options={{ 
                   headerTitle: '',
                   headerLeft: () => (
@@ -335,7 +361,13 @@ const App = () => {
                     </TouchableOpacity>
                   ),
                 }} 
-              />
+              >
+                {props => (
+    <HomeScreen
+      {...props} // navigation, route 등 기본 props
+      attendanceTotal={attendanceTotal} // 추가로 직접 넘김
+    />
+  )}</Stack.Screen>
               <Stack.Screen name="Trainer" component={TrainerScreen} options={{ title: t('menu.trainer') }} />
               <Stack.Screen name="TrainerDetail" component={TrainerDetailScreen} options={{ title: t('menu.trainer') }}/>
               <Stack.Screen name="Attendance" component={AttendanceScreen} options={{ title: t('menu.attendance') }}/>

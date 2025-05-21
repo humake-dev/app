@@ -26,9 +26,10 @@ import NoticeScreen from './NoticeScreen';
 import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const HomeScreen = ({navigation, route}) => {
+const HomeScreen = ({navigation, attendanceTotal}) => {
     const { t } = useTranslation();
     const [index, setIndex] = useState(1);
+
     const [routes] = useState([
       { key: 'first', title: t('tabMenu.message') },
       { key: 'second', title: t('tabMenu.menu') },
@@ -61,7 +62,7 @@ const HomeScreen = ({navigation, route}) => {
     
     useEffect(() => {
         if (index === 0) {
-          console.log('First 탭 보임');
+          // console.log('First 탭 보임');
           if(changeBrightness) {
             DeviceBrightness.setBrightnessLevel(brightness);
           }
@@ -73,7 +74,7 @@ const HomeScreen = ({navigation, route}) => {
             timeoutRef.current = null;
           }
         } else if (index === 1) {
-          console.log('Second 탭 보임');
+          // console.log('Second 탭 보임');
           DeviceBrightness.setBrightnessLevel(1);
           setChangeBrightness(true);
           timeoutRef.current = setTimeout(() => {DeviceBrightness.setBrightnessLevel(brightness)}, 17200);
@@ -82,7 +83,7 @@ const HomeScreen = ({navigation, route}) => {
 
     const renderScene = SceneMap({
       first: () => <FirstRoute navigation={navigation} t={t} user={user} />,
-      second: () => <SecondRoute navigation={navigation} t={t} user={user} />,
+      second: () => <SecondRoute navigation={navigation} t={t} user={user} attendanceTotal={attendanceTotal} />,
       third: () => <ThirdRoute navigation={navigation} t={t} user={user} />
       });
 
@@ -220,7 +221,10 @@ const FirstRoute = ({navigation, t, user}) => {
 
 
 // Tab screens
-const SecondRoute = ({navigation, t, user}) => {
+const SecondRoute = ({navigation, t, user, attendanceTotal}) => {
+  const now = new Date();
+  const monthStr = now.toLocaleString("ko-KR", { month: "long" });
+
   return (
     <View style={styles.tabContent}>
       <ScrollView 
@@ -260,11 +264,28 @@ const SecondRoute = ({navigation, t, user}) => {
           <TouchableOpacity
             style={styles.imageButton}
             onPress={() => navigation.navigate('Trainer')}>
+          {user.trainer  && user.trainer.picture.picture_url ?  ( 
+            <Image
+            source={{uri: `https://humake.blob.core.windows.net/humake/employee/${user.branch_id}/${user.trainer.picture.picture_url}`}}
+            style={[styles.imageIcon, { borderRadius: 24 }]}
+          />
+          ) : (
             <Image
               source={require('./assets/photo_none.gif')}
               style={[styles.imageIcon, { borderRadius: 24 }]}
             />
-            <Text style={styles.imageButtonText}>{t('menu.trainer')}</Text>
+          )}
+            {user.trainer ? (
+              <View>
+              <Text style={[styles.imageButtonText,{textAlign: 'center'}]}>{t('menu.my_trainer')}</Text>
+              <Text style={[styles.imageButtonText,{textAlign: 'center', color: '#ff8d1d'}]}>{user.trainer.name}</Text>
+              </View>
+            ) : (
+              <View>
+              <Text style={[styles.imageButtonText,{textAlign: 'center'}]}>{t('menu.my_trainer')}</Text>
+              <Text style={[styles.imageButtonText,{textAlign: 'center', color: '#ff8d1d'}]}>{t('common.none')}</Text>
+              </View>
+            )}
           </TouchableOpacity>
           
           <TouchableOpacity
@@ -274,7 +295,8 @@ const SecondRoute = ({navigation, t, user}) => {
               source={require('./assets/attendance.png')}
               style={styles.imageIcon}
             />
-            <Text style={styles.imageButtonText}>{t('menu.attendance')}</Text>
+            <Text style={styles.imageButtonText}>{monthStr} {t('menu.attendance')}</Text>
+            <Text style={[styles.imageButtonText,{textAlign: 'center', color: '#ff8d1d'}]}>{attendanceTotal}회</Text>
           </TouchableOpacity>
   
           <TouchableOpacity
@@ -324,12 +346,6 @@ const SecondRoute = ({navigation, t, user}) => {
   
   // SecondRoute.tsx
   const ThirdRoute = ({navigation, t, user}) => {
-  
-    useEffect(() => {
-      console.log('ThirdRoute user:', user);
-      console.log('ThirdRoute user access_card:', user?.access_card);
-    }, [user]);
-    
     const viewShotRef = useRef();
 
     const downloadBarcode = async () => {

@@ -55,6 +55,16 @@ const StopScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+            <View>
+        <Text>회원권에 따른 휴회 가능 일수 안내</Text>
+        <View>
+        <Text>3개월권 미만 : 휴회 가능 일수 0일</Text>
+        <Text>3개월권 : 휴회 가능일수 15일</Text>
+        <Text>6개월권 : 휴회 가능일수 30일</Text>
+        <Text>12개월권 : 휴회 가능일수 60일</Text>
+        </View>
+    <Text>*그 외 기타 회원권에 따른 휴회문의는 지점으로 직접 문의 부탁드립니다.</Text>
+      </View>
       <FlatList
         data={stops}
         renderItem={renderStopItem}

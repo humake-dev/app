@@ -21,31 +21,12 @@ const UserWeightScreen = ({ navigation }) => {
   const route = useRoute();
   useEffect(() => {
     if (route.params?.refresh) {
-      fetchUserWeights();
+        fetchUserWeights();
     }
   }, [route.params]);
 
-  const handleDeleteMessage = async (messageId) => {
-    try {
-      const response = await fetch(`${BASE_URL}/user_weights/delete/${messageId}`, {
-        method: 'POST',
-      });
-      
-      if (response.status === 401) {
-        navigation.navigate('Login');
-        return;
-      }
-      
-      if (response.ok) {
-        // Refresh the messages list after successful deletion
-        fetchUserWeights();
-      }
-    } catch (error) {
-      console.error('Error deleting message:', error);
-    }
-  };
 
-  const fetchUserWeights = useCallback(async () => {
+  const fetchUserWeights =async () => {
     try {
       const response = await fetch(`${BASE_URL}/user_weights`);
       
@@ -54,19 +35,21 @@ const UserWeightScreen = ({ navigation }) => {
         return;
       }
 
-      const data = await response.json();
-      setUserWeights(data.user_weights);
-      setLoading(false);
-      setTotal(data.total || 0);
+      if(response.ok){
+        const data = await response.json();
+        setUserWeights(data.user_weights);
+        setLoading(false);
+        setTotal(data.total || 0);
+      }
     } catch (error) {
       console.error('Error fetching messages:', error);
       setLoading(false);
     }
-  }, [navigation]);
+  };
 
   useEffect(() => {
-    fetchUserWeights();
-  }, [fetchUserWeights]);
+      fetchUserWeights();
+  }, []);
 
   if (loading) {
     return (
