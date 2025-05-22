@@ -317,6 +317,11 @@ const SecondRoute = ({navigation, t, user, attendanceTotal}) => {
               style={styles.imageIcon}
             />
             <Text style={styles.imageButtonText}>{t('menu.body')}</Text>
+            {user.user_weight ? (
+            <Text style={[styles.imageButtonText,{textAlign: 'center', color: '#ff8d1d'}]}>{user.user_weight.weight}kg</Text>            
+            ) : (
+            <Text style={[styles.imageButtonText,{textAlign: 'center', color: '#ff8d1d'}]}>{t('common.none')}</Text>            
+            )}
           </TouchableOpacity>
   
           <TouchableOpacity
