@@ -49,7 +49,11 @@
       },
       "message" : {
         "no_items": "No Message"
-      },   
+      },
+      "user_weight": {
+        "weight": "Weight",
+        "bmi": "BMI"
+      },
       "calendar": {
         "monthNames": [
           "January", "February", "March", "April", "May", "June",

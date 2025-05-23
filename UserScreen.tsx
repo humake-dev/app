@@ -1,13 +1,34 @@
-import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useRef } from 'react';
+import { View, TouchableOpacity, Text, StyleSheet, Alert, ScrollView, Dimensions,Image, useEffect } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import { useNavigation } from '@react-navigation/native';
 import { BASE_URL } from './Config';
+import { useUser } from './UserContext';
 
 const UserScreen = () => {
   const { t } = useTranslation();
   const navigation = useNavigation();
-  const [user, setUser] = useState(null);
+    const windowWidth = Dimensions.get('window').width;
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const userContext = useUser();
+  const user = userContext?.user;
+  const LAST_TAB_KEY = 'lastTab';
+
+  const [index, setIndex] = useState(0);
+  const [routes] = useState([
+    { key: 'first', title: t('수강') },
+    { key: 'second', title: t('락커') },
+    { key: 'third', title: t('내 정보') },
+  ]);
+
+
+// 탭 변경 시 저장
+const handleIndexChange = async (newIndex: number) => {
+  setIndex(newIndex);
+};
+
 
 
   const handleLogin = async () => {
@@ -33,24 +54,92 @@ const UserScreen = () => {
     }
   };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-      </View>
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.content}>
-          <View style={styles.contentContainer}>
 
-          </View>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <View style={styles.buttonContent}>
-              <Text style={styles.buttonText}>{t('common.backToList')}</Text>
-            </View>
-          </TouchableOpacity>
+    const renderScene = SceneMap({
+      first: () => <FirstRoute navigation={navigation} t={t} user={user} />,
+      second: () => <SecondRoute navigation={navigation} t={t} user={user} />,
+      third: () => <ThirdRoute navigation={navigation} t={t} user={user} />
+      });  
+
+
+  const FirstRoute = ({navigation, t, user}) => {
+
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
         </View>
-      </ScrollView>
+        <ScrollView style={styles.scrollView}>
+          <View style={styles.content}>
+            <View style={styles.contentContainer}>
+  
+            </View>
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+              <View style={styles.buttonContent}>
+                <Text style={styles.buttonText}>{t('common.backToList')}</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
+    );
+  };
+
+
+  const SecondRoute = ({navigation, t, user}) => {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+        </View>
+        <ScrollView style={styles.scrollView}>
+          <View style={styles.content}>
+            <View style={styles.contentContainer}>
+  
+            </View>
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+              <View style={styles.buttonContent}>
+                <Text style={styles.buttonText}>{t('common.backToList')}</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
+    );
+  };
+
+  const ThirdRoute = ({navigation, t, user}) => {
+
+  };
+
+    // 나머지 코드는 기존과 동일
+    return (
+      <View style={styles.container}>
+        {/* Tab View */}
+        <View style={styles.tabContainer}>
+        <TabView
+            navigationState={{ index, routes }}
+            renderScene={renderScene}
+            onIndexChange={handleIndexChange}
+            initialLayout={{ width: windowWidth }}
+            style={styles.tabView}
+            renderTabBar={props => (
+              <TabBar
+                {...props}
+                indicatorStyle={styles.tabIndicator}
+                style={styles.tabBar}
+                tabStyle={styles.tab}
+                labelStyle={styles.tabLabel}
+                renderLabel={({ route, focused }) => (
+                  <Text style={[styles.tabLabel, { opacity: focused ? 1 : 0.7 }]}>
+                    {route.title}
+                    </Text>
+                )}
+              />
+            )}
+          />
     </View>
-  );
+    </View>
+    );
+
 };
 
 const styles = StyleSheet.create({
@@ -92,6 +181,45 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: '#333',
   },
+
+  tabContainer: {
+    flex: 1,
+    height: '100%',
+    backgroundColor: '#fff',
+  },
+  tabView: {
+    flex: 1,
+    height: '100%',
+  },
+  tabBar: {
+    backgroundColor: '#333',
+    elevation: 0,
+    shadowOpacity: 0,
+    borderBottomWidth: 0,
+    height: 50,
+    width: '100%',
+  },
+  tabIndicator: {
+    backgroundColor: '#007AFF',
+    height: 3,
+  },
+  tab: {
+    flex: 1,
+    minWidth: 0,
+    paddingHorizontal: 16,
+  },
+  tabLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#000'
+  },
+  tabContent: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#f3f3f3',
+  },
+
   backButton: {
     backgroundColor: '#ccc',
     padding: 12,

@@ -89,7 +89,6 @@ const PtScreen = ({ navigation }) => {
   const disabledFutureDates = getDisabledFutureDates(today, 90);
 
   const onDayPress = (day) => {
-    console.log('Selected date:', day.dateString);
     const selected = new Date(day.dateString);
     if (selected > today) return; // 미래 날짜 선택 방지
   

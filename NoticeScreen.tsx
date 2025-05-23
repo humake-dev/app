@@ -4,7 +4,8 @@ import {
   Text,
   FlatList,
   StyleSheet,
-  TouchableOpacity
+  TouchableOpacity,
+  ActivityIndicator
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { BASE_URL } from './Config';
@@ -47,7 +48,7 @@ const NoticeScreen = ({ navigation, route }) => {
   if (loading) {
     return (
       <View>
-        <Text>Loading Notices...</Text>
+        <ActivityIndicator size="large" color="#007AFF" style={styles.loader} />
       </View>
     );
   }

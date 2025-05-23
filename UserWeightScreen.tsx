@@ -3,6 +3,7 @@ import {
   View,
   Text,
   FlatList,
+  Image,
   StyleSheet,
   TouchableOpacity
 } from 'react-native';
@@ -80,12 +81,6 @@ const UserWeightScreen = ({ navigation }) => {
 
     return (
       <View style={styles.messageItem}>
-        <TouchableOpacity onPress={handlePress} style={styles.messageInfo}>
-          <Text style={styles.messageTitle}>{item.title}</Text>
-          <Text style={styles.messageCreatedAt}>
-            {new Date(item.created_at).toLocaleDateString()}
-          </Text>
-        </TouchableOpacity>
         <TouchableOpacity
           style={styles.deleteButton}
           onPress={() => handleDeleteMessage(item.id)}
@@ -98,13 +93,21 @@ const UserWeightScreen = ({ navigation }) => {
 
   return (
     <View style={{ flex: 1 }}>
-      <FlatList
-        data={userWeights}
-        renderItem={renderUserWeightItem}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.messageList}
-        style={{ flexGrow: 1 }}
-      />
+        <View style={styles.infoContainer}>
+          <View>
+          <Text>{t('user_weight.weight')}</Text>
+            <Image source={require('./assets/ico_weight1.png')} />
+          </View>
+          <View>
+            <Text>{t('user_weight.bmi')}</Text>
+            <Image source={require('./assets/ico_weight2.png')} />
+          </View>
+        </View>
+        <View>
+          <Text>일간</Text>
+          <Text>주간</Text>
+          <Text>월간</Text>
+        </View>
             <TouchableOpacity 
               style={styles.addButton}
               onPress={() => navigation.navigate('UserWeightForm')}
@@ -122,6 +125,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 0,
   },
+  infoContainer: {
+    margin: 20,
+    padding: 25,
+    borderRadius: 10,
+    marginBottom: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  
   noMessagesText: {
     fontSize: 16,
     color: '#666',

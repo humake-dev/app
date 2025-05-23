@@ -55,7 +55,7 @@ const StopScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-            <View>
+            <View style={styles.infoContainer}>
         <Text>회원권에 따른 휴회 가능 일수 안내</Text>
         <View>
         <Text>3개월권 미만 : 휴회 가능 일수 0일</Text>
@@ -85,13 +85,20 @@ const StopScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f4f4f4 ',
   },
   screenContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 0,
+  },
+  infoContainer: {
+    margin: 20,
+    padding: 25,
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    marginBottom: 8,
   },
   stopList: {
     padding: 8,

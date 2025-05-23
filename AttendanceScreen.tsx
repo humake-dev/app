@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity,
+  ActivityIndicator, FlatList } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { BASE_URL } from './Config';
@@ -16,7 +17,8 @@ const AttendanceScreen = ({ navigation }) => {
   const [ptCount, setPtCount] = useState(0);
   const [markedDates, setMarkedDates] = useState({});
   const { t, i18n } = useTranslation();
-
+  const [Attendances, setAttendances] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!i18n.isInitialized) return;
@@ -100,14 +102,43 @@ const AttendanceScreen = ({ navigation }) => {
   };
 
 
+  const fetchAttendances = async (date) => {
+    try {
+      console.log('Fetching attendance for date:', date);
+      setLoading(true);
 
+      const response = await fetch(`${BASE_URL}/attendances?day=${date}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+
+      console.log('API Response:', data);
+      if (data.attendance_list) {
+        const formattedSchedules = data.attendance_list.map((item, index) => ({
+          id: item.id.toString(),
+          start_time: convertTime(item.start_time),
+        }));
+        setAttendances(formattedSchedules);
+      } else {
+        console.log('No attendance_list in response');
+        setAttendances([]);
+      }
+    } catch (error) {
+      console.error('Error fetching attendance:', error);
+      Alert.alert(t('errors.error'), t('errors.fetchAttendancesFailed'));
+      setAttendances([]);
+    } finally {
+      setLoading(false);
+    }
+  };
     
   const onDayPress = (day) => {
-    const today = new Date();
     const selected = new Date(day.dateString);
     if (selected > today) return; // 미래 날짜 선택 방지
   
     setSelectedDate(day.dateString);
+    fetchAttendances(day.dateString);
   };
 
 
@@ -137,8 +168,8 @@ const AttendanceScreen = ({ navigation }) => {
         hideExtraDays={true}
         theme={{
             monthTextColor: '#000', // 여기!
-            selectedDayBackgroundColor: '#007AFF',
             selectedDayTextColor: 'white',
+            selectedDayBackgroundColor: '#007AFF',
             arrowColor: '#007AFF',
             // 기본 요일 색상 (평일용)
             textSectionTitleColor: '#000',
@@ -189,6 +220,34 @@ const AttendanceScreen = ({ navigation }) => {
             );
           }}
         />
+
+              
+              <View style={styles.scheduleHeader}>
+                <Text style={styles.scheduleHeaderText}>PT 일정 ({selectedDate})</Text>
+              </View>
+              
+              {loading ? (
+                <ActivityIndicator size="large" color="#007AFF" style={styles.loader} />
+              ) : (
+                <FlatList
+                  data={ptSchedules}
+                  renderItem={renderPtScheduleItem}
+                  keyExtractor={item => item.id}
+                  style={styles.scheduleList}
+                  ListEmptyComponent={() => (
+                    <View style={styles.emptyContainer}>
+                      <Text style={styles.emptyText}>예약된 PT가 없습니다.</Text>
+                    </View>
+                  )}
+                  ListHeaderComponent={() => (
+                    <View style={styles.scheduleListHeader}>
+                      <Text style={styles.scheduleListHeaderText}>시간</Text>
+                      <Text style={styles.scheduleListHeaderText}>강사</Text>
+                      <Text style={styles.scheduleListHeaderText}>상태</Text>
+                    </View>
+                  )}
+                />
+              )}
     </View>
   );
 };
@@ -227,6 +286,65 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 8,
   },
+  scheduleHeader: {
+    padding: 15,
+    backgroundColor: '#f4f4f4',
+  },
+  scheduleHeaderText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  scheduleList: {
+    flex: 1,
+  },
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#888',
+  },
+  scheduleListHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+    backgroundColor: '#f8f8f8',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  scheduleListHeaderText: {
+    flex: 1,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  scheduleItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  scheduleItemText: {
+    flex: 1,
+    textAlign: 'center',
+  },
+  statusConfirmed: {
+    color: 'green',
+  },
+  statusPending: {
+    color: 'orange',
+  },
+  statusCompleted: {
+    color: 'gray',
+  },  
 });
 
 export default AttendanceScreen;

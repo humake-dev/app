@@ -4,14 +4,31 @@ import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import Barcode from '@kichiyaki/react-native-barcode-generator';
 import { useUser } from './UserContext';
+import DeviceBrightness from '@adrianso/react-native-device-brightness';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import { Platform } from 'react-native';
 
 const BarcodeScreen = () => {
-  const { t } = useTranslation();
-  const navigation = useNavigation();
-  const windowWidth = Dimensions.get('window').width;
     const userContext = useUser();
     const user = userContext?.user;
     
+    const [brightness, setBrightness] = useState();
+    const [changeBrightness, setChangeBrightness] = useState(false);
+
+    useEffect(() => {
+      if(Platform.OS == 'ios') {
+        DeviceBrightness.getBrightnessLevel().then((luminous) =>  {
+          setBrightness(luminous);
+        });
+      } else {
+        DeviceBrightness.getSystemBrightnessLevel().then((luminous) =>  {
+          setBrightness(luminous);
+        });
+      }
+  }, [brightness]);
+  
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>

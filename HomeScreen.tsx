@@ -256,7 +256,7 @@ const SecondRoute = ({navigation, t, user, attendanceTotal}) => {
             <View style={styles.memberInfoContainer}>
           <TouchableOpacity
             onPress={() => navigation.navigate('User')}>
-          <Text style={styles.memberText}>{user.name} {t('common.user_card')}</Text>
+          <Text style={styles.memberText}>[{user.name}]{t('common.user_card')}</Text>
           </TouchableOpacity>
           </View>
         </View>
