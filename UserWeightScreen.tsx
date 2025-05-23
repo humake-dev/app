@@ -143,8 +143,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   infoImage: {
-    width: 150,
-    height: 100,
+    width: 130,
+    height: 70,
     margin: 5,
   },
   

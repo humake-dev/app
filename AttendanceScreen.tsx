@@ -223,27 +223,25 @@ const AttendanceScreen = ({ navigation }) => {
 
               
               <View style={styles.scheduleHeader}>
-                <Text style={styles.scheduleHeaderText}>PT 일정 ({selectedDate})</Text>
+                <Text style={styles.scheduleHeaderText}>출석 현황 ({selectedDate})</Text>
               </View>
               
               {loading ? (
                 <ActivityIndicator size="large" color="#007AFF" style={styles.loader} />
               ) : (
                 <FlatList
-                  data={ptSchedules}
-                  renderItem={renderPtScheduleItem}
+                  data={Attendances}
+                  renderItem={renderAttendanceItem}
                   keyExtractor={item => item.id}
                   style={styles.scheduleList}
                   ListEmptyComponent={() => (
                     <View style={styles.emptyContainer}>
-                      <Text style={styles.emptyText}>예약된 PT가 없습니다.</Text>
+                      <Text style={styles.emptyText}>출석한 시간이 없습니다.</Text>
                     </View>
                   )}
                   ListHeaderComponent={() => (
                     <View style={styles.scheduleListHeader}>
                       <Text style={styles.scheduleListHeaderText}>시간</Text>
-                      <Text style={styles.scheduleListHeaderText}>강사</Text>
-                      <Text style={styles.scheduleListHeaderText}>상태</Text>
                     </View>
                   )}
                 />
