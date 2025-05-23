@@ -69,7 +69,6 @@ const NoticeScreen = ({ navigation, route }) => {
       <View style={styles.noticeItem}>
         <TouchableOpacity onPress={handlePress} style={styles.noticeInfo}>
           <Text style={styles.noticeTitle}>{item.title}</Text>
-
         </TouchableOpacity>
       </View>
     );

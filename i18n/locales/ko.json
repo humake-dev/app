@@ -9,7 +9,9 @@
       "backToList" : "목록으로",
       "month" : "월",
       "download_barcode" : "바코드다운로드",
-      "none" : "없음"
+      "none" : "없음",
+      "times" : "회",
+      "user_card" : "님의 회원카드"
     },
     "tabMenu": {
       "message": "알림",
@@ -41,6 +43,9 @@
       "no_items": "상담이 없습니다",
       "default": "default",
       "pt": "pt"
+    },
+    "notice": {
+      "no_items": "공지사항이 없습니다"
     },
     "stop": {
       "form": "휴회신청을 작성해주세요",

@@ -8,7 +8,9 @@
       "ok": "OK",
       "backToList" : "Back to List",
       "month" : "Month",
-      "none" : "None"
+      "none" : "None",
+      "times" : "times",
+      "user_card" : "User Card"
     },
     "menu": {
       "my_trainer": "My Trainer",
@@ -28,6 +30,9 @@
         "content": "Counsel Content",
         "contentPlaceholder": "Counsel Content",
         "no_items": "No Counsel"
+      },
+      "notice": {
+        "no_items": "No Notice"
       },
       "stop": {
         "form": "Stop Form",

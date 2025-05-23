@@ -9,119 +9,101 @@ const AttendanceScreen = ({ navigation }) => {
   const currentYear = now.getFullYear();
   const currentMonth = String(now.getMonth() + 1)
 
-  const { t } = useTranslation();
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [attendanceCount, setAttendanceCount] = useState(0);
   const [ptCount, setPtCount] = useState(0);
   const [markedDates, setMarkedDates] = useState({});
+  const { t, i18n } = useTranslation();
 
-  const fetchCounts = async () => {
-    try {
-      const today = new Date();
-      const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-      const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-
-      // Replace with actual API calls
-      // Example: await fetchAttendanceCounts(firstDayOfMonth, lastDayOfMonth)
-      setAttendanceCount(0); // Replace with actual count
-      setPtCount(0); // Replace with actual count
-    } catch (error) {
-      console.error('Error fetching counts:', error);
-    }
-  };
 
   useEffect(() => {
+    if (!i18n.isInitialized) return;
+  
     LocaleConfig.locales['ko'] = {
       monthNames: t('calendar.monthNames', { returnObjects: true }),
       monthNamesShort: t('calendar.monthNamesShort', { returnObjects: true }),
       dayNames: t('calendar.dayNames', { returnObjects: true }),
       dayNamesShort: t('calendar.dayNamesShort', { returnObjects: true }),
-      today: t('calendar.today')
+      today: t('calendar.today'),
     };
-
+  
     LocaleConfig.defaultLocale = 'ko';
-
-    // Fetch attendance and PT counts for the current month
-
-
-    fetchCounts();
-  }, []);
-
+  
+    fetchAttendanceMarks();
+    fetchPTMarks();
+  }, [i18n.isInitialized])
+  
   useEffect(() => {
-    fetch(`${BASE_URL}/entrances?month=${selectedMonth}&year=${selectedYear}`)
-    .then(response => response.json())
-    .then(data => {
+     fetchAttendanceMarks();
+     fetchPTMarks();
+   }, [selectedMonth, selectedYear]);
+
+   const fetchAttendanceMarks = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/entrances?month=${selectedMonth}&year=${selectedYear}`);
+      const data = await response.json();
       setAttendanceCount(data.total);
-      
-      if(data.total > 0) {
-      // Create marked dates object for calendar
-      const markedDates = {};
-      data.entrance_list.forEach(dateStr => {
-        if(dateStr.in_time) {
-          markedDates[dateStr.in_time.split('T')[0]]= {
-            marked: true,
-             dotColor: '#FF69B4'// Blue dot for marked dates
-          };
-        }
-      });
-      
-      // Update calendar with marked dates
-      setMarkedDates(markedDates);
+  
+      if (data.total > 0) {
+        const newMarks = {};
+        data.entrance_list.forEach(dateStr => {
+          if (dateStr.in_time) {
+            const dateKey = dateStr.in_time.split('T')[0];
+            newMarks[dateKey] = {
+              ...markedDates[dateKey],
+              marked: true,
+              dotColor: '#FF69B4',
+            };
+          }
+        });
+  
+        setMarkedDates(prev => ({
+          ...prev,
+          ...newMarks,
+        }));
       }
-    })
-    .catch(error => {
-      console.error('Error fetching messages:', error);
-    });
-
-    fetch(`${BASE_URL}/reservations?month=${selectedMonth}&year=${selectedYear}`)
-    .then(response => response.json())
-    .then(data => {
-      setPtCount(data.total);
-      
-      if(data.total > 0) {
-      // Create marked dates object for calendar
-      const markedDates = {};
-      data.reservation_list.forEach(dateStr => {
-        if(dateStr.in_time) {
-        markedDates[dateStr.in_time.split('T')[0]]= {
-          marked: true,
-           dotColor: 'red'// Blue dot for marked dates
-        };
-        }
-      });
-      
-      // Update calendar with marked dates
-      setMarkedDates(markedDates);
-      }
-    })
-    .catch(error => {
-      console.error('Error fetching messages:', error);
-    });
-
-  }, [selectedMonth, selectedYear]);
-
-  const today = new Date();
-  const formatDate = (d) => d.toISOString().split('T')[0];
-
-  const getDisabledFutureDates = (fromDate, days) => {
-    const disabled = {};
-    for (let i = 1; i <= days; i++) {
-      const future = new Date(fromDate);
-      future.setDate(future.getDate() + i);
-      disabled[formatDate(future)] = {
-        disabled: true,
-        disableTouchEvent: true,
-      };
+    } catch (error) {
+      console.error('Error fetching attendance:', error);
     }
-    return disabled;
   };
 
-  const todayStr = formatDate(today);
-  const disabledFutureDates = getDisabledFutureDates(today, 90);
 
+  const fetchPTMarks = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/reservations?month=${selectedMonth}&year=${selectedYear}`);
+      const data = await response.json();
+      setPtCount(data.total);
+  
+      if (data.total > 0) {
+        const newMarks = {};
+        data.reservation_list.forEach(dateStr => {
+          if (dateStr.in_time) {
+            const dateKey = dateStr.in_time.split('T')[0];
+            newMarks[dateKey] = {
+              ...markedDates[dateKey],
+              marked: true,
+              dotColor: 'red',
+            };
+          }
+        });
+  
+        setMarkedDates(prev => ({
+          ...prev,
+          ...newMarks,
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching attendance:', error);
+    }
+  };
+
+
+
+    
   const onDayPress = (day) => {
+    const today = new Date();
     const selected = new Date(day.dateString);
     if (selected > today) return; // 미래 날짜 선택 방지
   
@@ -129,27 +111,19 @@ const AttendanceScreen = ({ navigation }) => {
   };
 
 
-const year = today.getFullYear();
-const month = today.getMonth() + 1;
-
-// 이번 달 마지막 날 구하기
-const lastDayOfMonth = new Date(year, month, 0).getDate();
-const maxDate = `${year}-${String(month).padStart(2, '0')}-${lastDayOfMonth}`;
-
   return (
     <View style={styles.container}>
       <View style={styles.statsContainer}>
         <View style={styles.statsItem}>
           <Text style={styles.statsLabel}>{selectedMonth}{t('common.month')} {t('attendance.count')}  <View style={styles.attendanceCircle} /></Text>         
-          <Text style={styles.statsValue}>{attendanceCount}</Text>
+          <Text style={styles.statsValue}>{attendanceCount} {t('common.times')}</Text>
         </View>
         <View style={styles.statsItem}>
           <Text style={styles.statsLabel}>{selectedMonth}{t('common.month')} {t('attendance.PTcount')} <View style={[styles.attendanceCircle, { backgroundColor: 'blue' }]} /></Text>
-          <Text style={styles.statsValue}>{ptCount}</Text>
+          <Text style={styles.statsValue}>{ptCount} {t('common.times')}</Text>
         </View>
       </View>
       <Calendar 
-              maxDate={maxDate}
         onDayPress={onDayPress}
         markedDates={markedDates} 
         onVisibleMonthsChange={(months) => {
@@ -171,6 +145,7 @@ const maxDate = `${year}-${String(month).padStart(2, '0')}-${lastDayOfMonth}`;
             textDisabledColor: '#C7C7CD', // 흐리게 보여질 색상
           }}
           dayComponent={({ date, state }) => {
+            const today = new Date();
             const dayOfWeek = new Date(date.dateString).getDay();
             const isTodayOrPast = new Date(date.dateString) <= today;
           

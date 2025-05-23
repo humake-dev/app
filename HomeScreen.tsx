@@ -256,7 +256,7 @@ const SecondRoute = ({navigation, t, user, attendanceTotal}) => {
             <View style={styles.memberInfoContainer}>
           <TouchableOpacity
             onPress={() => navigation.navigate('User')}>
-          <Text style={styles.memberText}>{user.name}</Text>
+          <Text style={styles.memberText}>{user.name} {t('common.user_card')}</Text>
           </TouchableOpacity>
           </View>
         </View>
@@ -296,17 +296,7 @@ const SecondRoute = ({navigation, t, user, attendanceTotal}) => {
               style={styles.imageIcon}
             />
             <Text style={styles.imageButtonText}>{monthStr} {t('menu.attendance')}</Text>
-            <Text style={[styles.imageButtonText,{textAlign: 'center', color: '#ff8d1d'}]}>{attendanceTotal}회</Text>
-          </TouchableOpacity>
-  
-          <TouchableOpacity
-            style={styles.imageButton}
-            onPress={() => navigation.navigate('Pt')}>
-            <Image
-              source={require('./assets/pt.png')}
-              style={styles.imageIcon}
-            />
-            <Text style={styles.imageButtonText}>{t('menu.pt')}</Text>
+            <Text style={[styles.imageButtonText,{textAlign: 'center', color: '#ff8d1d'}]}>{attendanceTotal} {t('common.times')}</Text>
           </TouchableOpacity>
           
           <TouchableOpacity
@@ -322,6 +312,17 @@ const SecondRoute = ({navigation, t, user, attendanceTotal}) => {
             ) : (
             <Text style={[styles.imageButtonText,{textAlign: 'center', color: '#ff8d1d'}]}>{t('common.none')}</Text>            
             )}
+          </TouchableOpacity>
+
+  
+          <TouchableOpacity
+            style={styles.imageButton}
+            onPress={() => navigation.navigate('Pt')}>
+            <Image
+              source={require('./assets/pt.png')}
+              style={styles.imageIcon}
+            />
+            <Text style={styles.imageButtonText}>{t('menu.pt')}</Text>
           </TouchableOpacity>
   
           <TouchableOpacity

@@ -124,6 +124,8 @@ const styles = StyleSheet.create({
   noMessagesText: {
     fontSize: 16,
     color: '#666',
+    textAlign: 'center',
+    marginTop: 20,
   },
   messageList: {
     padding: 8,
