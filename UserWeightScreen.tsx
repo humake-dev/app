@@ -94,16 +94,16 @@ const UserWeightScreen = ({ navigation }) => {
   return (
     <View style={{ flex: 1 }}>
         <View style={styles.infoContainer}>
-          <View>
+          <View style={styles.infoItem}>
           <Text>{t('user_weight.weight')}</Text>
-            <Image source={require('./assets/ico_weight1.png')} />
+            <Image source={require('./assets/ico_weight1.png')} style={styles.infoImage}/>
           </View>
-          <View>
+          <View style={styles.infoItem}>
             <Text>{t('user_weight.bmi')}</Text>
-            <Image source={require('./assets/ico_weight2.png')} />
+            <Image source={require('./assets/ico_weight2.png')} style={styles.infoImage}/>
           </View>
         </View>
-        <View>
+        <View style={styles.infoContainer}>
           <Text>일간</Text>
           <Text>주간</Text>
           <Text>월간</Text>
@@ -131,10 +131,21 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 8,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+  },
+  infoItem: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    flex: 1,
+  },
+  infoImage: {
+    width: 150,
+    height: 100,
+    margin: 5,
   },
   
   noMessagesText: {
