@@ -1,0 +1,81 @@
+// i18n/locales/ko.json
+{
+    "common": {
+      "back": "뒤로 가기",
+      "home": "홈으로 돌아가기",
+      "delete": "삭제",
+      "submit": "제출",
+      "ok": "확인",
+      "backToList" : "목록으로",
+      "month" : "월",
+      "download_barcode" : "바코드다운로드",
+      "none" : "없음",
+      "times" : "회",
+      "user_card" : "님의 회원카드"
+    },
+    "tabMenu": {
+      "message": "알림",
+      "menu": "메뉴",
+      "barcode": "입장바코드"
+    },
+    "menu": {
+      "my_trainer": "담당강사",
+      "trainer": "강사",
+      "attendance": "출석",
+      "exercise": "운동",
+      "counsel": "상담",
+      "stop": "휴회",
+      "pt": "PT",
+      "user_weight": "몸무게",
+      "login" : "로그인",
+      "notice" : "공지사항",
+      "message" : "알림",
+      "user" : "내 정보"
+    },
+    "counsel": {
+      "form": "상담 내용을 작성해주세요",
+      "add": "상담 작성",
+      "selectCourse": "문의유형",
+      "course1": "기본문의",
+      "course2": "PT문의",
+      "content": "상담 내용",
+      "contentPlaceholder": "상담 내용을 입력해주세요",
+      "no_items": "상담이 없습니다",
+      "default": "default",
+      "pt": "pt"
+    },
+    "notice": {
+      "no_items": "공지사항이 없습니다"
+    },
+    "stop": {
+      "form": "휴회신청을 작성해주세요",
+      "stopPeriod": "휴회기간",
+      "add": "휴회 추가",
+      "selectDate": "날짜 선택",
+      "content": "휴회 사유",
+      "contentPlaceholder": "휴회 사유 간단히 한 줄로 써주세요",
+      "no_items": "휴회가 없습니다"
+    },
+    "attendance": {
+      "PTcount": "PT횟수",
+      "count": "출석"
+    },
+    "message" : {
+      "no_items": "메시지가 없습니다"
+    },
+    "user_weight": {
+      "weight": "몸무게",
+      "bmi": "BMI",
+      "period_day": "일간",
+      "period_week": "주간",
+      "period_month": "월간"
+    },
+    "calendar": {
+        "monthNames": ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+        "monthNamesShort": ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+        "dayNames": ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"],
+        "dayNamesShort": ["일", "월", "화", "수", "목", "금", "토"],
+        "today": "오늘",
+        "monthFormat": "yyyy년 M월"
+      }
+  }

@@ -1,0 +1,79 @@
+  // i18n/locales/en.json
+  {
+    "common": {
+      "back": "Back",
+      "home": "Back to Home",
+      "delete": "Delete",          
+      "submit": "Submit",
+      "ok": "OK",
+      "backToList" : "Back to List",
+      "month" : "Month",
+      "none" : "None",
+      "times" : "times",
+      "user_card" : "User Card"
+    },
+    "menu": {
+      "my_trainer": "My Trainer",
+      "trainer": "Trainer",
+      "attendance": "Attendance",
+      "exercise": "Exercise",
+      "counsel": "Counsel",
+      "user_weight": "Weight",
+      "stop": "Stop",
+      "pt": "PT"
+      },
+      "counsel":   {
+        "add": "Counsel Add",
+        "selectDate": "Select Date",
+        "selectOption": "Select Option",
+        "option1": "Option 1",
+        "option2": "Option 2",
+        "content": "Counsel Content",
+        "contentPlaceholder": "Counsel Content",
+        "no_items": "No Counsel"
+      },
+      "notice": {
+        "no_items": "No Notice"
+      },
+      "stop": {
+        "form": "Stop Form",
+        "stopPeriod": "Stop Period",
+        "add": "Stop Add",
+        "selectDate": "Select Date",
+        "content": "Stop Content",
+        "contentPlaceholder": "Stop Content",
+        "no_items": "No Stop"
+      },
+      "attendance": {
+        "PTcount": "PT Attendance",
+        "count": "Attendance"
+      },
+      "message" : {
+        "no_items": "No Message"
+      },
+      "user_weight": {
+        "weight": "Weight",
+        "bmi": "BMI",
+        "period_day": "Daily",
+        "period_week": "Weekly",
+        "period_month": "Monthly"
+      },
+      "calendar": {
+        "monthNames": [
+          "January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"
+        ],
+        "monthNamesShort": [
+          "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        ],
+        "dayNames": [
+          "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
+        ],
+        "dayNamesShort": [
+          "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
+        ],
+        "today": "Today",
+        "monthFormat": "MMMM yyyy"
+      }
+  }

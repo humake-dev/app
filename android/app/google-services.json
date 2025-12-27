@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "726814124114",
+    "firebase_url": "https://humake-fitness.firebaseio.com",
+    "project_id": "humake-fitness",
+    "storage_bucket": "humake-fitness.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:726814124114:android:87ee91366a24483598d78b",
+        "android_client_info": {
+          "package_name": "kr.co.humake"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "726814124114-sitp8rgt3k2o22bvohfq4bd2t9838t4d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdj2P9WkWmiwvT44ly6u7pDOnHhphooYk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "726814124114-sitp8rgt3k2o22bvohfq4bd2t9838t4d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
