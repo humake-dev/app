@@ -33,15 +33,14 @@ const AttendanceScreen = ({ navigation }) => {
     };
   
     LocaleConfig.defaultLocale = 'ko';
-  
-    fetchAttendanceMarks();
-    fetchPTMarks();
   }, [i18n.isInitialized])
   
-  useEffect(() => {
-     fetchAttendanceMarks();
-     fetchPTMarks();
-   }, [selectedMonth, selectedYear]);
+useEffect(() => {
+  if (!i18n.isInitialized) return;
+
+  fetchAttendanceMarks();
+  fetchPTMarks();
+}, [i18n.isInitialized, selectedMonth, selectedYear]);
 
    const fetchAttendanceMarks = async () => {
     try {
@@ -56,8 +55,6 @@ const AttendanceScreen = ({ navigation }) => {
 
 
       const data = await response.json();
-
-      console.log(data);
       setAttendanceCount(data.total);
   
       if (data.total > 0) {
@@ -86,7 +83,13 @@ const AttendanceScreen = ({ navigation }) => {
 
   const fetchPTMarks = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/reservations?month=${selectedMonth}&year=${selectedYear}`);
+      const token = await AsyncStorage.getItem("accessToken");
+      const response = await fetch(`${BASE_URL}/reservations?month=${selectedMonth}&year=${selectedYear}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       const data = await response.json();
       setPtCount(data.total);
   

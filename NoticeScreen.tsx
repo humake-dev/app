@@ -41,7 +41,7 @@ const NoticeScreen = ({ navigation, route }) => {
       console.error('Error fetching notices:', error);
       setLoading(false);
     }
-  }, [navigation]);
+  }, []);
 
   useEffect(() => {
     fetchNotices();

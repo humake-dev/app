@@ -515,7 +515,6 @@ const SecondRoute = ({navigation, t, user, attendanceTotal}) => {
         width: '30%',
         alignItems: 'flex-start',
         justifyContent: 'center',
-        alignItems: 'center',
         textAlign : 'center',
         marginBottom: 10,
         padding: 10,

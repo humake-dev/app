@@ -42,7 +42,7 @@ const MessageScreen = ({ navigation, route }) => {
       console.error('Error fetching messages:', error);
       setLoading(false);
     }
-  }, [navigation]);
+  }, []);
 
 
 

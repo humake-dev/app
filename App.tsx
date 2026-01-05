@@ -52,7 +52,7 @@ import { BASE_URL } from './Config';
 import UserContext, { UserProvider } from './UserContext';
 import BarcodeScreen from './BarcodeScreen';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 const Stack = createStackNavigator();
 
@@ -310,8 +310,6 @@ const loginCheck = async () => {
       return;
     }
 
-    console.log(BASE_URL);
-
     // 🔑 유저 상세 정보 요청
     const response = await fetch(`${BASE_URL}/user`, {
       method: "GET",
@@ -334,6 +332,63 @@ const loginCheck = async () => {
   } catch (e) {
     console.log("토큰 파싱 실패", e);
   }
+};
+
+const authFetch = async (url: string, options: any = {}) => {
+  let accessToken = await AsyncStorage.getItem("accessToken");
+
+  let res = await fetch(url, {
+    ...options,
+    headers: {
+      ...options.headers,
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  if (res.status !== 401) return res;
+
+  // 🔁 여기서 refresh
+  accessToken = await refreshAccessToken();
+
+  return fetch(url, {
+    ...options,
+    headers: {
+      ...options.headers,
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
+
+const refreshAccessToken = async () => {
+  const refreshToken = await AsyncStorage.getItem("refreshToken");
+
+  if (!refreshToken) {
+    throw new Error("No refresh token");
+  }
+
+  console.log(refreshToken);
+
+  const res = await fetch(`${BASE_URL}/refresh`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      refresh_token: refreshToken,
+    }),
+  });
+
+  if (!res.ok) {
+    // refresh 자체가 만료 → 로그아웃
+    await AsyncStorage.multiRemove(["accessToken", "refreshToken"]);
+    throw new Error("Refresh token expired");
+  }
+
+  const { access_token } = await res.json();
+  await AsyncStorage.setItem("accessToken", access_token);
+
+  return access_token;
 };
 
   return (

@@ -46,7 +46,7 @@ const TrainerScreen = ({navigation}) => {
         console.error('Error fetching trainers:', error);
         setLoading(false);
       }
-    }, [navigation]);
+    }, []);
   
     if (loading) {
       return (

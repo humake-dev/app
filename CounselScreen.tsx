@@ -56,19 +56,12 @@ const CounselScreen = ({ navigation }) => {
       console.error('Error fetching counsels:', error);
       setLoading(false);
     }
-  }, [navigation]);
+  }, []);
 
   // Initial fetch
   useEffect(() => {
     fetchCounsels();
   }, [fetchCounsels]);
-
-  // Refresh when screen comes into focus
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchCounsels();
-    }, [fetchCounsels])
-  );
 
   if (loading) {
     return (
