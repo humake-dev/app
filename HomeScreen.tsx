@@ -25,6 +25,7 @@ import MessageScreen from './MessageScreen';
 import NoticeScreen from './NoticeScreen';
 import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { uploadProfileImageFlow } from './utils/profileImageUploader';
 
 const HomeScreen = ({navigation, attendanceTotal}) => {
     const { t } = useTranslation();
@@ -96,7 +97,8 @@ const HomeScreen = ({navigation, attendanceTotal}) => {
           });
         }
     }, [brightness]);
-    
+
+
 
       // Dimensions를 state로 관리
   const [layout, setLayout] = useState({
@@ -222,6 +224,31 @@ const SecondRoute = ({navigation, t, user, attendanceTotal}) => {
   const now = new Date();
   const monthStr = now.toLocaleString("ko-KR", { month: "long" });
 
+const handleUploadProfileImage = async (image) => {
+  // 여기서 서버 업로드
+  const formData = new FormData();
+  formData.append('file', {
+    uri: image.uri,
+    name: image.name,
+    type: image.type,
+  });
+
+  const res = await authFetch('/users/profile_image', {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error('upload failed');
+  }
+
+  // 필요하면 유저 정보 다시 fetch
+};    
+    
+
   return (
     <View style={styles.tabContent}>
       <ScrollView 
@@ -230,25 +257,30 @@ const SecondRoute = ({navigation, t, user, attendanceTotal}) => {
       >
         <View style={styles.memberCard}>
           <View style={styles.memberImageContainer}>
-        {user?.picture?.picture_url ? (
-                            <Lightbox 
-                            activeProps={{
-                              style: styles.fullScreenImage
-                            }}
-                          >
-              <Image
-                source={{uri: `https://humake.blob.core.windows.net/humake/user/${user?.branch_id}/${user.picture.picture_url}`}}
-                style={styles.memberImage}
-                resizeMode="cover"
-              />
-            </Lightbox>
-            ) : (
-              <Image
-                source={require('./assets/photo_none.gif')}
-                style={styles.memberImage}
-                resizeMode="cover"
-              />
-            )}
+<TouchableOpacity
+  onPress={() => uploadProfileImageFlow(handleUploadProfileImage)}
+  activeOpacity={0.8}
+>
+  {user?.picture?.picture_url ? (
+    <Lightbox
+      activeProps={{ style: styles.fullScreenImage }}
+    >
+      <Image
+        source={{
+          uri: `https://humake.blob.core.windows.net/humake/user/${user?.branch_id}/${user.picture.picture_url}`,
+        }}
+        style={styles.memberImage}
+        resizeMode="cover"
+      />
+    </Lightbox>
+  ) : (
+    <Image
+      source={require('./assets/photo_none.gif')}
+      style={styles.memberImage}
+      resizeMode="cover"
+    />
+  )}
+</TouchableOpacity>
             </View>
             <View style={styles.memberInfoContainer}>
           <TouchableOpacity
@@ -272,17 +304,25 @@ const SecondRoute = ({navigation, t, user, attendanceTotal}) => {
               style={[styles.imageIcon, { borderRadius: 24 }]}
             />
           )}
-            {user?.trainer ? (
-              <View>
-              <Text style={[styles.imageButtonText,{textAlign: 'center'}]}>{t('menu.my_trainer')}</Text>
-              <Text style={[styles.imageButtonText,{textAlign: 'center', color: '#ff8d1d'}]}>{user.trainer.name}</Text>
-              </View>
-            ) : (
-              <View>
-              <Text style={[styles.imageButtonText,{textAlign: 'center'}]}>{t('menu.my_trainer')}</Text>
-              <Text style={[styles.imageButtonText,{textAlign: 'center', color: '#ff8d1d'}]}>{t('common.none')}</Text>
-              </View>
-            )}
+{user?.trainer ? (
+  <View style={styles.imageButtonTextWrapper}>
+    <Text style={styles.imageButtonText}>
+      {t('menu.my_trainer')}
+    </Text>
+    <Text style={[styles.imageButtonText, styles.highlightText]}>
+      {user.trainer.name}
+    </Text>
+  </View>
+) : (
+  <View style={styles.imageButtonTextWrapper}>
+    <Text style={styles.imageButtonText}>
+      {t('menu.my_trainer')}
+    </Text>
+    <Text style={[styles.imageButtonText, styles.highlightText]}>
+      {t('common.none')}
+    </Text>
+  </View>
+)}
           </TouchableOpacity>
           
           <TouchableOpacity
@@ -459,16 +499,19 @@ const SecondRoute = ({navigation, t, user, attendanceTotal}) => {
       },
 
     
-      menuContainer: {
-        flex: 1,
-        paddingTop: 10,
-        paddingHorizontal: 20,
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        flexDirection: 'row',
-        gap : '3.3%'
-      },
+menuContainer: {
+  flex: 1,
+  paddingTop: 10,
+  paddingHorizontal: 20,
+
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+
+  justifyContent: 'center', // ⬅️ 가로 중앙
+  alignItems: 'center',     // ⬅️ 세로 중앙
+
+  gap: 12,
+},
     
       menuTitle: {
         color: '#fff',
@@ -511,27 +554,40 @@ const SecondRoute = ({navigation, t, user, attendanceTotal}) => {
         fontSize: 24,
         fontWeight: 'bold',
       },
-      imageButton: {
-        width: '30%',
-        alignItems: 'flex-start',
-        justifyContent: 'center',
-        textAlign : 'center',
-        marginBottom: 10,
-        padding: 10,
-        backgroundColor: 'transparent',
-      },
-      imageIcon: {
-        width: 48,
-        height: 48,
-        marginBottom: 8,
-        resizeMode: 'contain',
-      },
-      imageButtonText: {
-        color: '#000',
-        fontSize: 16,
-        fontWeight: 'bold',
-        backgroundColor: 'transparent',
-      },
+imageButton: {
+  width: '30%',
+  alignItems: 'center',      // ⬅️ 아이콘 & 텍스트 중앙
+  justifyContent: 'center',
+  textAlign: 'center',
+
+  marginBottom: 16,
+  paddingVertical: 12,
+
+  backgroundColor: 'transparent',
+},
+imageButtonTextWrapper: {
+  width: '100%',        // ⬅️ 핵심
+  alignItems: 'center', // ⬅️ 핵심
+},
+
+highlightText: {
+  color: '#ff8d1d',
+},
+imageIcon: {
+  width: 48,
+  height: 48,
+  marginBottom: 8,
+  resizeMode: 'contain',
+  alignSelf: 'center', // ⬅️ 안전핀
+},
+imageButtonText: {
+  color: '#000',
+  fontSize: 16,
+  fontWeight: 'bold',
+  backgroundColor: 'transparent',
+  textAlign: 'center',   // ⬅️ 텍스트 중앙
+  width: '100%',         // ⬅️ 기준 폭 고정
+},
       tabContainer: {
         flex: 1,
         height: '100%',

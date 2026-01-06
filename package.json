@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "android:dev": "ENVFILE=.env.development npx react-native run-android",
-    "android:prod": "ENVFILE=.env npx react-native run-android",    
+    "android:prod": "ENVFILE=.env npx react-native run-android",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "lint": "eslint .",
