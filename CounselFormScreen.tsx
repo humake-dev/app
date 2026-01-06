@@ -9,8 +9,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Picker } from '@react-native-picker/picker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { BASE_URL } from './Config';
+import { authFetch } from "./utils/api"; // 경로는 프로젝트 구조에 맞춰서
 
 const CounselFormScreen = ({ navigation }) => {
   const { t } = useTranslation();
@@ -18,12 +17,10 @@ const CounselFormScreen = ({ navigation }) => {
   const [selectedCourse, setSelectedCourse] = useState('default');
 
   const handleSubmit = async () => {
-    try {
-      const token = await AsyncStorage.getItem("accessToken");       
-      const response = await fetch(`${BASE_URL}/counsels`, {
+    try {   
+      const response = await authFetch('/counsels', {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({

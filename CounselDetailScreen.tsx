@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
+  Alert,
   View,
   Text,
   ScrollView,
@@ -10,8 +11,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { BASE_URL } from './Config';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { authFetch } from "./utils/api";
 
 const CounselDetailScreen = ({ navigation }) => {
   const { t } = useTranslation();
@@ -34,10 +34,8 @@ const CounselDetailScreen = ({ navigation }) => {
 
   const fetchCounsel = async () => {
     try {
-      const token = await AsyncStorage.getItem("accessToken");
-      const response = await fetch(`${BASE_URL}/counsels/${route.params.id}`, {
+      const response = await authFetch(`/counsels/${route.params.id}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
@@ -55,9 +53,29 @@ const CounselDetailScreen = ({ navigation }) => {
     }
   };
 
+
+  const showConfirm = () => {
+  Alert.alert(
+    '삭제 확인',
+    '정말로 삭제하시겠습니까?',
+    [
+      {
+        text: '취소',
+        onPress: () => console.log('Cancel'),
+        style: 'cancel',
+      },
+      {
+        text: '확인',
+        onPress: () => hideCounsel(),
+      },
+    ],
+    { cancelable: true }
+  );
+};
+
   const hideCounsel = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/counsels/hide/${route.params.id}`, {
+      const response = await authFetch(`/counsels/hide/${route.params.id}`, {
         method: 'POST',
       });
 
@@ -105,7 +123,7 @@ const CounselDetailScreen = ({ navigation }) => {
           size={24} 
           color="#666"
           style={styles.closeButton}
-          onPress={hideCounsel}
+          onPress={showConfirm}
         />
       </View>
       <ScrollView style={styles.scrollView}>

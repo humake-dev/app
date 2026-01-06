@@ -21,9 +21,6 @@ const body =
   `username=${encodeURIComponent(username)}` +
   `&password=${encodeURIComponent(password)}`;
 
-  console.log(body);
-console.log(`${BASE_URL}/login`);
-
     const res = await fetch(`${BASE_URL}/login`, {
       method: "POST",
       headers: {

@@ -6,24 +6,14 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { authFetch } from './utils/api';
-import { useUser } from './UserContext';
 
 const UserWeightFormScreen = ({ navigation }) => {
   const { t } = useTranslation();
-  const userContext = useUser();
-  const user = userContext?.user;
-  
-  const defaultWeight =
-    user?.user_weight?.weight != null
-      ? user.user_weight.weight
-      : 60;
-
   const [error, setError] = useState('');
-  const [value, setValue] = useState(() => String(defaultWeight));
+  const [value, setValue] = useState('');
 
 const increase = () =>
   setValue(prev => {

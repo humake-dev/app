@@ -10,8 +10,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
-import { BASE_URL } from './Config';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { authFetch } from './utils/api';
 
 const PtScreen = ({ navigation }) => {
   const { t } = useTranslation();
@@ -38,10 +37,8 @@ const PtScreen = ({ navigation }) => {
       console.log('Fetching reservations for date:', date);
       setLoading(true);
 
-      const token = await AsyncStorage.getItem("accessToken");
-      const response = await fetch(`${BASE_URL}/reservations?day=${date}`, {
+      const response = await authFetch(`/reservations?day=${date}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });

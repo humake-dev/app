@@ -11,9 +11,8 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Lightbox from 'react-native-lightbox-v2';
-import { BASE_URL } from './Config';
+import { authFetch } from './utils/api';
 
 const TrainerDetailScreen = () => {
   const { t } = useTranslation();
@@ -37,10 +36,8 @@ const TrainerDetailScreen = () => {
 
   const fetchTrainer = async () => {
     try {
-      const token = await AsyncStorage.getItem("accessToken");
-      const response = await fetch(`${BASE_URL}/trainers/${route.params.id}`, {
+      const response = await authFetch(`/trainers/${route.params.id}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });

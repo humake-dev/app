@@ -44,6 +44,7 @@ import NoticeDetailScreen from './NoticeDetailScreen';
 import MessageDetailScreen from './MessageDetailScreen';
 import UserWeightScreen from './UserWeightScreen';
 import UserWeightFormScreen from './UserWeightFormScreen';
+import UserHeightFormScreen from './UserHeightFormScreen';
 import UserScreen from './UserScreen';
 import i18n from './i18n/i18n';
 import { useTranslation } from 'react-i18next'; 
@@ -53,6 +54,7 @@ import UserContext, { UserProvider } from './UserContext';
 import BarcodeScreen from './BarcodeScreen';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
+import { authFetch } from './utils/api';
 
 const Stack = createStackNavigator();
 
@@ -235,7 +237,7 @@ const App = () => {
     try {
       const refreshToken = await AsyncStorage.getItem("refreshToken");
       console.log(refreshToken);
-      const response = await fetch(`${BASE_URL}/logout`, {
+      const response = await authFetch('/logout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -270,12 +272,10 @@ const App = () => {
       const date = new Date();
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
-      const token = await AsyncStorage.getItem("accessToken");
 
-      const response = await fetch(`${BASE_URL}/entrances?year=${year}&month=${month}`, {
+      const response = await authFetch(`/entrances?year=${year}&month=${month}`, {
         method: 'GET',
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
@@ -311,10 +311,9 @@ const loginCheck = async () => {
     }
 
     // 🔑 유저 상세 정보 요청
-    const response = await fetch(`${BASE_URL}/user`, {
+    const response = await authFetch(`${BASE_URL}/user`, {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });
@@ -334,62 +333,7 @@ const loginCheck = async () => {
   }
 };
 
-const authFetch = async (url: string, options: any = {}) => {
-  let accessToken = await AsyncStorage.getItem("accessToken");
 
-  let res = await fetch(url, {
-    ...options,
-    headers: {
-      ...options.headers,
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-
-  if (res.status !== 401) return res;
-
-  // 🔁 여기서 refresh
-  accessToken = await refreshAccessToken();
-
-  return fetch(url, {
-    ...options,
-    headers: {
-      ...options.headers,
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-};
-
-
-const refreshAccessToken = async () => {
-  const refreshToken = await AsyncStorage.getItem("refreshToken");
-
-  if (!refreshToken) {
-    throw new Error("No refresh token");
-  }
-
-  console.log(refreshToken);
-
-  const res = await fetch(`${BASE_URL}/refresh`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      refresh_token: refreshToken,
-    }),
-  });
-
-  if (!res.ok) {
-    // refresh 자체가 만료 → 로그아웃
-    await AsyncStorage.multiRemove(["accessToken", "refreshToken"]);
-    throw new Error("Refresh token expired");
-  }
-
-  const { access_token } = await res.json();
-  await AsyncStorage.setItem("accessToken", access_token);
-
-  return access_token;
-};
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -485,8 +429,9 @@ const refreshAccessToken = async () => {
                   <Stack.Screen name="Pt" component={PtScreen} options={{ title: t('menu.pt') }}/>
                   <Stack.Screen name="UserWeight" component={UserWeightScreen} options={{ title: t('menu.user_weight') }}/>
                   <Stack.Screen name="UserWeightForm" component={UserWeightFormScreen} options={{ title: t('menu.user_weight') }}/>
+                  <Stack.Screen name="UserHeightForm" component={UserHeightFormScreen} options={{ title: t('menu.user_weight') }}/>                  
                   <Stack.Screen name="Counsel" component={CounselScreen} options={{ title: t('menu.counsel') }}/>
-                  <Stack.Screen name="CounselForm" component={CounselFormScreen} options={{ title: t('counsel.form') }}/>
+                  <Stack.Screen name="CounselForm" component={CounselFormScreen} options={{ title: t('menu.counsel') }}/>
                   <Stack.Screen name="CounselDetail" component={CounselDetailScreen} options={{ title: t('menu.counsel') }}/>
                   <Stack.Screen name="Stop" component={StopScreen} options={{ title: t('menu.stop') }}/>
                   <Stack.Screen name="StopForm" component={StopFormScreen} options={{ title: t('stop.form') }}/>

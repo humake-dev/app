@@ -9,10 +9,9 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { BASE_URL } from './Config';
 import { useUser } from './UserContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { authFetch } from './utils/api';
 
 const TrainerScreen = ({navigation}) => {
     const { t } = useTranslation();
@@ -26,11 +25,9 @@ const TrainerScreen = ({navigation}) => {
     }, [fetchTrainers]);
 
     const fetchTrainers = useCallback(async () => {
-      try {
-      const token = await AsyncStorage.getItem("accessToken");        
-      const response = await fetch(`${BASE_URL}/trainers`, {
+      try {     
+      const response = await authFetch(`/trainers`, {
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });

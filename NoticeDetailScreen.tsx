@@ -9,8 +9,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { BASE_URL } from './Config';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { authFetch } from './utils/api';
 
 const NoticeDetailScreen = ({ navigation }) => {
   const { t } = useTranslation();
@@ -20,7 +19,7 @@ const NoticeDetailScreen = ({ navigation }) => {
 
   /*const fetchNoticeRead = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/notices/read/${route.params.id}`, {
+      const response = await authFetch(`${BASE_URL}/notices/read/${route.params.id}`, {
         method: 'POST',
       });
 
@@ -35,10 +34,8 @@ const NoticeDetailScreen = ({ navigation }) => {
 
   const fetchNotice= async () => {
     try {
-      const token = await AsyncStorage.getItem("accessToken");
-      const response = await fetch(`${BASE_URL}/notices/${route.params.id}`, {
+      const response = await authFetch(`/notices/${route.params.id}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });

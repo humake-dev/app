@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
+  Alert,
   View,
   Text,
   FlatList,
@@ -9,8 +10,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { BASE_URL } from './Config';
+import { authFetch } from "./utils/api";
 
 const CounselScreen = ({ navigation }) => {
   const { t } = useTranslation();
@@ -18,13 +18,18 @@ const CounselScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
 
+  useFocusEffect(
+  useCallback(() => {
+    // 화면이 포커스될 때마다 실행
+    fetchCounsels();
+  }, [])
+  );
+
   const handleDeleteCounsel = async (counselId) => {
     try {
-      const token = await AsyncStorage.getItem("accessToken");      
-      const response = await fetch(`${BASE_URL}/counsels/hide/${counselId}`, {
+      const response = await authFetch(`/counsels/hide/${counselId}`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
@@ -38,30 +43,40 @@ const CounselScreen = ({ navigation }) => {
     }
   };
 
-  const fetchCounsels = useCallback(async () => {
-    try {
-      const token = await AsyncStorage.getItem("accessToken");
-      const response = await fetch(`${BASE_URL}/counsels`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+const fetchCounsels = async () => {
+  try {
+    const response = await authFetch(`/counsels`, {
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const data = await response.json();
+    setCounsels(data.counsel_list);
+    setTotal(data.total || 0);
+  } catch (e) {
+    console.error(e);
+  } finally {
+    setLoading(false);
+  }
+};
+
+    const showConfirm = (counselId) => {
+    Alert.alert(
+      '삭제 확인',
+      '정말로 삭제하시겠습니까?',
+      [
+        {
+          text: '취소',
+          onPress: () => console.log('Cancel'),
+          style: 'cancel',
         },
-      });
-
-      const data = await response.json();
-      setCounsels(data.counsel_list);
-      setLoading(false);
-      setTotal(data.total || 0);
-    } catch (error) {
-      console.error('Error fetching counsels:', error);
-      setLoading(false);
-    }
-  }, []);
-
-  // Initial fetch
-  useEffect(() => {
-    fetchCounsels();
-  }, [fetchCounsels]);
+        {
+          text: '확인',
+          onPress: () => handleDeleteCounsel(counselId),
+        },
+      ],
+      { cancelable: true }
+    );
+  };
 
   if (loading) {
     return (
@@ -100,7 +115,7 @@ const CounselScreen = ({ navigation }) => {
       </TouchableOpacity>
               <TouchableOpacity
               style={styles.deleteButton}
-              onPress={() => handleDeleteCounsel(item.id)}
+              onPress={() => showConfirm(item.id)}
             >
               <Text style={styles.deleteButtonText}>{t('common.delete')}</Text>
             </TouchableOpacity>

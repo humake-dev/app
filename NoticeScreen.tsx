@@ -8,8 +8,7 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { BASE_URL } from './Config';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { authFetch } from './utils/api';
 
 const NoticeScreen = ({ navigation, route }) => {
   const { t } = useTranslation();
@@ -19,10 +18,8 @@ const NoticeScreen = ({ navigation, route }) => {
 
   const fetchNotices = useCallback(async () => {
     try {
-      const token = await AsyncStorage.getItem("accessToken");
-      const response = await fetch(`${BASE_URL}/notices`, {
+      const response = await authFetch(`/notices`, {
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });

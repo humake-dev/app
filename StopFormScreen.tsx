@@ -12,8 +12,7 @@ import {
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTranslation } from 'react-i18next';
-import { BASE_URL } from './Config';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { authFetch } from './utils/api';
 
 const StopFormScreen = ({ navigation }) => {
   const { t, i18n } = useTranslation();
@@ -48,12 +47,10 @@ const StopFormScreen = ({ navigation }) => {
 
   const handleSubmit = async () => {
     try {
-      const token = await AsyncStorage.getItem("accessToken");
-      const response = await fetch(`${BASE_URL}/stops`, {
+      const response = await authFetch(`/stops`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           stop_start_date: startDate.toISOString().slice(0, 10),

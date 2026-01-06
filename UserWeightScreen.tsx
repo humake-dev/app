@@ -12,9 +12,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { LineChart } from 'react-native-chart-kit';
 import { useRoute } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUser } from './UserContext';
-import { BASE_URL } from './Config';
+import { authFetch } from './utils/api';
 
 const UserWeightScreen = ({ navigation }) => {
   const { t } = useTranslation();
@@ -30,6 +29,40 @@ const UserWeightScreen = ({ navigation }) => {
   const chartData = [...userWeights].reverse().map(item => item.avg_weight);
 
 
+
+// user 아직 로딩 중일 수도 있음
+if (!user) {
+  return (
+    <View style={styles.screenContainer}>
+      <Text>Loading user...</Text>
+    </View>
+  );
+}
+
+// 키가 없으면 👉 안내 화면
+if (!user.user_height?.height) {
+  return (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyTitle}>
+        {t('user_height.required')}
+      </Text>
+
+      <Text style={styles.emptyDescription}>
+        {t('user_height.required_description')}
+      </Text>
+
+      <TouchableOpacity
+        style={styles.goButton}
+        onPress={() => navigation.navigate('UserHeightForm')}
+      >
+        <Text style={styles.goButtonText}>
+          {t('user_height.go_to_form')}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
   // Handle refresh parameter from navigation
   const route = useRoute();
   useEffect(() => {
@@ -38,6 +71,7 @@ const UserWeightScreen = ({ navigation }) => {
     }
   }, [route.params]);
 
+  console.log('userContext:', userContext);
 
   const calculateBMI = (weight: number, height: number) => {
     let m_h=height *0.01;
@@ -70,28 +104,16 @@ const UserWeightScreen = ({ navigation }) => {
 
   const fetchUserWeights = async () => {
     try {
-      const token = await AsyncStorage.getItem("accessToken");
-
       let response;
       if(selectedType=='day') {
-      response = await fetch(`${BASE_URL}/user_weights`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+        response = await authFetch(`/user_weights`);
       } else if(selectedType=='week') {
-      response = await fetch(`${BASE_URL}/user_weights?week=1`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+        response = await authFetch(`/user_weights?week=1`);
       } else if(selectedType=='month') {
-      response = await fetch(`${BASE_URL}/user_weights?month=1`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+        response = await authFetch(`/user_weights?month=1`);
       }
+
+      console.log(response);
 
       if(response.ok){
         const data = await response.json();
@@ -285,14 +307,13 @@ const UserWeightScreen = ({ navigation }) => {
                   scrollEnabled={false}
                 />
                 </View>
-
-            <TouchableOpacity 
+    </ScrollView>
+                <TouchableOpacity 
               style={styles.addButton}
               onPress={() => navigation.navigate('UserWeightForm')}
             >
               <Text style={styles.addButtonText}>+</Text>
             </TouchableOpacity>
-    </ScrollView>
     </View>
   );
 };
@@ -425,6 +446,36 @@ const styles = StyleSheet.create({
   userWeightList: {
     paddingHorizontal: 20
   },
+
+  emptyContainer: {
+  flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: 24,
+  backgroundColor: '#fff',
+},
+emptyTitle: {
+  fontSize: 18,
+  fontWeight: 'bold',
+  marginBottom: 8,
+},
+emptyDescription: {
+  fontSize: 14,
+  color: '#666',
+  textAlign: 'center',
+  marginBottom: 20,
+},
+goButton: {
+  backgroundColor: '#007AFF',
+  paddingHorizontal: 20,
+  paddingVertical: 12,
+  borderRadius: 8,
+},
+goButtonText: {
+  color: '#fff',
+  fontSize: 16,
+  fontWeight: 'bold',
+},
 });
 
 export default UserWeightScreen;

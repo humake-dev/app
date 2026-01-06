@@ -3,8 +3,7 @@ import { View, StyleSheet, Text, TouchableOpacity,
   ActivityIndicator, FlatList } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
-import { BASE_URL } from './Config';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { authFetch } from "./utils/api";
 
 const AttendanceScreen = ({ navigation }) => {
   const now = new Date();
@@ -44,10 +43,8 @@ useEffect(() => {
 
    const fetchAttendanceMarks = async () => {
     try {
-      const token = await AsyncStorage.getItem("accessToken");
-      const response = await fetch(`${BASE_URL}/entrances?month=${selectedMonth}&year=${selectedYear}`, {
+      const response = await authFetch(`/entrances?month=${selectedMonth}&year=${selectedYear}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
@@ -83,10 +80,8 @@ useEffect(() => {
 
   const fetchPTMarks = async () => {
     try {
-      const token = await AsyncStorage.getItem("accessToken");
-      const response = await fetch(`${BASE_URL}/reservations?month=${selectedMonth}&year=${selectedYear}`, {
+      const response = await authFetch(`/reservations?month=${selectedMonth}&year=${selectedYear}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
@@ -122,7 +117,7 @@ useEffect(() => {
       console.log('Fetching attendance for date:', date);
       setLoading(true);
 
-      const response = await fetch(`${BASE_URL}/attendances?day=${date}`);
+      const response = await authFetch(`/attendances?day=${date}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

@@ -10,8 +10,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { BASE_URL } from './Config';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { authFetch } from './utils/api';
 
 const MessageDetailScreen = ({ navigation }) => {
   const { t } = useTranslation();
@@ -34,8 +33,7 @@ const MessageDetailScreen = ({ navigation }) => {
 
   const fetchMessageRead = async () => {
     try {
-      const token = await AsyncStorage.getItem("accessToken");
-      const response = await fetch(`${BASE_URL}/messages/read/${route.params.id}`, {
+      const response = await authFetch(`/messages/read/${route.params.id}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -54,9 +52,8 @@ const MessageDetailScreen = ({ navigation }) => {
 
   const fetchMessage = async () => {
     try {
-      const token = await AsyncStorage.getItem("accessToken");
       console.log(route.params.id);
-      const response = await fetch(`${BASE_URL}/messages/${route.params.id}`, {
+      const response = await authFetch(`/messages/${route.params.id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -86,11 +83,9 @@ const MessageDetailScreen = ({ navigation }) => {
 
   const hideMessage = async () => {
     try {
-      const token = await AsyncStorage.getItem("accessToken");
-      const response = await fetch(`${BASE_URL}/messages/hide/${route.params.id}`, {
+      const response = await authFetch(`/messages/hide/${route.params.id}`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });

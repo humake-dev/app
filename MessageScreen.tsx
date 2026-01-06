@@ -8,8 +8,8 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { BASE_URL } from './Config';
+import { authFetch } from './utils/api';
+
 
 const MessageScreen = ({ navigation, route }) => {
   const { t } = useTranslation();
@@ -19,10 +19,8 @@ const MessageScreen = ({ navigation, route }) => {
 
   const fetchMessages = useCallback(async () => {
     try {
-      const token = await AsyncStorage.getItem("accessToken");
-      const response = await fetch(`${BASE_URL}/messages`, {
+      const response = await authFetch(`/messages`, {
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
@@ -53,7 +51,7 @@ const MessageScreen = ({ navigation, route }) => {
 
   const handleDeleteMessage = async (messageId) => {
     try {
-      const response = await fetch(`${BASE_URL}/messages/hide/${messageId}`, {
+      const response = await authFetch(`/messages/hide/${messageId}`, {
         method: 'POST',
       });
       
