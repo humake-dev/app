@@ -10,7 +10,8 @@
       "month" : "Month",
       "none" : "None",
       "times" : "times",
-      "user_card" : "User Card"
+      "user_card" : "User Card",
+      "go_to_home" : "홈으로"      
     },
     "menu": {
       "my_trainer": "My Trainer",
@@ -19,6 +20,7 @@
       "exercise": "Exercise",
       "counsel": "Counsel",
       "user_weight": "Weight",
+      "user_height": "Height",      
       "stop": "Stop",
       "pt": "PT"
       },
@@ -57,6 +59,11 @@
         "period_day": "Daily",
         "period_week": "Weekly",
         "period_month": "Monthly"
+      },
+      "user_height": {
+        "required" : "Enter height required",
+        "required_description" : "Please click the button below and enter the information on the input screen",
+        "go_to_form" : "Enter your height"
       },
       "calendar": {
         "monthNames": [

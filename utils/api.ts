@@ -1,7 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BASE_URL } from '../Config';
 
-
 export const authFetch = async (url: string, options: any = {}) => {
   let accessToken = await AsyncStorage.getItem("accessToken");
 
@@ -57,4 +56,10 @@ export const refreshAccessToken = async () => {
   await AsyncStorage.setItem("accessToken", access_token);
 
   return access_token;
+};
+
+export const fetchUser = async () => {
+  const response = await authFetch(`/user`, { method: "GET" });
+  if (!response.ok) throw new Error("유저 조회 실패");
+  return response.json();
 };

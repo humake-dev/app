@@ -8,12 +8,20 @@ import {
   ScrollView,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { authFetch } from './utils/api';
+import { useUser } from './UserContext';
+import { authFetch, fetchUser } from './utils/api';
 
-const UserWeightFormScreen = ({ navigation }) => {
+const UserHeightFormScreen = ({ navigation }) => {
   const { t } = useTranslation();
+  const { user, setUser } = useUser();
+  
+  const defaultHeight =
+    user?.user_height?.height != null
+      ? user.user_height.height
+      : 165;
+
   const [error, setError] = useState('');
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState(() => String(defaultHeight));
 
 const increase = () =>
   setValue(prev => {
@@ -47,8 +55,8 @@ const handleChange = (text: string) => {
 
   const num = parseFloat(formatted);
   if (!isNaN(num)) {
-    if (num < 30 || num > 150) {
-      setError('30 이상 150 이하의 숫자를 입력하세요');
+    if (num < 50 || num > 250) {
+      setError('50 이상 250 이하의 숫자를 입력하세요');
     } else {
       setError('');
     }
@@ -61,30 +69,31 @@ const handleChange = (text: string) => {
 
 
 const handleSubmit = async () => {
-  const weight = parseFloat(value);
+  const height = parseFloat(value);
 
-  if (isNaN(weight)) {
-    setError('몸무게를 입력하세요');
+  if (isNaN(height)) {
+    setError('키(신장)를 입력하세요');
     return;
   }
 
-  if (weight < 30 || weight > 150) {
-    setError('30 이상 150 이하의 숫자를 입력하세요');
+    if (height < 50 || height > 250) {
+      setError('50 이상 250 이하의 숫자를 입력하세요');
     return;
   }
 
    console.log('SUBMIT CLICKED'); 
   try {
-    const response = await authFetch(`/user_weights`, {
+    const response = await authFetch(`/user_heights`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ weight }),
+      body: JSON.stringify({ height }),
     });
 
     if (response.ok) {
-      setValue('');
+      const userData = await fetchUser();
+      setUser(userData); 
       navigation.goBack();
     } else {
       throw new Error('Failed to submit form');
@@ -97,7 +106,7 @@ const handleSubmit = async () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.formContainer}>
-        <Text style={styles.label}>{t('user_weight.weight')}</Text>
+        <Text style={styles.label}>{t('user_height.height')}</Text>
 <View style={styles.inputContainer}>
   <TouchableOpacity style={styles.button} onPress={decrease}>
     <Text style={styles.buttonText}>−</Text>
@@ -191,4 +200,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UserWeightFormScreen;
+export default UserHeightFormScreen;

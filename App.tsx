@@ -54,7 +54,7 @@ import UserContext, { UserProvider } from './UserContext';
 import BarcodeScreen from './BarcodeScreen';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
-import { authFetch } from './utils/api';
+import { authFetch, fetchUser } from './utils/api';
 
 const Stack = createStackNavigator();
 
@@ -300,29 +300,8 @@ const loginCheck = async () => {
   }
 
   try {
-    // (선택) 토큰 만료 확인
-    const decoded = jwtDecode(token);
-    const now = Date.now() / 1000;
-
-    if (decoded.exp < now) {
-      console.log("토큰 만료");
-      await AsyncStorage.multiRemove(["accessToken", "refreshToken"]);
-      return;
-    }
-
-    // 🔑 유저 상세 정보 요청
-    const response = await authFetch(`${BASE_URL}/user`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      return false;
-    }
-
-    const userData = await response.json();
+    const userData = await fetchUser();
+    setUser(userData);
 
     // ✅ 여기서 유저 상태 복구
     setIsLoggedIn(true);
@@ -429,7 +408,7 @@ const loginCheck = async () => {
                   <Stack.Screen name="Pt" component={PtScreen} options={{ title: t('menu.pt') }}/>
                   <Stack.Screen name="UserWeight" component={UserWeightScreen} options={{ title: t('menu.user_weight') }}/>
                   <Stack.Screen name="UserWeightForm" component={UserWeightFormScreen} options={{ title: t('menu.user_weight') }}/>
-                  <Stack.Screen name="UserHeightForm" component={UserHeightFormScreen} options={{ title: t('menu.user_weight') }}/>                  
+                  <Stack.Screen name="UserHeightForm" component={UserHeightFormScreen} options={{ title: t('menu.user_height') }}/>                  
                   <Stack.Screen name="Counsel" component={CounselScreen} options={{ title: t('menu.counsel') }}/>
                   <Stack.Screen name="CounselForm" component={CounselFormScreen} options={{ title: t('menu.counsel') }}/>
                   <Stack.Screen name="CounselDetail" component={CounselDetailScreen} options={{ title: t('menu.counsel') }}/>

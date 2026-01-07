@@ -46,7 +46,7 @@ const UserScreen = () => {
             </View>
             <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
               <View style={styles.buttonContent}>
-                <Text style={styles.buttonText}>{t('common.backToList')}</Text>
+                <Text style={styles.buttonText}>{t('common.go_to_home')}</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -68,7 +68,7 @@ const UserScreen = () => {
             </View>
             <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
               <View style={styles.buttonContent}>
-                <Text style={styles.buttonText}>{t('common.backToList')}</Text>
+                <Text style={styles.buttonText}>{t('common.go_to_home')}</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -78,7 +78,48 @@ const UserScreen = () => {
   };
 
   const ThirdRoute = ({navigation, t, user}) => {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+        </View>
+        <ScrollView style={styles.scrollView}>
+          <View style={styles.content}>
+<View style={styles.contentContainer}>
+  {/* 이름 */}
+  <Text style={styles.userName}>
+    {user?.name}
+  </Text>
 
+  {/* 키 + 수정 */}
+  <View style={styles.heightRow}>
+    <Text style={styles.userHeight}>
+      키: {user?.user_height?.height
+        ? `${user.user_height.height} cm`
+        : '미입력'}
+    </Text>
+
+    <TouchableOpacity
+      style={[
+        styles.editButton,
+        !user?.user_height?.height && styles.addButton,
+      ]}
+      onPress={() => navigation.navigate('UserHeightForm')}
+    >
+      <Text style={styles.editButtonText}>
+        {user?.user_height?.height ? '수정하기' : '입력'}
+      </Text>
+    </TouchableOpacity>
+  </View>
+</View>
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+              <View style={styles.buttonContent}>
+                <Text style={styles.buttonText}>{t('common.go_to_home')}</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
+    );
   };
 
     // 나머지 코드는 기존과 동일
@@ -227,7 +268,41 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     marginBottom: 32,
-  }
+  },
+userName: {
+  fontSize: 18,
+  fontWeight: 'bold',
+  color: '#333',
+  marginBottom: 12,
+},
+
+heightRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+},
+
+userHeight: {
+  fontSize: 16,
+  color: '#333',
+},
+
+editButton: {
+  paddingHorizontal: 12,
+  paddingVertical: 6,
+  backgroundColor: '#007AFF',
+  borderRadius: 6,
+},
+
+editButtonText: {
+  color: '#fff',
+  fontSize: 14,
+  fontWeight: '500',
+},
+
+addButton: {
+  backgroundColor: '#34C759', // 미입력일 때 강조
+},
 });
 
 export default UserScreen;

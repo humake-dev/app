@@ -6,16 +6,14 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { authFetch } from './utils/api';
 import { useUser } from './UserContext';
+import { authFetch, fetchUser } from './utils/api';
 
 const UserWeightFormScreen = ({ navigation }) => {
   const { t } = useTranslation();
-  const userContext = useUser();
-  const user = userContext?.user;
+  const { user, setUser } = useUser();
   
   const defaultWeight =
     user?.user_weight?.weight != null
@@ -94,7 +92,8 @@ const handleSubmit = async () => {
     });
 
     if (response.ok) {
-      setValue('');
+      const userData = await fetchUser();
+      setUser(userData);
       navigation.goBack();
     } else {
       throw new Error('Failed to submit form');

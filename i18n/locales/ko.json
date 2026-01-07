@@ -11,7 +11,8 @@
       "download_barcode" : "바코드다운로드",
       "none" : "없음",
       "times" : "회",
-      "user_card" : "님의 회원카드"
+      "user_card" : "님의 회원카드",
+      "go_to_home" : "홈으로"
     },
     "tabMenu": {
       "message": "알림",
@@ -27,6 +28,7 @@
       "stop": "휴회",
       "pt": "PT",
       "user_weight": "몸무게",
+      "user_height": "키",
       "login" : "로그인",
       "notice" : "공지사항",
       "message" : "알림",
@@ -69,6 +71,12 @@
       "period_day": "일간",
       "period_week": "주간",
       "period_month": "월간"
+    },
+    "user_height": {
+      "height": "키(신장)",
+      "required" : "키(신장) 입력이 필요합니다.",
+      "required_description" : "아래버튼을 눌러서 입력화면에서 입력해주세요",
+      "go_to_form" : "키(신장) 입력"
     },
     "calendar": {
         "monthNames": ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
