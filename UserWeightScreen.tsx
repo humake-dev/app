@@ -71,12 +71,10 @@ if (!user.user_height?.height) {
     }
   }, [route.params]);
 
-  console.log('userContext:', userContext);
 
   const calculateBMI = (weight: number, height: number) => {
     let m_h=height *0.01;
     let bmi=(weight / (m_h * m_h)).toFixed(2);
-    console.log(bmi);
     setUserBMI(Number(bmi));
   }
 

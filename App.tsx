@@ -147,6 +147,16 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+  loginCheck();
+}, []);
+
+useEffect(() => {
+  if (!isLoggedIn) return;
+
+  getEntrance();
+}, [isLoggedIn]);  
+
+  useEffect(() => {
     const updateDimensions = () => {
       if (!isMenuOpen) {
         slideAnim.setValue(Dimensions.get('window').width);
@@ -236,7 +246,7 @@ const App = () => {
   const handleLogout = async () => {
     try {
       const refreshToken = await AsyncStorage.getItem("refreshToken");
-      console.log(refreshToken);
+     //  console.log(refreshToken);
       const response = await authFetch('/logout', {
         method: 'POST',
         headers: {
@@ -244,8 +254,6 @@ const App = () => {
         },
         body: JSON.stringify({ refresh_token: refreshToken }),
       });
-
-      console.log(response);
 
       if (response.ok) {
         await AsyncStorage.multiRemove(["accessToken", "refreshToken"]);
@@ -263,6 +271,7 @@ const App = () => {
     }
   };
 
+
   const getEntrance = async () => {
     try {
       if (!isLoggedIn) {
@@ -272,6 +281,8 @@ const App = () => {
       const date = new Date();
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
+
+      console.log(month);
 
       const response = await authFetch(`/entrances?year=${year}&month=${month}`, {
         method: 'GET',
@@ -319,10 +330,7 @@ const loginCheck = async () => {
       <I18nextProvider i18n={i18n}>
         <UserProvider value={{ user, setUser, setIsLoggedIn }}>
           <StatusBar barStyle="dark-content" />
-          <NavigationContainer ref={(container) => navigation.current = container} onReady={async () => {
-    await loginCheck();
-    await getEntrance();
-  }}>  
+          <NavigationContainer ref={(container) => navigation.current = container}>  
             <Stack.Navigator 
               initialRouteName={isLoggedIn ? 'Home' : 'Login'}
               screenOptions={{

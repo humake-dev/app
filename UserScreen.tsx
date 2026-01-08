@@ -85,12 +85,14 @@ const UserScreen = () => {
         <ScrollView style={styles.scrollView}>
           <View style={styles.content}>
 <View style={styles.contentContainer}>
-  {/* 이름 */}
   <Text style={styles.userName}>
     {user?.name}
   </Text>
 
-  {/* 키 + 수정 */}
+  <Text>
+    사용자번호 : {user?.branch_id}#{user?.id}
+  </Text>  
+
   <View style={styles.heightRow}>
     <Text style={styles.userHeight}>
       키: {user?.user_height?.height

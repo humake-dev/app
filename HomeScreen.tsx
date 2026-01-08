@@ -2,13 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
-  FlatList,
   StyleSheet,
   TouchableOpacity,
   Image,
   ScrollView,
   Dimensions,
-  StatusBar,
   Alert,
   Platform
 } from 'react-native';
@@ -26,6 +24,7 @@ import NoticeScreen from './NoticeScreen';
 import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { uploadProfileImageFlow } from './utils/profileImageUploader';
+import { authFetch } from './utils/api';
 
 const HomeScreen = ({navigation, attendanceTotal}) => {
     const { t } = useTranslation();
@@ -225,15 +224,19 @@ const SecondRoute = ({navigation, t, user, attendanceTotal}) => {
   const monthStr = now.toLocaleString("ko-KR", { month: "long" });
 
 const handleUploadProfileImage = async (image) => {
+  console.log('good');
+  console.log(image);
   // 여기서 서버 업로드
   const formData = new FormData();
-  formData.append('file', {
+  formData.append('picture', {
     uri: image.uri,
     name: image.name,
     type: image.type,
   });
 
-  const res = await authFetch('/users/profile_image', {
+  console.log(image);
+
+  const res = await authFetch('/user_pictures', {
     method: 'POST',
     body: formData,
     headers: {
@@ -244,8 +247,6 @@ const handleUploadProfileImage = async (image) => {
   if (!res.ok) {
     throw new Error('upload failed');
   }
-
-  // 필요하면 유저 정보 다시 fetch
 };    
     
 
@@ -258,7 +259,7 @@ const handleUploadProfileImage = async (image) => {
         <View style={styles.memberCard}>
           <View style={styles.memberImageContainer}>
 <TouchableOpacity
-  onPress={() => uploadProfileImageFlow(handleUploadProfileImage)}
+  onPress={() => uploadProfileImageFlow(handleUploadProfileImage, user.id)}
   activeOpacity={0.8}
 >
   {user?.picture?.picture_url ? (
@@ -396,7 +397,6 @@ const handleUploadProfileImage = async (image) => {
           const uri = await viewShotRef.current.capture();
           console.log('Captured barcode URI:', uri);
     
-          console.log(CameraRoll);
     
           // 사진첩에 저장
           await CameraRoll.save(uri, { type: 'photo' });

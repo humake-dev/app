@@ -8,10 +8,13 @@ type UploadFn = (image: {
   type: string;
 }) => Promise<void>;
 
-export const uploadProfileImageFlow = (uploadFn: UploadFn) => {
+export const uploadProfileImageFlow = (
+  uploadFn: UploadFn,
+  userId: number | string
+) => {
   Alert.alert("프로필 사진", "선택하세요", [
-    { text: "사진 찍기", onPress: () => openCamera(uploadFn) },
-    { text: "파일에서 선택", onPress: () => openGallery(uploadFn) },
+    { text: "사진 찍기", onPress: () => openCamera(uploadFn, userId) },
+    { text: "파일에서 선택", onPress: () => openGallery(uploadFn, userId) },
     { text: "취소", style: "cancel" }
   ]);
 };
@@ -21,27 +24,31 @@ const pickerOptions = {
   quality: 1
 };
 
-const openCamera = async (uploadFn: UploadFn) => {
+const openCamera = async (uploadFn: UploadFn, userId: number | string) => {
   const res = await launchCamera(pickerOptions);
-  handleResult(res, uploadFn);
+  handleResult(res, uploadFn, userId);
 };
 
-const openGallery = async (uploadFn: UploadFn) => {
+const openGallery = async (uploadFn: UploadFn, userId: number | string) => {
   const res = await launchImageLibrary(pickerOptions);
-  handleResult(res, uploadFn);
+  handleResult(res, uploadFn, userId);
 };
 
-const handleResult = async (res: any, uploadFn: UploadFn) => {
+const handleResult = async (
+  res: any,
+  uploadFn: UploadFn,
+  userId: number | string
+) => {
   if (res.didCancel || res.errorCode) return;
 
   const asset = res.assets?.[0];
-  if (!asset?.uri || !asset.width || !asset.height) return;
+  if (!asset?.uri) return;
 
   const processed = await processImage(asset);
 
   await uploadFn({
     uri: processed.uri,
-    name: "profile.jpg",
+    name: `${userId}_profile.jpg`,
     type: "image/jpeg"
   });
 };

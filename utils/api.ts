@@ -1,10 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BASE_URL } from '../Config';
 
-export const authFetch = async (url: string, options: any = {}) => {
+const authFetch = async (url: string, options: any = {}) => {
   let accessToken = await AsyncStorage.getItem("accessToken");
 
-  let res = await fetch(BASE_URL+url, {
+  let res = await fetch(url, {
     ...options,
     headers: {
       ...options.headers,
@@ -14,9 +14,13 @@ export const authFetch = async (url: string, options: any = {}) => {
 
   if (res.status !== 401) return res;
 
-  // 🔁 여기서 refresh
+try {
   accessToken = await refreshAccessToken();
-
+} catch {
+  await AsyncStorage.multiRemove(["accessToken", "refreshToken"]);
+  throw new Error("logout");
+}
+  console.log("🟢 authFetch using accessToken:", accessToken);
   return fetch(url, {
     ...options,
     headers: {
@@ -33,8 +37,6 @@ export const refreshAccessToken = async () => {
   if (!refreshToken) {
     throw new Error("No refresh token");
   }
-
-  console.log(refreshToken);
 
   const res = await fetch(`${BASE_URL}/refresh`, {
     method: "POST",

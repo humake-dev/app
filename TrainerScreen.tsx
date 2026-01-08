@@ -20,30 +20,30 @@ const TrainerScreen = ({navigation}) => {
     const userContext = useUser();
     const user = userContext?.user;
   
-    useEffect(() => {
-      fetchTrainers();
-    }, [fetchTrainers]);
-
-    const fetchTrainers = useCallback(async () => {
-      try {     
+useEffect(() => {
+  const fetchTrainers = async () => {
+    try {
       const response = await authFetch(`/trainers`, {
         headers: {
           "Content-Type": "application/json",
         },
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setTrainers(data.trainer_list);
-        setLoading(false);
-      } else {
+      if (!response.ok) {
         throw new Error('Failed to fetch trainers data');
       }
-      } catch (error) {
-        console.error('Error fetching trainers:', error);
-        setLoading(false);
-      }
-    }, []);
+
+      const data = await response.json();
+      setTrainers(data.trainer_list);
+    } catch (error) {
+      console.error('Error fetching trainers:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchTrainers();
+}, []);
   
     if (loading) {
       return (
