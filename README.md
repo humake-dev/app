@@ -88,7 +88,7 @@ npx react-native run-ios
 
 ## 🔗 Backend Integration
 
-⚠️ This React Native app **requires** the Gym Management API (FastAPI) to be running.
+⚠️ This React Native app **requires** the Gym Management API (FastAPI) to be running.<br>
 The app cannot function without the backend API.
 
 This app communicates with the Gym Management API (FastAPI) for all business logic:
