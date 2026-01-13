@@ -88,15 +88,19 @@ npx react-native run-ios
 
 ## 🔗 Backend Integration
 
-This app communicates with the **Gym Management API (FastAPI)** for all business logic:
+⚠️ This React Native app **requires** the Gym Management API (FastAPI) to be running.
+The app cannot function without the backend API.
 
-* Authentication and authorization
-* Membership and payment data
-* Attendance tracking
+This app communicates with the Gym Management API (FastAPI) for all business logic:
+
+- Authentication and authorization
+- Membership and payment data
+- Attendance tracking
 
 The backend API repository:
+- https://github.com/humake-dev/api
 
-> [https://github.com/humake-dev/api](https://github.com/humake-dev/api)
+⚠️ 이 앱은 Gym Management API (FastAPI)가 실행 중이어야 정상적으로 동작합니다.
 
 ---
 
