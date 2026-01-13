@@ -96,7 +96,7 @@ This app communicates with the **Gym Management API (FastAPI)** for all business
 
 The backend API repository:
 
-> [https://github.com/yourname/gym-management-api](https://github.com/yourname/gym-management-api)
+> [https://github.com/humake-dev/api](https://github.com/humake-dev/api)
 
 ---
 
