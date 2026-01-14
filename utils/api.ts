@@ -1,10 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BASE_URL } from '../Config';
 
-const authFetch = async (url: string, options: any = {}) => {
+export const authFetch = async (url: string, options: any = {}) => {
   let accessToken = await AsyncStorage.getItem("accessToken");
 
-  let res = await fetch(url, {
+  let res = await fetch(`${BASE_URL}`+url, {
     ...options,
     headers: {
       ...options.headers,
@@ -21,7 +21,7 @@ try {
   throw new Error("logout");
 }
   console.log("🟢 authFetch using accessToken:", accessToken);
-  return fetch(url, {
+  return fetch(`${BASE_URL}`+url, {
     ...options,
     headers: {
       ...options.headers,
