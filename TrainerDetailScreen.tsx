@@ -12,7 +12,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import Lightbox from 'react-native-lightbox-v2';
-import { authFetch } from './utils/api';
+import { authFetch } from './src/utils/api';
 
 const TrainerDetailScreen = () => {
   const { t } = useTranslation();

@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { authFetch } from './utils/api';
+import { authFetch } from './src/utils/api';
 
 const NoticeDetailScreen = ({ navigation }) => {
   const { t } = useTranslation();

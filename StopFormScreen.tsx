@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTranslation } from 'react-i18next';
-import { authFetch } from './utils/api';
+import { authFetch } from './src/utils/api';
 
 const StopFormScreen = ({ navigation }) => {
   const { t, i18n } = useTranslation();

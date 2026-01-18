@@ -6,24 +6,41 @@
       "delete": "Delete",          
       "submit": "Submit",
       "ok": "OK",
-      "backToList" : "Back to List",
+      "backToList" : "Back to List",    
       "month" : "Month",
+      "download_barcode" : "Download Barcode",
       "none" : "None",
       "times" : "times",
       "user_card" : "User Card",
-      "go_to_home" : "홈으로"      
+      "go_to_home" : "Go to Home",
+      "logout": "Logout"
+    },
+    "tabMenu": {
+      "message": "Message",
+      "menu": "Menu",
+      "barcode": "Entrance Barcode"
     },
     "menu": {
       "my_trainer": "My Trainer",
       "trainer": "Trainer",
       "attendance": "Attendance",
       "exercise": "Exercise",
-      "counsel": "Counsel",
-      "user_weight": "Weight",
-      "user_height": "Height",      
+      "counsel": "Counsel",    
       "stop": "Stop",
-      "pt": "PT"
-      },
+      "pt": "PT",
+      "user_weight": "Weight",
+      "user_height": "Height",
+      "login" : "Login",
+      "notice" : "Notice",
+      "message" : "Message",
+      "enroll" : "Enroll",
+      "locker" : "Locker",
+      "user" : "User Info"  
+    },
+    "login": {
+      "username": "Username",
+      "password": "Password"
+    },
       "counsel":   {
         "add": "Counsel Add",
         "selectDate": "Select Date",

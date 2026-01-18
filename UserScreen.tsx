@@ -17,9 +17,9 @@ const UserScreen = () => {
 
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    { key: 'first', title: t('수강') },
-    { key: 'second', title: t('락커') },
-    { key: 'third', title: t('내 정보') },
+    { key: 'first', title: t('menu.enroll') },
+    { key: 'second', title: t('menu.locker') },
+    { key: 'third', title: t('menu.user') },
   ]);
   
   // 탭 변경 시 저장

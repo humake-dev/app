@@ -11,7 +11,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useUser } from './UserContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { authFetch } from './utils/api';
+import { authFetch } from './src/utils/api';
 
 const TrainerScreen = ({navigation}) => {
     const { t } = useTranslation();

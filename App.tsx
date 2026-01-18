@@ -53,8 +53,7 @@ import { BASE_URL } from './Config';
 import UserContext, { UserProvider } from './UserContext';
 import BarcodeScreen from './BarcodeScreen';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { jwtDecode } from "jwt-decode";
-import { authFetch, fetchUser } from './utils/api';
+import { authFetch, fetchUser } from './src/utils/api';
 
 const Stack = createStackNavigator();
 
@@ -245,26 +244,11 @@ useEffect(() => {
 
   const handleLogout = async () => {
     try {
-      const refreshToken = await AsyncStorage.getItem("refreshToken");
-     //  console.log(refreshToken);
-      const response = await authFetch('/logout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ refresh_token: refreshToken }),
-      });
-
-      if (response.ok) {
         await AsyncStorage.multiRemove(["accessToken", "refreshToken"]);
-
+        
         // Reset menu state
         setIsMenuVisible(false);
         setIsLoggedIn(false);
-
-      } else {
-        Alert.alert('Error', 'Logout failed');
-      }
     } catch (error) {
       console.error('Logout error:', error);
       Alert.alert('Error', 'An error occurred during logout');
@@ -502,7 +486,7 @@ const loginCheck = async () => {
                             size={16}
                             style={styles.logoutIcon}
                           />
-                          <Text style={styles.logoutText}>로그아웃</Text>
+                          <Text style={styles.logoutText}>{t('common.logout')}</Text>
                         </View>
                       </TouchableOpacity>
                     </View>

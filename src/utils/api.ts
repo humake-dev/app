@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { BASE_URL } from '../Config';
+import { BASE_URL } from '../../Config';
 
 export const authFetch = async (url: string, options: any = {}) => {
   let accessToken = await AsyncStorage.getItem("accessToken");

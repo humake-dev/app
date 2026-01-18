@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, TouchableOpacity,
   ActivityIndicator, FlatList } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
-import { authFetch } from "./utils/api";
+import { authFetch } from "./src/utils/api";
 
 const AttendanceScreen = ({ navigation }) => {
   const now = new Date();

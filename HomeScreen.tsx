@@ -23,8 +23,8 @@ import MessageScreen from './MessageScreen';
 import NoticeScreen from './NoticeScreen';
 import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { uploadProfileImageFlow } from './utils/profileImageUploader';
-import { authFetch } from './utils/api';
+import { uploadProfileImageFlow } from './src/utils/profileImageUploader';
+import { authFetch } from './src/utils/api';
 
 const HomeScreen = ({navigation, attendanceTotal}) => {
     const { t } = useTranslation();

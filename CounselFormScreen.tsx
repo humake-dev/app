@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Picker } from '@react-native-picker/picker';
-import { authFetch } from "./utils/api"; // 경로는 프로젝트 구조에 맞춰서
+import { authFetch } from "./src/utils/api"; // 경로는 프로젝트 구조에 맞춰서
 
 const CounselFormScreen = ({ navigation }) => {
   const { t } = useTranslation();

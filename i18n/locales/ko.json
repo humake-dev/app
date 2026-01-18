@@ -12,7 +12,8 @@
       "none" : "없음",
       "times" : "회",
       "user_card" : "님의 회원카드",
-      "go_to_home" : "홈으로"
+      "go_to_home" : "홈으로",
+      "logout": "로그아웃"
     },
     "tabMenu": {
       "message": "알림",
@@ -32,7 +33,13 @@
       "login" : "로그인",
       "notice" : "공지사항",
       "message" : "알림",
+      "enroll" : "수강",
+      "locker" : "락커",
       "user" : "내 정보"
+    },
+    "login": {
+      "username": "아이디",
+      "password": "비밀번호"
     },
     "counsel": {
       "form": "상담 내용을 작성해주세요",

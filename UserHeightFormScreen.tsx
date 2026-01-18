@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useUser } from './UserContext';
-import { authFetch, fetchUser } from './utils/api';
+import { authFetch, fetchUser } from './src/utils/api';
 
 const UserHeightFormScreen = ({ navigation }) => {
   const { t } = useTranslation();

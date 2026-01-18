@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { LineChart } from 'react-native-chart-kit';
 import { useRoute } from '@react-navigation/native';
 import { useUser } from './UserContext';
-import { authFetch } from './utils/api';
+import { authFetch } from './src/utils/api';
 
 const UserWeightScreen = ({ navigation }) => {
   const { t } = useTranslation();
