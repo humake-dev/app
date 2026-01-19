@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity,
-  ActivityIndicator, FlatList } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { authFetch } from "./src/utils/api";
@@ -31,7 +30,6 @@ const AttendanceScreen = ({ navigation }) => {
       today: t('calendar.today'),
     };
   
-    LocaleConfig.defaultLocale = 'ko';
   }, [i18n.isInitialized])
   
 useEffect(() => {

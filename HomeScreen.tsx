@@ -25,6 +25,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { uploadProfileImageFlow } from './src/utils/profileImageUploader';
 import { authFetch } from './src/utils/api';
+import i18n from './i18n/i18n';
 
 const HomeScreen = ({navigation, attendanceTotal}) => {
     const { t } = useTranslation();
@@ -221,7 +222,7 @@ const FirstRoute = ({navigation, t, user}) => {
 // Tab screens
 const SecondRoute = ({navigation, t, user, attendanceTotal}) => {
   const now = new Date();
-  const monthStr = now.toLocaleString("ko-KR", { month: "long" });
+  const monthStr = now.toLocaleString(i18n.language, { month: "long" });
 
 const handleUploadProfileImage = async (image) => {
   console.log('good');

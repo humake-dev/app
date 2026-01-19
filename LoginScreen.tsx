@@ -75,6 +75,7 @@ const body =
   ref={usernameRef}
   style={styles.input}
   placeholder={t('login.username')}
+  value={username}
   onChangeText={setUsername}
   autoCapitalize="none"
   returnKeyType="next"
@@ -85,6 +86,7 @@ const body =
   ref={passwordRef}
   style={styles.input}
   placeholder={t('login.password')}
+  value={password}
   onChangeText={setPassword}
   secureTextEntry
   returnKeyType="done"
