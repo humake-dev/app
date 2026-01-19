@@ -31,9 +31,13 @@ The app focuses on real-world gym usage rather than UI-heavy showcase features, 
 
 ## 📱 ScreenShot
 
+![앱 화면](screenshot/screenshot1.jpg)
 ![앱 화면](screenshot/screenshot2.jpg)
 ![앱 화면](screenshot/screenshot3.jpg)
-
+![앱 화면](screenshot/screenshot4.jpg)
+![앱 화면](screenshot/screenshot5.jpg)
+![앱 화면](screenshot/screenshot6.jpg)
+![앱 화면](screenshot/screenshot7.jpg)
 
 ---
 
