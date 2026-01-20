@@ -16,28 +16,42 @@ const AttendanceScreen = ({ navigation }) => {
   const [ptCount, setPtCount] = useState(0);
   const [markedDates, setMarkedDates] = useState({});
   const { t, i18n } = useTranslation();
-  const [Attendances, setAttendances] = useState([]);
+  const [attendances, setAttendances] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentMonthName, setCurrentMonthName] = useState('');
 
   useEffect(() => {
     if (!i18n.isInitialized) return;
-  
-    LocaleConfig.locales['ko'] = {
+
+    const lang = i18n.language; // 현재 언어
+    LocaleConfig.locales[lang] = {
       monthNames: t('calendar.monthNames', { returnObjects: true }),
       monthNamesShort: t('calendar.monthNamesShort', { returnObjects: true }),
       dayNames: t('calendar.dayNames', { returnObjects: true }),
       dayNamesShort: t('calendar.dayNamesShort', { returnObjects: true }),
       today: t('calendar.today'),
     };
-  
-  }, [i18n.isInitialized])
+
+    LocaleConfig.defaultLocale = lang; 
+  }, [i18n.language, i18n.isInitialized]);
   
 useEffect(() => {
   if (!i18n.isInitialized) return;
+   const monthNames = t('calendar.monthNames', { returnObjects: true });
+   const currentMonthName = setCurrentMonthName(monthNames[selectedMonth-1]);
 
   fetchAttendanceMarks();
   fetchPTMarks();
 }, [i18n.isInitialized, selectedMonth, selectedYear]);
+
+useEffect(() => {
+  const today = new Date();
+  const todayString = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+  const dayOnly = today.getDate(); // 1~31 숫자
+
+  setSelectedDate(todayString);
+  fetchAttendances(dayOnly);
+}, []);
 
    const fetchAttendanceMarks = async () => {
     try {
@@ -48,10 +62,10 @@ useEffect(() => {
       });
 
 
-
       const data = await response.json();
+
       setAttendanceCount(data.total);
-  
+
       if (data.total > 0) {
         const newMarks = {};
         data.entrance_list.forEach(dateStr => {
@@ -110,55 +124,62 @@ useEffect(() => {
   };
 
 
-  const fetchAttendances = async (date) => {
-    try {
-      console.log('Fetching attendance for date:', date);
-      setLoading(true);
+const fetchAttendances = async (date) => {
+  try {
+    setLoading(true);
+      const response = await authFetch(`/entrances?month=${selectedMonth}&year=${selectedYear}&day=${date}`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-      const response = await authFetch(`/attendances?day=${date}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
+    const data = await response.json();
+    console.log('Raw API data:', data);
 
-      console.log('API Response:', data);
-      if (data.attendance_list) {
-        const formattedSchedules = data.attendance_list.map((item, index) => ({
-          id: item.id.toString(),
-          start_time: convertTime(item.start_time),
-        }));
-        setAttendances(formattedSchedules);
-      } else {
-        console.log('No attendance_list in response');
-        setAttendances([]);
-      }
-    } catch (error) {
-      console.error('Error fetching attendance:', error);
-      Alert.alert(t('errors.error'), t('errors.fetchAttendancesFailed'));
-      setAttendances([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-    
+if (data.total > 0) {
+  const formattedSchedules = data.entrance_list.map((item) => ({
+    id: item.id.toString(),
+    in_time: item.in_time, // 원본 문자열
+  }));
+  setAttendances(formattedSchedules); // **배열만 저장**
+} else {
+  setAttendances([]);
+}
+  } catch (error) {
+    console.error('Error fetching attendance:', error);
+    Alert.alert(t('errors.error'), t('errors.fetchAttendancesFailed'));
+    setAttendances([]);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
   const onDayPress = (day) => {
-    const selected = new Date(day.dateString);
-    if (selected > today) return; // 미래 날짜 선택 방지
-  
+    const dayOnly = new Date(day.dateString).getDate();
+
     setSelectedDate(day.dateString);
-    fetchAttendances(day.dateString);
+    fetchAttendances(dayOnly);
   };
 
+const renderAttendanceItem = ({ item }) => {
+  return (
+    <View style={styles.attendanceItem}>
+      <Text style={styles.attendanceTime}>{item.in_time}</Text>
+    </View>
+  );
+};
 
   return (
     <View style={styles.container}>
       <View style={styles.statsContainer}>
         <View style={styles.statsItem}>
-          <Text style={styles.statsLabel}>{selectedMonth}{t('common.month')} {t('attendance.count')}  <View style={styles.attendanceCircle} /></Text>         
+          <Text style={styles.statsLabel}>{currentMonthName} {t('attendance.count')}  <View style={styles.attendanceCircle} /></Text>         
           <Text style={styles.statsValue}>{attendanceCount} {t('common.times')}</Text>
         </View>
         <View style={styles.statsItem}>
-          <Text style={styles.statsLabel}>{selectedMonth}{t('common.month')} {t('attendance.PTcount')} <View style={[styles.attendanceCircle, { backgroundColor: 'blue' }]} /></Text>
+          <Text style={styles.statsLabel}>{currentMonthName} {t('attendance.PTcount')} <View style={[styles.attendanceCircle, { backgroundColor: 'blue' }]} /></Text>
           <Text style={styles.statsValue}>{ptCount} {t('common.times')}</Text>
         </View>
       </View>
@@ -183,50 +204,51 @@ useEffect(() => {
             textSectionTitleColor: '#000',
             textDisabledColor: '#C7C7CD', // 흐리게 보여질 색상
           }}
-          dayComponent={({ date, state }) => {
-            const today = new Date();
-            const dayOfWeek = new Date(date.dateString).getDay();
-            const isTodayOrPast = new Date(date.dateString) <= today;
-          
-            let textColor = '#000'; // 평일
-            if (dayOfWeek === 0) textColor = '#FF3B30'; // 일
-            else if (dayOfWeek === 6) textColor = '#007AFF'; // 토
-            if (!isTodayOrPast) textColor = '#C7C7CD';
-          
-            const isSelected = date.dateString === selectedDate;
-            const isMarked = markedDates[date.dateString]?.marked;
-          
-            return (
-              <View
-                style={{
-                  backgroundColor: isSelected ? '#007AFF' : 'transparent',
-                  borderRadius: 20,
-                  padding: 8,
-                  alignItems: 'center',
-                }}
-              >
-                <Text
-                  style={{
-                    color: isSelected ? '#fff' : textColor,
-                    fontWeight: isSelected ? 'bold' : 'normal',
-                  }}
-                >
-                  {date.day}
-                </Text>
-                {isMarked && (
-                  <View
-                    style={{
-                      width: 7,
-                      height: 7,
-                      borderRadius:  3.5,
-                      backgroundColor: markedDates[date.dateString].dotColor ||  '#FF69B4',
-                      marginTop: 2,
-                    }}
-                  />
-                )}
-              </View>
-            );
+dayComponent={({ date, state }) => {
+  const today = new Date();
+  const dayOfWeek = new Date(date.dateString).getDay();
+  const isTodayOrPast = new Date(date.dateString) <= today;
+
+  let textColor = '#000';
+  if (dayOfWeek === 0) textColor = '#FF3B30';
+  else if (dayOfWeek === 6) textColor = '#007AFF';
+  if (!isTodayOrPast) textColor = '#C7C7CD';
+
+  const isSelected = date.dateString === selectedDate;
+  const isMarked = markedDates[date.dateString]?.marked;
+
+  return (
+    <TouchableOpacity
+      onPress={() => onDayPress(date)}
+      style={{
+        backgroundColor: isSelected ? '#007AFF' : 'transparent',
+        borderRadius: 20,
+        padding: 8,
+        alignItems: 'center',
+      }}
+    >
+      <Text
+        style={{
+          color: isSelected ? '#fff' : textColor,
+          fontWeight: isSelected ? 'bold' : 'normal',
+        }}
+      >
+        {date.day}
+      </Text>
+      {isMarked && (
+        <View
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: 3.5,
+            backgroundColor: markedDates[date.dateString].dotColor || '#FF69B4',
+            marginTop: 2,
           }}
+        />
+      )}
+    </TouchableOpacity>
+  );
+}}
         />
 
               
@@ -237,22 +259,22 @@ useEffect(() => {
               {loading ? (
                 <ActivityIndicator size="large" color="#007AFF" style={styles.loader} />
               ) : (
-                <FlatList
-                  data={Attendances}
-                  renderItem={renderAttendanceItem}
-                  keyExtractor={item => item.id}
-                  style={styles.scheduleList}
-                  ListEmptyComponent={() => (
-                    <View style={styles.emptyContainer}>
-                      <Text style={styles.emptyText}>출석한 시간이 없습니다.</Text>
-                    </View>
-                  )}
-                  ListHeaderComponent={() => (
-                    <View style={styles.scheduleListHeader}>
-                      <Text style={styles.scheduleListHeaderText}>시간</Text>
-                    </View>
-                  )}
-                />
+  <FlatList
+    data={attendances}
+    renderItem={renderAttendanceItem}
+    keyExtractor={(item) => item.id}
+    style={styles.scheduleList}
+    ListEmptyComponent={() => (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>출석한 시간이 없습니다.</Text>
+      </View>
+    )}
+    ListHeaderComponent={() => (
+      <View style={styles.scheduleListHeader}>
+        <Text style={styles.scheduleListHeaderText}>시간</Text>
+      </View>
+    )}
+  />
               )}
     </View>
   );
@@ -350,7 +372,17 @@ const styles = StyleSheet.create({
   },
   statusCompleted: {
     color: 'gray',
-  },  
+  }, 
+    attendanceItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5EA',
+  },
+  attendanceTime: {
+    fontSize: 16,
+    color: '#000',
+  },
 });
 
 export default AttendanceScreen;
