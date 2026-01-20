@@ -5,6 +5,8 @@ import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { authFetch } from "./src/utils/api";
 
 const AttendanceScreen = ({ navigation }) => {
+  const { t, i18n } = useTranslation();
+
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = String(now.getMonth() + 1)
@@ -15,7 +17,7 @@ const AttendanceScreen = ({ navigation }) => {
   const [attendanceCount, setAttendanceCount] = useState(0);
   const [ptCount, setPtCount] = useState(0);
   const [markedDates, setMarkedDates] = useState({});
-  const { t, i18n } = useTranslation();
+
   const [attendances, setAttendances] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentMonthName, setCurrentMonthName] = useState('');
@@ -62,7 +64,10 @@ useEffect(() => {
       });
 
 
+
       const data = await response.json();
+
+     // console.log(data);
 
       setAttendanceCount(data.total);
 
@@ -85,6 +90,7 @@ useEffect(() => {
         }));
       }
     } catch (error) {
+      console.error('JSON parse error:', response);
       console.error('Error fetching attendance:', error);
     }
   };

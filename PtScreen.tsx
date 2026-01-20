@@ -13,10 +13,53 @@ import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { authFetch } from './src/utils/api';
 
 const PtScreen = ({ navigation }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = String(now.getMonth() + 1)
+
   const [selectedDate, setSelectedDate] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [ptCount, setPtCount] = useState(0);
   const [ptSchedules, setPtSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentMonthName, setCurrentMonthName] = useState('');
+
+  useEffect(() => {
+    if (!i18n.isInitialized) return;
+
+    const lang = i18n.language; // 현재 언어
+    LocaleConfig.locales[lang] = {
+      monthNames: t('calendar.monthNames', { returnObjects: true }),
+      monthNamesShort: t('calendar.monthNamesShort', { returnObjects: true }),
+      dayNames: t('calendar.dayNames', { returnObjects: true }),
+      dayNamesShort: t('calendar.dayNamesShort', { returnObjects: true }),
+      today: t('calendar.today'),
+    };
+
+    LocaleConfig.defaultLocale = lang; 
+  }, [i18n.language, i18n.isInitialized]);
+  
+useEffect(() => {
+  if (!i18n.isInitialized) return;
+   const monthNames = t('calendar.monthNames', { returnObjects: true });
+   const currentMonthName = setCurrentMonthName(monthNames[selectedMonth-1]);
+
+  fetchPTMarks();
+}, [i18n.isInitialized, selectedMonth, selectedYear]);
+
+
+useEffect(() => {
+  const today = new Date();
+  const todayString = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+  const dayOnly = today.getDate(); // 1~31 숫자
+
+  setSelectedDate(todayString);
+  fetchReservations(dayOnly);
+}, []);
+
 
   const today = new Date();
   const formatDate = (d) => d.toISOString().split('T')[0];
@@ -32,24 +75,78 @@ const PtScreen = ({ navigation }) => {
     return hourStr;
   }
 
+  const getDisabledFutureDates = (fromDate, days) => {
+    const disabled = {};
+    for (let i = 1; i <= days; i++) {
+      const future = new Date(fromDate);
+      future.setDate(future.getDate() + i);
+      disabled[formatDate(future)] = {
+        disabled: true,
+        disableTouchEvent: true,
+      };
+    }
+    return disabled;
+  };
+
+
+  const disabledFutureDates = getDisabledFutureDates(today, 90);
+
+  const onDayPress = (day) => {
+    const dayOnly = new Date(day.dateString).getDate();
+
+    setSelectedDate(day.dateString);
+    fetchReservations(dayOnly);
+  };
+
+    const fetchPTMarks = async () => {
+      try {
+        const response = await authFetch(`/reservations?month=${selectedMonth}&year=${selectedYear}`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await response.json();
+        setPtCount(data.total);
+    
+        if (data.total > 0) {
+          const newMarks = {};
+          data.reservation_list.forEach(dateStr => {
+            if (dateStr.in_time) {
+              const dateKey = dateStr.in_time.split('T')[0];
+              newMarks[dateKey] = {
+                ...markedDates[dateKey],
+                marked: true,
+                dotColor: 'red',
+              };
+            }
+          });
+    
+          setMarkedDates(prev => ({
+            ...prev,
+            ...newMarks,
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching fetchPTMarks:', error);
+      }
+    };
+  
+
+
   const fetchReservations = async (date) => {
     try {
-      console.log('Fetching reservations for date:', date);
       setLoading(true);
-
-      const response = await authFetch(`/reservations?day=${date}`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+        const response = await authFetch(`/reservations?month=${selectedMonth}&year=${selectedYear}&day=${date}`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+  
       const data = await response.json();
 
       console.log('API Response:', data);
-      if (data.reservation_list) {
+      if (data.total > 0) {
         const formattedSchedules = data.reservation_list.map((item, index) => ({
           id: item.id.toString(),
           start_time: convertTime(item.start_time),
@@ -69,37 +166,7 @@ const PtScreen = ({ navigation }) => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    // Fetch reservations for today when screen loads
-    const todayStr = formatDate(today);
-    setSelectedDate(todayStr);
-    fetchReservations(todayStr);
-  }, []);
-
-  const getDisabledFutureDates = (fromDate, days) => {
-    const disabled = {};
-    for (let i = 1; i <= days; i++) {
-      const future = new Date(fromDate);
-      future.setDate(future.getDate() + i);
-      disabled[formatDate(future)] = {
-        disabled: true,
-        disableTouchEvent: true,
-      };
-    }
-    return disabled;
-  };
-
-  const todayStr = formatDate(today);
-  const disabledFutureDates = getDisabledFutureDates(today, 90);
-
-  const onDayPress = (day) => {
-    const selected = new Date(day.dateString);
-    if (selected > today) return; // 미래 날짜 선택 방지
   
-    setSelectedDate(day.dateString);
-    fetchReservations(day.dateString);
-  };
 
   const renderPtScheduleItem = ({ item }) => (
     <TouchableOpacity style={styles.scheduleItem}>
