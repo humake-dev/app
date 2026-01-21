@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native';
+import { View, StyleSheet, Text, FlatList, TouchableOpacity,ActivityIndicator, Alert} from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { authFetch } from "./src/utils/api";
@@ -15,7 +15,6 @@ const AttendanceScreen = ({ navigation }) => {
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [attendanceCount, setAttendanceCount] = useState(0);
-  const [ptCount, setPtCount] = useState(0);
   const [markedDates, setMarkedDates] = useState({});
 
   const [attendances, setAttendances] = useState([]);
@@ -43,17 +42,38 @@ useEffect(() => {
    const currentMonthName = setCurrentMonthName(monthNames[selectedMonth-1]);
 
   fetchAttendanceMarks();
-  fetchPTMarks();
 }, [i18n.isInitialized, selectedMonth, selectedYear]);
 
 useEffect(() => {
   const today = new Date();
-  const todayString = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+  const todayString = new Date().toLocaleDateString('en-CA'); // ✅ 로컬 YYYY-MM-DD
   const dayOnly = today.getDate(); // 1~31 숫자
 
   setSelectedDate(todayString);
   fetchAttendances(dayOnly);
 }, []);
+
+  const today = new Date();
+
+  const formatDate = (date: Date) =>
+  date.toISOString().split('T')[0];
+
+  const getDisabledFutureDates = (fromDate, days) => {
+    const disabled = {};
+    for (let i = 1; i <= days; i++) {
+      const future = new Date(fromDate);
+      future.setDate(future.getDate() + i);
+      disabled[formatDate(future)] = {
+        disabled: true,
+        disableTouchEvent: true,
+      };
+    }
+    return disabled;
+  };
+
+
+  const disabledFutureDates = getDisabledFutureDates(today, 90);
+
 
    const fetchAttendanceMarks = async () => {
     try {
@@ -62,8 +82,6 @@ useEffect(() => {
           "Content-Type": "application/json",
         },
       });
-
-
 
       const data = await response.json();
 
@@ -91,40 +109,6 @@ useEffect(() => {
       }
     } catch (error) {
       console.error('JSON parse error:', response);
-      console.error('Error fetching attendance:', error);
-    }
-  };
-
-
-  const fetchPTMarks = async () => {
-    try {
-      const response = await authFetch(`/reservations?month=${selectedMonth}&year=${selectedYear}`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await response.json();
-      setPtCount(data.total);
-  
-      if (data.total > 0) {
-        const newMarks = {};
-        data.reservation_list.forEach(dateStr => {
-          if (dateStr.in_time) {
-            const dateKey = dateStr.in_time.split('T')[0];
-            newMarks[dateKey] = {
-              ...markedDates[dateKey],
-              marked: true,
-              dotColor: 'red',
-            };
-          }
-        });
-  
-        setMarkedDates(prev => ({
-          ...prev,
-          ...newMarks,
-        }));
-      }
-    } catch (error) {
       console.error('Error fetching attendance:', error);
     }
   };
@@ -184,14 +168,11 @@ const renderAttendanceItem = ({ item }) => {
           <Text style={styles.statsLabel}>{currentMonthName} {t('attendance.count')}  <View style={styles.attendanceCircle} /></Text>         
           <Text style={styles.statsValue}>{attendanceCount} {t('common.times')}</Text>
         </View>
-        <View style={styles.statsItem}>
-          <Text style={styles.statsLabel}>{currentMonthName} {t('attendance.PTcount')} <View style={[styles.attendanceCircle, { backgroundColor: 'blue' }]} /></Text>
-          <Text style={styles.statsValue}>{ptCount} {t('common.times')}</Text>
-        </View>
       </View>
       <Calendar 
         onDayPress={onDayPress}
         markedDates={markedDates} 
+        maxDate={today}
         onVisibleMonthsChange={(months) => {
 
     setSelectedMonth(months[0].month);
@@ -211,9 +192,9 @@ const renderAttendanceItem = ({ item }) => {
             textDisabledColor: '#C7C7CD', // 흐리게 보여질 색상
           }}
 dayComponent={({ date, state }) => {
-  const today = new Date();
+          const todayStr = new Date().toLocaleDateString('en-CA');
+          const isTodayOrPast = date.dateString <= todayStr;
   const dayOfWeek = new Date(date.dateString).getDay();
-  const isTodayOrPast = new Date(date.dateString) <= today;
 
   let textColor = '#000';
   if (dayOfWeek === 0) textColor = '#FF3B30';

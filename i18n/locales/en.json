@@ -64,7 +64,7 @@
         "no_items": "No Stop"
       },
       "attendance": {
-        "PTcount": "PT Attendance",
+        "PTcount": "PT Schedules",
         "count": "Attendance"
       },
       "message" : {

@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  StyleSheet, 
-  Text, 
-  FlatList, 
-  TouchableOpacity,
-  ActivityIndicator,
-  Alert
-} from 'react-native';
+import { View, StyleSheet, Text, FlatList, TouchableOpacity,ActivityIndicator, Alert} from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { authFetch } from './src/utils/api';
@@ -23,6 +15,8 @@ const PtScreen = ({ navigation }) => {
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [ptCount, setPtCount] = useState(0);
+  const [markedDates, setMarkedDates] = useState({});
+
   const [ptSchedules, setPtSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentMonthName, setCurrentMonthName] = useState('');
@@ -50,26 +44,29 @@ useEffect(() => {
   fetchPTMarks();
 }, [i18n.isInitialized, selectedMonth, selectedYear]);
 
-
 useEffect(() => {
   const today = new Date();
-  const todayString = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+  const todayString = new Date().toLocaleDateString('en-CA'); // ✅ 로컬 YYYY-MM-DD
   const dayOnly = today.getDate(); // 1~31 숫자
 
   setSelectedDate(todayString);
   fetchReservations(dayOnly);
 }, []);
 
-
   const today = new Date();
-  const formatDate = (d) => d.toISOString().split('T')[0];
+
+  const formatDate = (date: Date) =>
+  date.toISOString().split('T')[0];
+
+  const maxDate = new Date(today);
+  maxDate.setMonth(today.getMonth() + 3);
 
   const convertTime = (dateStr) => {
     const date = new Date(dateStr);
 
     const hourStr = date.toLocaleTimeString('ko-KR', {
       hour: 'numeric',
-      hour12: false  // 24시간제, 원하면 true로 바꿔도 됨
+      hour12: true  // 24시간제, 원하면 true로 바꿔도 됨
     });
 
     return hourStr;
@@ -89,7 +86,7 @@ useEffect(() => {
   };
 
 
-  const disabledFutureDates = getDisabledFutureDates(today, 90);
+  const disabledFutureDates = getDisabledFutureDates(maxDate, 90);
 
   const onDayPress = (day) => {
     const dayOnly = new Date(day.dateString).getDate();
@@ -98,45 +95,45 @@ useEffect(() => {
     fetchReservations(dayOnly);
   };
 
-    const fetchPTMarks = async () => {
-      try {
-        const response = await authFetch(`/reservations?month=${selectedMonth}&year=${selectedYear}`, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        const data = await response.json();
-        setPtCount(data.total);
-    
-        if (data.total > 0) {
-          const newMarks = {};
-          data.reservation_list.forEach(dateStr => {
-            if (dateStr.in_time) {
-              const dateKey = dateStr.in_time.split('T')[0];
-              newMarks[dateKey] = {
-                ...markedDates[dateKey],
-                marked: true,
-                dotColor: 'red',
-              };
-            }
-          });
-    
-          setMarkedDates(prev => ({
-            ...prev,
-            ...newMarks,
-          }));
-        }
-      } catch (error) {
-        console.error('Error fetching fetchPTMarks:', error);
-      }
-    };
+  const fetchPTMarks = async () => {
+    try {
+      const response = await authFetch(`/reservations?month=${selectedMonth}&year=${selectedYear}`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      setPtCount(data.total);
   
-
+      if (data.total > 0) {
+        const newMarks = {};
+        data.reservation_list.forEach(dateStr => {
+          if (dateStr.start_time) {
+            const dateKey = dateStr.start_time.split('T')[0];
+            newMarks[dateKey] = {
+              ...markedDates[dateKey],
+              marked: true,
+              dotColor: 'red',
+            };
+          }
+        });
+  
+        setMarkedDates(prev => ({
+          ...prev,
+          ...newMarks,
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching attendance:', error);
+    }
+  };
 
   const fetchReservations = async (date) => {
+      const day = date ?? today.getDate();
+
     try {
       setLoading(true);
-        const response = await authFetch(`/reservations?month=${selectedMonth}&year=${selectedYear}&day=${date}`, {
+        const response = await authFetch(`/reservations?month=${selectedMonth}&year=${selectedYear}&day=${day}`, {
           headers: {
             "Content-Type": "application/json",
           },
@@ -185,9 +182,15 @@ useEffect(() => {
 
   return (
     <View style={styles.container}>
+            <View style={styles.statsContainer}>
+              <View style={styles.statsItem}>
+                <Text style={styles.statsLabel}>{currentMonthName} {t('attendance.PTcount')} <View style={[styles.attendanceCircle]} /></Text>
+                <Text style={styles.statsValue}>{ptCount} {t('common.times')}</Text>
+              </View>
+              </View>
       <Calendar 
         onDayPress={onDayPress}
-        markedDates={{
+        markedDates={{markedDates,
           ...disabledFutureDates,
           [selectedDate]: { selected: true, marked: true }
         }}
@@ -195,7 +198,12 @@ useEffect(() => {
         enableSwipeMonths={true}
         firstDay={0}
         hideExtraDays={true}
-        maxDate={today} 
+        maxDate={formatDate(maxDate)}
+                onVisibleMonthsChange={(months) => {
+
+    setSelectedMonth(months[0].month);
+    setSelectedYear(months[0].year);
+  }}
         theme={{
           monthTextColor: '#000',
           selectedDayBackgroundColor: '#007AFF',
@@ -206,7 +214,7 @@ useEffect(() => {
           todayTextColor: '#007AFF',
           selectedDayTextColor: 'white',
           selectedDayBackgroundColor: '#007AFF',
-          dotColor: '#007AFF',
+          dotColor: 'FF69B4',
           selectedDotColor: '#007AFF',
           disabledDotColor: '#C7C7CD',
           disabledDayTextColor: '#C7C7CD',
@@ -214,6 +222,51 @@ useEffect(() => {
           textDayFontFamily: 'System',
           textMonthFontFamily: 'System',
           textDayHeaderFontFamily: 'System',
+        }}
+        dayComponent={({ date, state }) => {
+          const todayStr = new Date().toLocaleDateString('en-CA');
+          const isTodayOrPast = date.dateString <= todayStr;
+          const dayOfWeek = new Date(date.dateString).getDay();
+        
+          let textColor = '#000';
+          if (dayOfWeek === 0) textColor = '#FF3B30';
+          else if (dayOfWeek === 6) textColor = '#007AFF';
+          if (!isTodayOrPast) textColor = '#C7C7CD';
+        
+          const isSelected = date.dateString === selectedDate;
+          const isMarked = markedDates[date.dateString]?.marked;
+        
+          return (
+            <TouchableOpacity
+              onPress={() => onDayPress(date)}
+              style={{
+                backgroundColor: isSelected ? '#007AFF' : 'transparent',
+                borderRadius: 20,
+                padding: 8,
+                alignItems: 'center',
+              }}
+            >
+              <Text
+                style={{
+                  color: isSelected ? '#fff' : textColor,
+                  fontWeight: isSelected ? 'bold' : 'normal',
+                }}
+              >
+                {date.day}
+              </Text>
+              {isMarked && (
+                <View
+                  style={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: 3.5,
+                    backgroundColor: markedDates[date.dateString].dotColor,
+                    marginTop: 2,
+                  }}
+                />
+              )}
+            </TouchableOpacity>
+          );
         }}
       />
       
@@ -251,7 +304,38 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    padding: 16,
   },
+
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 20,
+  },
+  statsItem: {
+    alignItems: 'center',
+    flexDirection: 'column',
+    justifyContent: 'center',
+  },
+  statsLabel: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 8,
+  },
+  statsValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+    attendanceCircle: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: '#FF69B4',
+    alignSelf: 'center',
+    marginTop: 8,
+  },
+
   scheduleHeader: {
     padding: 15,
     backgroundColor: '#f4f4f4',
