@@ -1,9 +1,10 @@
-import React, { useState, useRef } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, Alert, ScrollView, Dimensions,Image, useEffect } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, TouchableOpacity, Text, StyleSheet, FlatList,  Alert, ScrollView, Dimensions, Image, ActivityIndicator } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { useNavigation } from '@react-navigation/native';
 import { useUser } from './UserContext';
+import { authFetch } from './src/utils/api';
 
 const UserScreen = () => {
   const { t } = useTranslation();
@@ -35,47 +36,84 @@ const UserScreen = () => {
   
   const FirstRoute = ({navigation, t, user}) => {
 
-    return (
-      <View style={styles.container}>
-        <View style={styles.header}>
-        </View>
-        <ScrollView style={styles.scrollView}>
-          <View style={styles.content}>
-            <View style={styles.contentContainer}>
-  
-            </View>
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-              <View style={styles.buttonContent}>
-                <Text style={styles.buttonText}>{t('common.go_to_home')}</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </View>
-    );
-  };
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const fetchEnrolls = async () => {
+      try {
+        const response = await authFetch('/enrolls', {
+          headers: { "Content-Type": "application/json" },
+        });
+        if (response.ok) {
+          const json = await response.json();
+          setData(json.enroll_list || []);
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEnrolls();
+  }, []);
+
+  if (loading) return <ActivityIndicator style={{ marginTop: 20 }} />;
+  if (!data.length) return <Text style={styles.emptyText}>등록 내역이 없습니다.</Text>;
+
+  return (
+    <FlatList
+      data={data}
+      keyExtractor={(item, idx) => item.id?.toString() || idx.toString()}
+      renderItem={({ item }) => (
+        <View style={styles.itemBox}>
+          <Text style={styles.itemTitle}>{item.title || item.product_name}</Text>
+          <Text style={styles.itemDate}>{item.start_date} ~ {item.end_date}</Text>
+        </View>
+      )}
+    />
+  )
+};
 
   const SecondRoute = ({navigation, t, user}) => {
-    return (
-      <View style={styles.container}>
-        <View style={styles.header}>
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRents = async () => {
+      try {
+        const response = await authFetch('/rents', {
+          headers: { "Content-Type": "application/json" },
+        });
+        if (response.ok) {
+          const json = await response.json();
+          setData(json.rent_list || []);
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRents();
+  }, []);
+
+  if (loading) return <ActivityIndicator style={{ marginTop: 20 }} />;
+  if (!data.length) return <Text style={styles.emptyText}>대여 내역이 없습니다.</Text>;
+
+  return (
+    <FlatList
+      data={data}
+      keyExtractor={(item, idx) => item.id?.toString() || idx.toString()}
+      renderItem={({ item }) => (
+        <View style={styles.itemBox}>
+          <Text style={styles.itemTitle}>{item.title || item.product_name}</Text>
+          <Text style={styles.itemDate}>{item.start_date } ~ {item.end_date}</Text>
         </View>
-        <ScrollView style={styles.scrollView}>
-          <View style={styles.content}>
-            <View style={styles.contentContainer}>
-  
-            </View>
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-              <View style={styles.buttonContent}>
-                <Text style={styles.buttonText}>{t('common.go_to_home')}</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </View>
-    );
-  };
+      )}
+    />
+  );
+};
 
   const ThirdRoute = ({navigation, t, user}) => {
     return (
@@ -305,6 +343,28 @@ editButtonText: {
 addButton: {
   backgroundColor: '#34C759', // 미입력일 때 강조
 },
+
+  itemBox: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderColor: '#eee',
+  },
+  itemTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  itemDate: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: '#888',
+    marginTop: 30,
+    fontSize: 16,
+  },
 });
 
 export default UserScreen;
