@@ -52,7 +52,6 @@ const MessageDetailScreen = ({ navigation }) => {
 
   const fetchMessage = async () => {
     try {
-      console.log(route.params.id);
       const response = await authFetch(`/messages/${route.params.id}`, {
         headers: {
           Authorization: `Bearer ${token}`,

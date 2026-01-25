@@ -10,7 +10,7 @@ import {
   Alert,
   Platform
 } from 'react-native';
-import { useTranslation } from 'react-i18next';
+import {Trans, useTranslation} from 'react-i18next';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import Barcode from '@kichiyaki/react-native-barcode-generator';
 import ViewShot from 'react-native-view-shot';
@@ -27,7 +27,7 @@ import { uploadProfileImageFlow } from './src/utils/profileImageUploader';
 import { authFetch } from './src/utils/api';
 import i18n from './i18n/i18n';
 
-const HomeScreen = ({navigation, attendanceTotal}) => {
+const HomeScreen = ({navigation, attendanceTotal, reservationTotal, enrollInfo}) => {
     const { t } = useTranslation();
     const [index, setIndex] = useState(1);
 
@@ -82,7 +82,7 @@ const HomeScreen = ({navigation, attendanceTotal}) => {
 
     const renderScene = SceneMap({
       first: () => <FirstRoute navigation={navigation} t={t} user={user} />,
-      second: () => <SecondRoute navigation={navigation} t={t} user={user} attendanceTotal={attendanceTotal} />,
+      second: () => <SecondRoute navigation={navigation} t={t} user={user} attendanceTotal={attendanceTotal} reservationTotal={reservationTotal} enrollInfo={enrollInfo} />,
       third: () => <ThirdRoute navigation={navigation} t={t} user={user} />
       });
 
@@ -220,7 +220,7 @@ const FirstRoute = ({navigation, t, user}) => {
 
 
 // Tab screens
-const SecondRoute = ({navigation, t, user, attendanceTotal}) => {
+const SecondRoute = ({navigation, t, user, attendanceTotal, reservationTotal, enrollInfo}) => {
   const now = new Date();
   const monthStr = now.toLocaleString(i18n.language, { month: "long" });
 
@@ -235,7 +235,6 @@ const handleUploadProfileImage = async (image) => {
     type: image.type,
   });
 
-  console.log(image);
 
   const res = await authFetch('/user_pictures', {
     method: 'POST',
@@ -248,7 +247,54 @@ const handleUploadProfileImage = async (image) => {
   if (!res.ok) {
     throw new Error('upload failed');
   }
-};    
+};
+
+const formatDate = (dateStr, locale) =>
+  new Date(dateStr).toLocaleDateString(locale, {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+
+const diffDaysFromToday = (dateStr) => {
+  const todayStr = new Date().toISOString().slice(0, 10);
+
+  const toUtcDate = (d) => {
+    const [y, m, day] = d.split('-').map(Number);
+    return Date.UTC(y, m - 1, day);
+  };
+
+  return (toUtcDate(dateStr) - toUtcDate(todayStr)) / 86400000;
+};  
+
+const renderEnrollInfo = (enrollInfo) => {
+  if (!enrollInfo || !enrollInfo.total) {
+    return (
+      <View style={styles.enrollInfoContainer}>
+        <Text style={styles.enrollInfoText}>{t('user.enroll_info_failed')}</Text>
+      </View>
+    );
+  }
+
+  const endDateStr = enrollInfo.enroll_list[0].end_date;
+  const formattedDate = formatDate(endDateStr, i18n.language);
+  const diffDays = diffDaysFromToday(endDateStr);
+
+  return (
+    <View style={styles.enrollInfoContainer}>
+      <Text style={styles.enrollInfoText}>
+        <Trans
+          i18nKey="deadline.remaining"
+          values={{ date: formattedDate, days: Math.max(0, diffDays) }}
+          components={[
+            <Text key="date" />,
+            <Text key="days" style={styles.enrollInfoHighlight} />
+          ]}
+        />
+      </Text>
+    </View>
+  );
+};
     
 
   return (
@@ -257,40 +303,44 @@ const handleUploadProfileImage = async (image) => {
         contentContainerStyle={styles.menuScrollContainer}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.memberCard}>
-          <View style={styles.memberImageContainer}>
-<TouchableOpacity
-  onPress={() => uploadProfileImageFlow(handleUploadProfileImage, user.id)}
-  activeOpacity={0.8}
->
-  {user?.picture?.picture_url ? (
-    <Lightbox
-      activeProps={{ style: styles.fullScreenImage }}
-    >
-      <Image
-        source={{
-          uri: `https://humake.blob.core.windows.net/humake/user/${user?.branch_id}/${user.picture.picture_url}`,
-        }}
-        style={styles.memberImage}
-        resizeMode="cover"
-      />
-    </Lightbox>
-  ) : (
-    <Image
-      source={require('./assets/photo_none.gif')}
-      style={styles.memberImage}
-      resizeMode="cover"
-    />
-  )}
-</TouchableOpacity>
-            </View>
-            <View style={styles.memberInfoContainer}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('User')}>
-          <Text style={styles.memberText}>[{user?.name || ''}]{t('common.user_card')}</Text>
-          </TouchableOpacity>
-          </View>
-        </View>
+<View style={styles.memberCard}>
+  <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%'}}>
+    <View style={styles.memberImageContainer}>
+      {/* 프로필 이미지 코드 */}
+      <TouchableOpacity
+        onPress={() => uploadProfileImageFlow(handleUploadProfileImage, user.id)}
+        activeOpacity={0.8}
+      >
+        {user?.picture?.picture_url ? (
+          <Lightbox activeProps={{ style: styles.fullScreenImage }}>
+            <Image
+              source={{
+                uri: `https://humake.blob.core.windows.net/humake/user/${user?.branch_id}/${user.picture.picture_url}`,
+              }}
+              style={styles.memberImage}
+              resizeMode="cover"
+            />
+          </Lightbox>
+        ) : (
+          <Image
+            source={require('./assets/photo_none.gif')}
+            style={styles.memberImage}
+            resizeMode="cover"
+          />
+        )}
+      </TouchableOpacity>
+    </View>
+    {/* userInfo와 enrollInfo를 세로로 묶어서 이미지 오른쪽에 배치 */}
+    <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', flex: 1, marginLeft: 20 }}>
+      <TouchableOpacity onPress={() => navigation.navigate('User')}>
+        <Text style={styles.memberText}>[{user?.name || ''}]{t('common.user_card')}</Text>
+
+      {renderEnrollInfo(enrollInfo)}
+            </TouchableOpacity>
+    </View>
+  </View>
+</View>
+
         <View style={styles.menuContainer}>
           <TouchableOpacity
             style={styles.imageButton}
@@ -334,7 +384,7 @@ const handleUploadProfileImage = async (image) => {
               source={require('./assets/attendance.png')}
               style={styles.imageIcon}
             />
-            <Text style={styles.imageButtonText}>{monthStr} {t('menu.attendance')}</Text>
+            <Text style={styles.imageButtonText}>{t('menu.attendance')}({monthStr})</Text>
             <Text style={[styles.imageButtonText,{textAlign: 'center', color: '#ff8d1d'}]}>{attendanceTotal} {t('common.times')}</Text>
           </TouchableOpacity>
           
@@ -361,7 +411,8 @@ const handleUploadProfileImage = async (image) => {
               source={require('./assets/pt.png')}
               style={styles.imageIcon}
             />
-            <Text style={styles.imageButtonText}>{t('menu.pt')}</Text>
+            <Text style={styles.imageButtonText}>{t('menu.pt')}({monthStr})</Text>
+            <Text style={[styles.imageButtonText,{textAlign: 'center', color: '#ff8d1d'}]}>{reservationTotal} {t('common.times')}</Text>
           </TouchableOpacity>
   
           <TouchableOpacity
@@ -637,21 +688,6 @@ imageButtonText: {
         fontWeight: 'bold',
         marginBottom: 20,
       },
-      memberCard: {
-        display: 'flex',
-        flexDirection: 'row',
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        elevation:2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        width: '90%',
-        padding: 15,
-        alignItems: 'flex-start',
-        justifyContent: 'flex-start',
-      },
       memberImageContainer: {
         width: 60,
         height: 60,
@@ -724,7 +760,46 @@ imageButtonText: {
         backgroundColor: '#333',
         zIndex: 100,
       },
-  });
+memberCard: {
+  flexDirection: 'column', // ← column으로 변경
+  backgroundColor: '#fff',
+  borderRadius: 10,
+  elevation: 2,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.25,
+  shadowRadius: 3.84,
+  width: '90%',
+  padding: 15,
+  alignItems: 'flex-start',
+  justifyContent: 'flex-start',
+},
+memberInfoContainer: {
+  justifyContent: 'center',
+  alignItems: 'flex-start',
+},
+memberText: {
+  fontSize: 18,
+  fontWeight: 'bold',
+  color: '#333',
+},
+enrollInfoContainer: {
+  alignSelf: 'flex-start',
+  marginTop: 2,
+  marginLeft: 0,
+},
+enrollInfoText: {
+  fontSize: 16,
+  color: '#333',
+  textAlign: 'left',
+  fontWeight: '400',
+},
+enrollInfoHighlight: {
+  fontSize: 20,
+  fontWeight: '700',
+  color: '#ff8d1d',
+}
+});
 
 
   export default HomeScreen;

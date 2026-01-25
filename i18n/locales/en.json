@@ -99,5 +99,8 @@
         ],
         "today": "Today",
         "monthFormat": "MMMM yyyy"
-      }
+      },
+    "deadline": {
+      "remaining": "<1>{{days}}</1> days left until {{date}}"
+    }      
   }

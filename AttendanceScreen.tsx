@@ -72,7 +72,7 @@ useEffect(() => {
   };
 
 
-  const disabledFutureDates = getDisabledFutureDates(today, 90);
+  const disabledFutureDates = getDisabledFutureDates(today, 0);
 
 
    const fetchAttendanceMarks = async () => {
@@ -147,6 +147,12 @@ if (data.total > 0) {
 
 
   const onDayPress = (day) => {
+  const todayStr = new Date().toLocaleDateString('en-CA');
+
+  if (day.dateString > todayStr) {
+    return; // ⛔ 여기서 완전히 종료
+  }
+
     const dayOnly = new Date(day.dateString).getDate();
 
     setSelectedDate(day.dateString);
@@ -172,7 +178,7 @@ const renderAttendanceItem = ({ item }) => {
       <Calendar 
         onDayPress={onDayPress}
         markedDates={markedDates} 
-        maxDate={today}
+        maxDate={formatDate(today)}
         onVisibleMonthsChange={(months) => {
 
     setSelectedMonth(months[0].month);
@@ -206,7 +212,8 @@ dayComponent={({ date, state }) => {
 
   return (
     <TouchableOpacity
-      onPress={() => onDayPress(date)}
+      onPress={() => 
+        onDayPress(date)}
       style={{
         backgroundColor: isSelected ? '#007AFF' : 'transparent',
         borderRadius: 20,

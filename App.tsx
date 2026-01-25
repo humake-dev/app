@@ -70,6 +70,8 @@ const App = () => {
   const messaging = useRef(null);
   const [user, setUser] = useState(null);
   const [attendanceTotal, setAttendanceTotal] = useState(0);
+  const [reservationTotal, setReservationTotal] = useState(0);
+  const [enrollInfo, setEnrollInfo] = useState({});
 
   const fetchFcmToken = async () => {
     if(!fcmToken) {
@@ -152,7 +154,9 @@ const App = () => {
 useEffect(() => {
   if (!isLoggedIn) return;
 
+  getPt();
   getEntrance();
+  getEnroll();
 }, [isLoggedIn]);  
 
   useEffect(() => {
@@ -256,6 +260,61 @@ useEffect(() => {
   };
 
 
+  const getEnroll = async () => {
+    try {
+      if (!isLoggedIn) {
+        return;
+      }
+
+      const response = await authFetch(`/enrolls`, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setEnrollInfo(data);
+      } else {
+        throw new Error('Failed to fetch reservation data');
+      }
+    } catch (error) {
+      console.error('Error during reservation fetch:', error);
+    }
+  };    
+
+  const getPt = async () => {
+    try {
+      if (!isLoggedIn) {
+        return;
+      }
+
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+
+      console.log(month);
+
+      const response = await authFetch(`/reservations?year=${year}&month=${month}`, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setReservationTotal(data.total);
+      } else {
+        throw new Error('Failed to fetch reservation data');
+      }
+    } catch (error) {
+      console.error('Error during reservation fetch:', error);
+    }
+  };  
+
+
   const getEntrance = async () => {
     try {
       if (!isLoggedIn) {
@@ -306,8 +365,6 @@ const loginCheck = async () => {
     console.log("토큰 파싱 실패", e);
   }
 };
-
-
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -390,6 +447,8 @@ const loginCheck = async () => {
                       <HomeScreen
                         {...props}
                         attendanceTotal={attendanceTotal}
+                        reservationTotal={reservationTotal}
+                        enrollInfo={enrollInfo}
                       />
                     )}
                   </Stack.Screen>
