@@ -26,6 +26,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { uploadProfileImageFlow } from './src/utils/profileImageUploader';
 import { authFetch } from './src/utils/api';
 import i18n from './i18n/i18n';
+import { useMessageContext } from "./MessageContext";
 
 const HomeScreen = ({navigation, attendanceTotal, reservationTotal, enrollInfo}) => {
     const { t } = useTranslation();
@@ -43,6 +44,7 @@ const HomeScreen = ({navigation, attendanceTotal, reservationTotal, enrollInfo})
 
     const userContext = useUser();
     const user = userContext?.user;
+    
     const LAST_TAB_KEY = 'lastTab';
 
 
@@ -155,9 +157,25 @@ const HomeScreen = ({navigation, attendanceTotal, reservationTotal, enrollInfo})
 };
 
 
-const FirstRoute = ({navigation, t, user}) => {
-  const [selectedCategory, setSelectedCategory] = useState(1);
-  const Stack = createStackNavigator();
+const FirstRoute = ({ navigation, t, user }) => {
+const [selectedCategory, setSelectedCategory] = useState(1);
+const { refreshMessages } = useMessageContext();
+
+
+const prevCategoryRef = useRef(selectedCategory);
+
+
+useEffect(() => {
+const prev = prevCategoryRef.current;
+
+
+if (prev !== 1 && selectedCategory === 1) {
+refreshMessages(); // ✅ 진짜 원하는 타이밍
+}
+
+
+prevCategoryRef.current = selectedCategory;
+}, [selectedCategory]);
 
   return (
     <View style={styles.tabContent}>

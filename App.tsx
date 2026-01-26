@@ -50,7 +50,8 @@ import i18n from './i18n/i18n';
 import { useTranslation } from 'react-i18next'; 
 import {Icon} from 'react-native-elements';
 import { BASE_URL } from './Config';
-import UserContext, { UserProvider } from './UserContext';
+import { UserProvider } from './UserContext';
+import { MessageProvider } from "./MessageContext";
 import BarcodeScreen from './BarcodeScreen';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authFetch, fetchUser } from './src/utils/api';
@@ -149,7 +150,7 @@ const App = () => {
 
   useEffect(() => {
   loginCheck();
-}, []);
+}, [loginCheck]);
 
 useEffect(() => {
   if (!isLoggedIn) return;
@@ -370,6 +371,7 @@ const loginCheck = async () => {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <I18nextProvider i18n={i18n}>
         <UserProvider value={{ user, setUser, setIsLoggedIn }}>
+          <MessageProvider>
           <StatusBar barStyle="dark-content" />
           <NavigationContainer ref={(container) => navigation.current = container}>  
             <Stack.Navigator 
@@ -554,6 +556,7 @@ const loginCheck = async () => {
               </View>
             )}
           </NavigationContainer>
+          </MessageProvider>
         </UserProvider>
       </I18nextProvider>
     </GestureHandlerRootView>

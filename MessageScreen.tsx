@@ -8,62 +8,11 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { authFetch } from './src/utils/api';
+import { useMessageContext } from './MessageContext';
 
-
-const MessageScreen = ({ navigation, route }) => {
+const MessageScreen = ({ navigation }) => {
   const { t } = useTranslation();
-  const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [total, setTotal] = useState(0);
-
-  const fetchMessages = useCallback(async () => {
-    try {
-      const response = await authFetch(`/messages`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if(response.ok){
-        const data = await response.json();
-
-        setTotal(data.total);
-
-        if(data.total) {
-          setMessages(data.message_list);
-        }
-        setLoading(false);
-      }
-
-    } catch (error) {
-      console.error('Error fetching messages:', error);
-      setLoading(false);
-    }
-  }, []);
-
-
-
-  useEffect(() => {
-    fetchMessages();
-  }, [fetchMessages]);
-
-
-  const handleDeleteMessage = async (messageId) => {
-    try {
-      const response = await authFetch(`/messages/hide/${messageId}`, {
-        method: 'POST',
-      });
-      
-      
-      if (response.ok) {
-        // Refresh the messages list after successful deletion
-        fetchMessages();
-      }
-    } catch (error) {
-      console.error('Error deleting message:', error);
-    }
-  };
+  const { messages, total, loading, handleDeleteMessage } = useMessageContext();
 
   if (loading) {
     return (
@@ -75,7 +24,7 @@ const MessageScreen = ({ navigation, route }) => {
 
   if (total === 0) {
     return (
-      <View >
+      <View>
         <Text style={styles.noMessagesText}>{t('message.no_items')}</Text>
       </View>
     );
@@ -83,7 +32,7 @@ const MessageScreen = ({ navigation, route }) => {
 
   const renderMessageItem = ({ item }) => {
     const handlePress = () => {
-      navigation.navigate('MessageDetail', { id: item.id});
+      navigation.navigate('MessageDetail', { id: item.id });
     };
 
     return (

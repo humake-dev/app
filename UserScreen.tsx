@@ -5,6 +5,7 @@ import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { useNavigation } from '@react-navigation/native';
 import { useUser } from './UserContext';
 import { authFetch } from './src/utils/api';
+import { formatDate } from './src/utils/helper';
 
 const UserScreen = () => {
   const { t } = useTranslation();
@@ -108,7 +109,9 @@ const UserScreen = () => {
       renderItem={({ item }) => (
         <View style={styles.itemBox}>
           <Text style={styles.itemTitle}>{item.title || item.product_name}</Text>
-          <Text style={styles.itemDate}>{item.start_date } ~ {item.end_date}</Text>
+          <Text style={styles.itemDate}>
+            {formatDate(item.start_datetime)} ~ {formatDate(item.end_datetime)}
+          </Text>
         </View>
       )}
     />
