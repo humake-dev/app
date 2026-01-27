@@ -20,6 +20,7 @@ jobs:
       - name: Install dependencies
         run: |
           yarn install
+          sed -i '' 's/targetSdkVersion 31/targetSdkVersion 34/' \./node_modules/@adrianso/react-native-device-brightness/android/build.gradle
           cd ios && pod install
 
       - name: Setup signing
