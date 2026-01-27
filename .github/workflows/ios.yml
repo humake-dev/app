@@ -21,6 +21,16 @@ jobs:
         run: |
           yarn install
           cd ios && pod install
+          
+      - name: Debug password length
+        run: |
+          echo "PASS len: ${#IOS_CERT_PASSWORD}"
+          printf "%q\n" "$IOS_CERT_PASSWORD"
+          
+      - name: Debug p12
+        run: |
+          echo "$IOS_CERT_BASE64" | base64 --decode > cert.p12
+          openssl pkcs12 -info -in cert.p12 -noout -passin pass:$IOS_CERT_PASSWORD          
 
       - name: Setup signing
         env:
