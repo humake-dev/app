@@ -13,7 +13,15 @@
       "times" : "times",
       "user_card" : "User Card",
       "go_to_home" : "Go to Home",
-      "logout": "Logout"
+      "logout": "로그logout아웃",
+      "loading": "loading...",
+      "product": "product",
+      "period": "period",
+      "number": "number",
+      "count": "count",
+      "trainer": "trainer",
+      "no_enroll": "No Enrolls",
+      "no_rent": "No Lockers"
     },
     "tabMenu": {
       "message": "Message",

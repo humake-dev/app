@@ -13,7 +13,15 @@
       "times" : "회",
       "user_card" : "님의 회원카드",
       "go_to_home" : "홈으로",
-      "logout": "로그아웃"
+      "logout": "로그아웃",
+      "loading": "로딩중...",
+      "product": "상품",
+      "period": "기간",
+      "number": "번호",
+      "count": "횟수",
+      "trainer": "강사",
+      "no_enroll": "수강이 없습니다.",
+      "no_rent": "락커가 없습니다."      
     },
     "tabMenu": {
       "message": "알림",

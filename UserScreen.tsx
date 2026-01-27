@@ -94,14 +94,14 @@ return (
           keyExtractor={item => item.id}
           ListEmptyComponent={() => (
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>예약된 PT가 없습니다.</Text>
+              <Text style={styles.emptyText}>{t('common.no_enroll')}</Text>
             </View>
           )}
           ListHeaderComponent={() => (
             <View style={styles.listHeader}>
-              <Text style={styles.listHeaderText}>상품</Text>
-              <Text style={styles.listHeaderText}>기간,횟수</Text>
-              <Text style={styles.listHeaderText}>강사</Text>
+              <Text style={styles.listHeaderText}>{t('common.product')}</Text>
+              <Text style={styles.listHeaderText}>{t('common.period')},{t('common.count')}</Text>
+              <Text style={styles.listHeaderText}>{t('common.trainer')}</Text>
             </View>
           )}
         />
@@ -156,14 +156,14 @@ return (
           keyExtractor={item => item.id}
           ListEmptyComponent={() => (
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>예약된 PT가 없습니다.</Text>
+              <Text style={styles.emptyText}>{t('common.no_rent')}</Text>
             </View>
           )}
           ListHeaderComponent={() => (
             <View style={styles.listHeader}>
-              <Text style={styles.listHeaderText}>상품</Text>
-              <Text style={styles.listHeaderText}>기간</Text>
-              <Text style={styles.listHeaderText}>번호</Text>
+              <Text style={styles.listHeaderText}>{t('common.product')}</Text>
+              <Text style={styles.listHeaderText}>{t('common.period')}</Text>
+              <Text style={styles.listHeaderText}>{t('common.number')}</Text>
             </View>
           )}
         />
@@ -184,9 +184,17 @@ return (
     {user?.name}
   </Text>
 
+<View style={styles.userNumberRow}>
   <Text>
     사용자번호 : {user?.branch_id}#{user?.id}
-  </Text>  
+  </Text>
+</View>
+
+<View style={styles.trainerRow}>
+<Text>
+담당강사 : {user?.trainer?.name ?? '없음'}
+</Text>
+</View>
 
   <View style={styles.heightRow}>
     <Text style={styles.userHeight}>
@@ -372,7 +380,12 @@ userName: {
   color: '#333',
   marginBottom: 12,
 },
-
+userNumberRow: {
+  marginBottom: 12,
+},
+trainerRow: {
+  marginBottom: 12,
+},
 heightRow: {
   flexDirection: 'row',
   alignItems: 'center',
