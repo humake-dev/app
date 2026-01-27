@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
- "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+"http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>method</key>
-  <string>ad-hoc</string>
-  <key>teamID</key>
-  <string>YOUR_TEAM_ID</string>
-  <key>signingStyle</key>
-  <string>manual</string>
+<key>method</key>
+<string>app-store</string>
+
+
+<key>teamID</key>
+<string>kr.co.humake</string>
+
+
+<key>signingStyle</key>
+<string>manual</string>
+
+
+<key>provisioningProfiles</key>
+<dict>
+<key>kr.co.humake</key>
+<string>IOS_PROVISION_PROFILE_BASE64</string>
+</dict>
 </dict>
 </plist>
