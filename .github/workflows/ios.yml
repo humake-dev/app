@@ -21,17 +21,22 @@ jobs:
         run: |
           yarn install
           cd ios && pod install
-
-      # --- iOS Signing Setup ---
+          
+      # --- Import certificates only ---
       - name: Import Code-Signing Certificates
         uses: Apple-Actions/import-codesign-certs@v6.0.0
         with:
           p12-file-base64: ${{ secrets.IOS_CERT_BASE64 }}
           p12-password: ${{ secrets.IOS_CERT_PASSWORD }}
-          provisioning-profile-file-base64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
-          keychain: build.keychain
+          keychain: build_keychain           # <-- .keychain 붙이지 마세요
           create-keychain: true
           keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+        
+      # --- Provisioning profile manually ---
+      - name: Setup provisioning profile
+        run: |
+        mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+        echo "${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
 
       # --- Build ---
       - name: Build archive
