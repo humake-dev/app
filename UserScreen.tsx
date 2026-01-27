@@ -43,7 +43,7 @@ const UserScreen = () => {
   useEffect(() => {
     const fetchEnrolls = async () => {
       try {
-        const response = await authFetch('/enrolls', {
+        const response = await authFetch('/enrolls?primary_only=false', {
           headers: { "Content-Type": "application/json" },
         });
         if (response.ok) {
@@ -59,21 +59,55 @@ const UserScreen = () => {
     fetchEnrolls();
   }, []);
 
-  if (loading) return <ActivityIndicator style={{ marginTop: 20 }} />;
-  if (!data.length) return <Text style={styles.emptyText}>등록 내역이 없습니다.</Text>;
+const renderEnrollItem = ({ item }) => {
+const isQuantityType = item.lesson_type === 4;
+const remainCount = item.quantity - item.use_quantity;
+
+
+return (
+<View style={styles.itemBox}>
+<Text style={styles.itemText}>{item.product_title}</Text>
+
+
+{isQuantityType ? (
+<Text style={styles.itemText}>{remainCount}회 남음</Text>
+) : (
+<Text style={styles.itemText}>
+{formatDate(item.start_date)} ~ {formatDate(item.end_date)}
+</Text>
+)}
+
+
+<Text style={styles.itemText}>{item.trainer_name}</Text>
+</View>
+);
+};
 
   return (
-    <FlatList
-      data={data}
-      keyExtractor={(item, idx) => item.id?.toString() || idx.toString()}
-      renderItem={({ item }) => (
-        <View style={styles.itemBox}>
-          <Text style={styles.itemTitle}>{item.title || item.product_name}</Text>
-          <Text style={styles.itemDate}>{item.start_date} ~ {item.end_date}</Text>
-        </View>
+    <View>
+      {loading ? (
+        <ActivityIndicator size="large" color="#007AFF" style={styles.loader} />
+      ) : (
+        <FlatList
+          data={data}
+          renderItem={renderEnrollItem}
+          keyExtractor={item => item.id}
+          ListEmptyComponent={() => (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>예약된 PT가 없습니다.</Text>
+            </View>
+          )}
+          ListHeaderComponent={() => (
+            <View style={styles.listHeader}>
+              <Text style={styles.listHeaderText}>상품</Text>
+              <Text style={styles.listHeaderText}>기간,횟수</Text>
+              <Text style={styles.listHeaderText}>강사</Text>
+            </View>
+          )}
+        />
       )}
-    />
-  )
+    </View>
+  );
 };
 
   const SecondRoute = ({navigation, t, user}) => {
@@ -99,22 +133,42 @@ const UserScreen = () => {
     fetchRents();
   }, []);
 
-  if (loading) return <ActivityIndicator style={{ marginTop: 20 }} />;
-  if (!data.length) return <Text style={styles.emptyText}>대여 내역이 없습니다.</Text>;
+  const renderRentItem = ({ item }) => {
+      return (
+            <View style={styles.itemBox}>
+          <Text style={styles.itemText}>{item.product_title}</Text>
+          <Text style={styles.itemText}>
+            {formatDate(item.start_date)} ~ {formatDate(item.end_date)}
+          </Text>
+           <Text style={styles.itemText}>{item.no}</Text>
+        </View>
+      );
+  }
 
   return (
-    <FlatList
-      data={data}
-      keyExtractor={(item, idx) => item.id?.toString() || idx.toString()}
-      renderItem={({ item }) => (
-        <View style={styles.itemBox}>
-          <Text style={styles.itemTitle}>{item.title || item.product_name}</Text>
-          <Text style={styles.itemDate}>
-            {formatDate(item.start_datetime)} ~ {formatDate(item.end_datetime)}
-          </Text>
-        </View>
+    <View>
+      {loading ? (
+        <ActivityIndicator size="large" color="#007AFF" style={styles.loader} />
+      ) : (
+        <FlatList
+          data={data}
+          renderItem={renderRentItem}
+          keyExtractor={item => item.id}
+          ListEmptyComponent={() => (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>예약된 PT가 없습니다.</Text>
+            </View>
+          )}
+          ListHeaderComponent={() => (
+            <View style={styles.listHeader}>
+              <Text style={styles.listHeaderText}>상품</Text>
+              <Text style={styles.listHeaderText}>기간</Text>
+              <Text style={styles.listHeaderText}>번호</Text>
+            </View>
+          )}
+        />
       )}
-    />
+    </View>
   );
 };
 
@@ -346,12 +400,6 @@ editButtonText: {
 addButton: {
   backgroundColor: '#34C759', // 미입력일 때 강조
 },
-
-  itemBox: {
-    padding: 12,
-    borderBottomWidth: 1,
-    borderColor: '#eee',
-  },
   itemTitle: {
     fontSize: 16,
     fontWeight: 'bold',
@@ -368,6 +416,31 @@ addButton: {
     marginTop: 30,
     fontSize: 16,
   },
+
+  listHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+    backgroundColor: '#f8f8f8',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  listHeaderText: {
+    flex: 1,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  itemBox: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  itemText: {
+    flex: 1,
+    textAlign: 'center',
+  },  
 });
 
 export default UserScreen;

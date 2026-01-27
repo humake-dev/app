@@ -53,6 +53,12 @@ useEffect(() => {
   fetchReservations(dayOnly);
 }, []);
 
+const statusTextMap: Record<string, string> = {
+'0': 'pt.statusConfirmed',
+'1': 'pt.statusPending',
+'2': 'pt.statusCompleted',
+};
+
   const today = new Date();
 
   const formatDate = (date: Date) =>
@@ -171,11 +177,11 @@ useEffect(() => {
       <Text style={styles.scheduleItemText}>{item.trainer_name}</Text>
       <Text style={[
         styles.scheduleItemText, 
-        item.complete === '1' && styles.statusConfirmed,
-        item.complete === '2' && styles.statusPending,
-        item.complete === '3' && styles.statusCompleted
+        item.complete === '0' && styles.statusConfirmed,
+        item.complete === '1' && styles.statusPending,
+        item.complete === '2' && styles.statusCompleted
       ]}>
-        {item.complete}
+       {t(statusTextMap[String(item.complete)])}
       </Text>
     </TouchableOpacity>
   );

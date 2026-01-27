@@ -100,6 +100,9 @@
         "today": "Today",
         "monthFormat": "MMMM yyyy"
       },
+    "pt": { "statusConfirmed" : "예약",
+            "statusPending" :   "완료확인중",         
+            "statusCompleted" : "완료" },          
     "deadline": {
       "remaining": "<1>{{days}}</1> days left until {{date}}"
     }      
