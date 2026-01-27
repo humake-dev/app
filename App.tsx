@@ -519,10 +519,12 @@ const loginCheck = async () => {
 
                       <TouchableOpacity 
                         style={styles.sideMenuItem}
-                        onPress={() => {
-                          closeMenu();
-                          navigation.current.navigate('Message');
-                        }}>
+onPress={() => {
+closeMenu();
+navigation.current.navigate('Home', {
+targetTab: 'first',
+});
+}}>
                         <Text style={styles.sideMenuItemText}>{t('menu.message')}</Text>
                       </TouchableOpacity>
 

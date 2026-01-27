@@ -27,7 +27,7 @@ import { authFetch } from './src/utils/api';
 import i18n from './i18n/i18n';
 import { useMessageContext } from "./MessageContext";
 
-const HomeScreen = ({navigation, attendanceTotal, reservationTotal, enrollInfo}) => {
+const HomeScreen = ({navigation, route, attendanceTotal, reservationTotal, enrollInfo}) => {
     const { t } = useTranslation();
     const [index, setIndex] = useState(1);
 
@@ -45,6 +45,12 @@ const HomeScreen = ({navigation, attendanceTotal, reservationTotal, enrollInfo})
     const user = userContext?.user;
     
     const LAST_TAB_KEY = 'lastTab';
+
+useEffect(() => {
+if (route.params?.targetTab === 'first') {
+setIndex(0);
+}
+}, [route.params]);
 
 
       // 앱 시작 시 저장된 탭 인덱스 로딩
