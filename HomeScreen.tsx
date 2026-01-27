@@ -14,7 +14,6 @@ import {Trans, useTranslation} from 'react-i18next';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import Barcode from '@kichiyaki/react-native-barcode-generator';
 import ViewShot from 'react-native-view-shot';
-import { CameraRoll } from '@react-native-camera-roll/camera-roll'; // 사진 저장용
 import DeviceBrightness from '@adrianso/react-native-device-brightness';
 import { useUser } from './UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -243,8 +242,6 @@ const SecondRoute = ({navigation, t, user, attendanceTotal, reservationTotal, en
   const monthStr = now.toLocaleString(i18n.language, { month: "long" });
 
 const handleUploadProfileImage = async (image) => {
-  console.log('good');
-  console.log(image);
   // 여기서 서버 업로드
   const formData = new FormData();
   formData.append('picture', {
@@ -324,8 +321,7 @@ const renderEnrollInfo = (enrollInfo) => {
 <View style={styles.memberCard}>
   <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%'}}>
     <View style={styles.memberImageContainer}>
-      {/* 프로필 이미지 코드 */}
-      <TouchableOpacity
+        {/* <TouchableOpacity
         onPress={() => uploadProfileImageFlow(handleUploadProfileImage, user.id)}
         activeOpacity={0.8}
       >
@@ -339,14 +335,14 @@ const renderEnrollInfo = (enrollInfo) => {
               resizeMode="cover"
             />
           </Lightbox>
-        ) : (
+        ) : (  */}
           <Image
-            source={require('./assets/photo_none.gif')}
+            source={user?.picture?.picture_url ? {uri: `https://humake.blob.core.windows.net/humake/user/${user?.branch_id}/${user.picture.picture_url}`} : (require('./assets/photo_none.gif'))}
             style={styles.memberImage}
             resizeMode="cover"
           />
-        )}
-      </TouchableOpacity>
+       {/*  )}  
+      </TouchableOpacity>*/}
     </View>
     {/* userInfo와 enrollInfo를 세로로 묶어서 이미지 오른쪽에 배치 */}
     <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', flex: 1, marginLeft: 20 }}>
@@ -469,7 +465,7 @@ const renderEnrollInfo = (enrollInfo) => {
     
     
           // 사진첩에 저장
-          await CameraRoll.save(uri, { type: 'photo' });
+          //await CameraRoll.save(uri, { type: 'photo' });
           Alert.alert('Success', 'Barcode saved to Photos!');
         } catch (error) {
           console.error('Error saving barcode:', error);
@@ -530,7 +526,7 @@ const renderEnrollInfo = (enrollInfo) => {
             }}>
               {user.access_card.card_no}
             </Text>
-            <TouchableOpacity 
+            {/*<TouchableOpacity 
               style={{
                 marginTop: 20,
                 padding: 10,
@@ -547,7 +543,7 @@ const renderEnrollInfo = (enrollInfo) => {
               }}>
                 {t('common.download_barcode')}
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         ) : (
             <Text style={{ 

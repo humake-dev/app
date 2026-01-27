@@ -3,9 +3,11 @@ import { View, TouchableOpacity, Text, StyleSheet, FlatList,  Alert, ScrollView,
 import { useTranslation } from 'react-i18next';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { useNavigation } from '@react-navigation/native';
+import Lightbox from 'react-native-lightbox-v2';
 import { useUser } from './UserContext';
 import { authFetch } from './src/utils/api';
 import { formatDate } from './src/utils/helper';
+import { uploadProfileImageFlow } from './src/utils/profileImageUploader';
 
 const UserScreen = () => {
   const { t } = useTranslation();
@@ -78,7 +80,7 @@ return (
 )}
 
 
-<Text style={styles.itemText}>{item.trainer_name}</Text>
+<Text style={styles.itemText}>{item.trainer_name? (item.trainer_name): "-" }</Text>
 </View>
 );
 };
@@ -179,10 +181,50 @@ return (
         </View>
         <ScrollView style={styles.scrollView}>
           <View style={styles.content}>
+
+
+
+
 <View style={styles.contentContainer}>
-  <Text style={styles.userName}>
-    {user?.name}
-  </Text>
+
+
+<View style={styles.userNumberRow}>
+<View style={styles.memberImageContainer}>
+<TouchableOpacity
+onPress={() =>
+uploadProfileImageFlow(handleUploadProfileImage, user.id)
+}
+activeOpacity={0.8}
+>
+{user?.picture?.picture_url ? (
+<Lightbox activeProps={{ style: styles.fullScreenImage }}>
+<Image
+source={{
+uri: `https://humake.blob.core.windows.net/humake/user/${user?.branch_id}/${user.picture.picture_url}`,
+}}
+style={styles.memberImage}
+resizeMode="cover"
+/>
+</Lightbox>
+) : (
+<Image
+source={require('./assets/photo_none.gif')}
+style={styles.memberImage}
+resizeMode="cover"
+/>
+)}
+</TouchableOpacity>
+</View>
+
+
+{/* 👉 이름을 같은 row 안으로 */}
+<Text style={styles.userName}>
+{user?.name}
+</Text>
+</View>
+
+
+
 
 <View style={styles.userNumberRow}>
   <Text>
@@ -380,11 +422,12 @@ userName: {
   color: '#333',
   marginBottom: 12,
 },
-userNumberRow: {
-  marginBottom: 12,
-},
+
 trainerRow: {
-  marginBottom: 12,
+flexDirection: 'row',
+alignItems: 'center', // ⭐ 세로 중앙 정렬
+marginBottom: 10,
+marginLeft: 10,
 },
 heightRow: {
   flexDirection: 'row',
@@ -395,6 +438,7 @@ heightRow: {
 userHeight: {
   fontSize: 16,
   color: '#333',
+  marginLeft: 10
 },
 
 editButton: {
@@ -410,6 +454,32 @@ editButtonText: {
   fontWeight: '500',
 },
 
+userNumberRow: {
+flexDirection: 'row',
+alignItems: 'center', // ⭐ 세로 중앙 정렬
+margin: 10,
+},
+
+userName: {
+fontSize: 18,
+fontWeight: '600',
+},
+      memberImageContainer: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        marginRight: 12,
+        overflow: 'hidden',
+      },
+      memberImage: {
+        width: '100%',
+        height: '100%',
+      },
+      fullScreenImage: {
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height,
+        resizeMode: 'contain',
+      },
 addButton: {
   backgroundColor: '#34C759', // 미입력일 때 강조
 },
