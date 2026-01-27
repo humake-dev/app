@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: |
           yarn install
-          cd ios && pod install
+          cd ios && pod install --repo-update
 
       - name: Setup signing
         run: |
@@ -57,3 +57,4 @@ jobs:
         with:
           name: ipa
           path: build/*.ipa
+          
