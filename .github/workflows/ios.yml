@@ -47,7 +47,7 @@ jobs:
       - name: Build archive
         run: |
           xcodebuild \
-            -workspace ios/App.xcworkspace \
+            -workspace ios/humake_app.xcworkspace \
             -scheme App \
             -configuration Release \
             -archivePath build/App.xcarchive \
