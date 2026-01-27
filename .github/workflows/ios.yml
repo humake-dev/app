@@ -1,67 +1,40 @@
-name: iOS Build with Safe Signing
+name: iOS Build
 
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:
 
 jobs:
   build-ios:
     runs-on: macos-latest
-    env:
-      # Secrets
-      IOS_CERT_BASE64: ${{ secrets.IOS_CERT_BASE64 }}
-      IOS_CERT_PASSWORD: ${{ secrets.IOS_CERT_PASSWORD }}
-      KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-      IOS_PROVISION_PROFILE_BASE64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Decode p12 certificate
-        run: |
-          echo "$IOS_CERT_BASE64" | tr -d '\n' | base64 --decode > cert.p12
-          shasum cert.p12
-
-      - name: Debug IOS_CERT_PASSWORD
-        run: |
-          echo "=== DEBUG: IOS_CERT_PASSWORD ==="
-          echo "PASS len: ${#IOS_CERT_PASSWORD}"
-          printf "'%s'\n" "$IOS_CERT_PASSWORD"
-
-      - name: Decode IOS_CERT_BASE64 → cert.p12
-        run: |
-          echo "=== DEBUG: IOS_CERT_BASE64 decode ==="
-          echo "$IOS_CERT_BASE64" | base64 --decode > cert.p12
-          file cert.p12
-          ls -l cert.p12
-          openssl pkcs12 -info -in cert.p12 -noout -passin pass:$IOS_CERT_PASSWORD || true 
-
-      # ===== 여기서 Import Code-Signing Certificates =====
-      - name: Import Code-Signing Certificates
-        uses: Apple-Actions/import-codesign-certs@v6.0.0
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          p12-base64: ${{ secrets.IOS_CERT_BASE64 }}
-          p12-password: ${{ secrets.IOS_CERT_PASSWORD }}
-          provisioning-profile-base64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
-          keychain-name: build.keychain
-          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
-          keychain-default: true
-          keychain-lock-timeout: 3600 
+          node-version: '>=20'
 
-      - name: Setup Node & Install Dependencies
+      - name: Install dependencies
         run: |
           yarn install
           cd ios && pod install
 
-      - name: Install Provisioning Profile
-        run: |
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "$IOS_PROVISION_PROFILE_BASE64" | tr -d '\n' | base64 --decode > profile.mobileprovision
-          cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+      # --- iOS Signing Setup ---
+      - name: Import Code-Signing Certificates
+        uses: Apple-Actions/import-codesign-certs@v6.0.0
+        with:
+          p12-file-base64: ${{ secrets.IOS_CERT_BASE64 }}
+          p12-password: ${{ secrets.IOS_CERT_PASSWORD }}
+          provisioning-profile-file-base64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
+          keychain: build.keychain
+          create-keychain: true
+          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
 
-      - name: Build Archive
+      # --- Build ---
+      - name: Build archive
         run: |
           xcodebuild \
             -workspace ios/App.xcworkspace \
@@ -78,7 +51,7 @@ jobs:
             -exportPath build \
             -exportOptionsPlist ios/exportOptions.plist
 
-      - name: Upload IPA
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ipa
