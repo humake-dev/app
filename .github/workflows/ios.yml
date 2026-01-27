@@ -36,20 +36,40 @@ jobs:
           echo "$IOS_CERT_BASE64" | base64 --decode > cert.p12
           file cert.p12
           ls -l cert.p12
-          openssl pkcs12 -info -in cert.p12 -noout -passin pass:$IOS_CERT_PASSWORD || true               
+          openssl pkcs12 -info -in cert.p12 -noout -passin pass:$IOS_CERT_PASSWORD || true 
 
       - name: Setup Keychain
         run: |
-          KEYCHAIN_PATH="$HOME/Library/Keychains/build.keychain"
+          KEYCHAIN_PATH="$HOME/Library/Keychains/build.keychain-db"
+          echo "=== Creating keychain ==="
           security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          echo "=== Unlock keychain ==="
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          security set-keychain-settings -t 3600 -u "$KEYCHAIN_PATH"
+
+          echo "=== Set keychain as default ==="
+          security list-keychains -s "$KEYCHAIN_PATH" $(security list-keychains -d user | tr -d '"')
           security default-keychain -s "$KEYCHAIN_PATH"
-          echo "$IOS_CERT_BASE64" | tr -d '\n' | base64 --decode > cert.p12
-          security import cert.p12 -k "$KEYCHAIN_PATH" -P "$IOS_CERT_PASSWORD" -T /usr/bin/codesign
+
+          echo "=== Keychain settings ==="
+          security set-keychain-settings -t 3600 -u "$KEYCHAIN_PATH"
+
+          echo "=== Decode and import certificate ==="
+          echo "$IOS_CERT_BASE64" | base64 --decode > cert.p12
+          security import cert.p12 \
+            -k "$KEYCHAIN_PATH" \
+            -P "$IOS_CERT_PASSWORD" \
+            -T /usr/bin/codesign \
+            -A
+
+          echo "=== Install provisioning profile ==="
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "$IOS_PROVISION_PROFILE_BASE64" | base64 --decode > profile.mobileprovision
-          cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/        
+          echo "$IOS_PROVISION_PROFILE_BASE64" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+
+      - name: List keychains and certificates
+        run: |
+          security list-keychains
+          security find-identity -v -p codesigning  
 
       - name: Setup Node & Install Dependencies
         run: |
