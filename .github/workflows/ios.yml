@@ -42,16 +42,16 @@ jobs:
         run: |
           ls -l ios/
           pwd
-
-      # --- Build ---
+          
       - name: Build archive
         run: |
           xcodebuild \
             -workspace ios/humake_app.xcworkspace \
             -scheme humake_app \
             -configuration Release \
-            -archivePath build/App.xcarchive \
+            -archivePath build/humake_app.xcarchive \
             -allowProvisioningUpdates \
+            DEVELOPMENT_TEAM=${{ secrets.APPLE_TEAM_ID }} \
             archive
 
       - name: Export IPA
