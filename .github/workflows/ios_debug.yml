@@ -22,12 +22,6 @@ jobs:
           echo "PASS len: ${#IOS_CERT_PASSWORD}"
           printf "'%s'\n" "$IOS_CERT_PASSWORD"
 
-      - name: Debug KEYCHAIN_PASSWORD
-        run: |
-          echo "=== DEBUG: KEYCHAIN_PASSWORD ==="
-          echo "PASS len: ${#KEYCHAIN_PASSWORD}"
-          printf "'%s'\n" "$KEYCHAIN_PASSWORD"
-
       - name: Decode IOS_CERT_BASE64 → cert.p12
         run: |
           echo "=== DEBUG: IOS_CERT_BASE64 decode ==="

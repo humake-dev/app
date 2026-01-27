@@ -18,11 +18,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        
+
       - name: Decode p12 certificate
         run: |
           echo "$IOS_CERT_BASE64" | tr -d '\n' | base64 --decode > cert.p12
-          shasum cert.p12        
+          shasum cert.p12
+
+      - name: Debug IOS_CERT_PASSWORD
+        run: |
+          echo "=== DEBUG: IOS_CERT_PASSWORD ==="
+          echo "PASS len: ${#IOS_CERT_PASSWORD}"
+          printf "'%s'\n" "$IOS_CERT_PASSWORD"
+
+      - name: Decode IOS_CERT_BASE64 → cert.p12
+        run: |
+          echo "=== DEBUG: IOS_CERT_BASE64 decode ==="
+          echo "$IOS_CERT_BASE64" | base64 --decode > cert.p12
+          file cert.p12
+          ls -l cert.p12
+          openssl pkcs12 -info -in cert.p12 -noout -passin pass:$IOS_CERT_PASSWORD || true               
 
       - name: Setup Keychain
         run: |
