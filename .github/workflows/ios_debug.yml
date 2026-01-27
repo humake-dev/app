@@ -56,3 +56,8 @@ jobs:
       - name: Test import with verbose
         run: |
           security import cert.p12 -k build.keychain -P "$IOS_CERT_PASSWORD" -T /usr/bin/codesign -v                
+          
+      - name: Debug p12 checksum
+        run: |
+          echo "$IOS_CERT_BASE64" | base64 --decode > cert.p12
+          md5 cert.p12
