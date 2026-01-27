@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "postinstall": "sed -i 's/targetSdkVersion 31/targetSdkVersion 34/' ./node_modules/@adrianso/react-native-device-brightness/android/build.gradle"
+    // "postinstall": "sed -i 's/targetSdkVersion 31/targetSdkVersion 34/' ./node_modules/@adrianso/react-native-device-brightness/android/build.gradle"
   },
   "dependencies": {
     "@adrianso/react-native-device-brightness": "^1.2.7",
