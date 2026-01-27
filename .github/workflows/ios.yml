@@ -52,13 +52,17 @@ jobs:
         run: |
           echo "=== DEBUG: Setup Keychain ==="
           KEYCHAIN_PATH="$HOME/Library/Keychains/build.keychain"
+          
           security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security default-keychain -s "$KEYCHAIN_PATH"
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security set-keychain-settings -t 3600 -u "$KEYCHAIN_PATH"
           
           echo "=== DEBUG: Import p12 ==="
-          security import cert.p12 -k "$KEYCHAIN_PATH" -P "$IOS_CERT_PASSWORD" -T /usr/bin/codesign -v
+          security import cert.p12 \
+          -k "$KEYCHAIN_PATH" \
+          -P "$IOS_CERT_PASSWORD" \
+          -T /usr/bin/codesign
         env:
           IOS_CERT_PASSWORD: ${{ secrets.IOS_CERT_PASSWORD }}
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
