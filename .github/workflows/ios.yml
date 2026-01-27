@@ -7,11 +7,6 @@ on:
 jobs:
   build-ios:
     runs-on: macos-latest
-    env:
-      IOS_CERT_PASSWORD: ${{ secrets.IOS_CERT_PASSWORD }}
-      KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-      IOS_CERT_BASE64: ${{ secrets.IOS_CERT_BASE64 }}
-      IOS_PROVISION_PROFILE_BASE64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
 
     steps:
       - name: Checkout
@@ -29,15 +24,20 @@ jobs:
 
       - name: Debug Secrets
         run: |
-          echo "PASS len: ${#IOS_CERT_PASSWORD}"
+          echo "=== DEBUG: IOS_CERT_PASSWORD ==="
+          echo "length: ${#IOS_CERT_PASSWORD}"
           printf "'%s'\n" "$IOS_CERT_PASSWORD"
+        env:
+          IOS_CERT_PASSWORD: ${{ secrets.IOS_CERT_PASSWORD }}
 
       - name: Decode IOS_CERT_BASE64 → cert.p12
         run: |
           printf "%s" "$IOS_CERT_BASE64" | base64 --decode > cert.p12
-          file cert.p12
           ls -l cert.p12
           openssl pkcs12 -info -in cert.p12 -noout -passin pass:$IOS_CERT_PASSWORD || true
+        env:
+          IOS_CERT_BASE64: ${{ secrets.IOS_CERT_BASE64 }}
+          IOS_CERT_PASSWORD: ${{ secrets.IOS_CERT_PASSWORD }}
 
       - name: Decode IOS_PROVISION_PROFILE_BASE64
         run: |
@@ -45,19 +45,23 @@ jobs:
           ls -l profile.mobileprovision
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+        env:
+          IOS_PROVISION_PROFILE_BASE64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
 
       - name: Setup Keychain and Import Certificate
         run: |
+          echo "=== DEBUG: Setup Keychain ==="
           KEYCHAIN_PATH="$HOME/Library/Keychains/build.keychain"
-          
-          # keychain 생성 및 기본 keychain으로 설정
           security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security default-keychain -s "$KEYCHAIN_PATH"
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security set-keychain-settings -t 3600 -u "$KEYCHAIN_PATH"
-
-          # p12 import (codesign 접근 허용)
-          security import cert.p12 -k "$KEYCHAIN_PATH" -P "$IOS_CERT_PASSWORD" -T /usr/bin/codesign
+          
+          echo "=== DEBUG: Import p12 ==="
+          security import cert.p12 -k "$KEYCHAIN_PATH" -P "$IOS_CERT_PASSWORD" -T /usr/bin/codesign -v
+        env:
+          IOS_CERT_PASSWORD: ${{ secrets.IOS_CERT_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
 
       - name: Build Archive
         run: |
