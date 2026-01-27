@@ -18,6 +18,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        
+      - name: Setup Keychain
+        run: |
+          KEYCHAIN_PATH="$HOME/Library/Keychains/build.keychain"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -t 3600 -u "$KEYCHAIN_PATH"
+          security default-keychain -s "$KEYCHAIN_PATH"
+          echo "$IOS_CERT_BASE64" | base64 --decode > cert.p12
+          security import cert.p12 -k "$KEYCHAIN_PATH" -P "$IOS_CERT_PASSWORD" -T /usr/bin/codesign
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$IOS_PROVISION_PROFILE_BASE64" | base64 --decode > profile.mobileprovision
+          cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/        
 
       - name: Setup Node & Install Dependencies
         run: |
@@ -28,25 +41,6 @@ jobs:
         run: |
           echo "$IOS_CERT_BASE64" | tr -d '\n' | base64 --decode > cert.p12
           shasum cert.p12
-
-      - name: Setup Keychain
-        run: |
-          # 절대 경로 keychain
-          KEYCHAIN_PATH="$HOME/Library/Keychains/build.keychain"
-
-          echo "=== Creating keychain ==="
-          KEYCHAIN_PATH="$HOME/Library/Keychains/build.keychain"
-          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          security set-keychain-settings -t 3600 -u "$KEYCHAIN_PATH"
-          security default-keychain -s "$KEYCHAIN_PATH"
-          security import cert.p12 -k "$KEYCHAIN_PATH" -P "$IOS_CERT_PASSWORD" -T /usr/bin/codesign
-
-          echo "=== Import certificate ==="
-          security import cert.p12 \
-            -k "$KEYCHAIN_PATH" \
-            -P "$IOS_CERT_PASSWORD" \
-            -T /usr/bin/codesign
 
       - name: Install Provisioning Profile
         run: |
