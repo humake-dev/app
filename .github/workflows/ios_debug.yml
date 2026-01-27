@@ -1,0 +1,44 @@
+name: iOS Secrets Rerun Debug
+
+
+on:
+workflow_dispatch: # 수동 실행 가능
+
+
+jobs:
+rerun-debug:
+runs-on: macos-latest
+steps:
+- name: Checkout repo
+uses: actions/checkout@v4
+
+
+- name: Debug IOS_CERT_PASSWORD
+run: |
+echo "=== DEBUG: IOS_CERT_PASSWORD ==="
+echo "PASS len: ${#IOS_CERT_PASSWORD}"
+printf "'%s'\n" "$IOS_CERT_PASSWORD"
+
+
+- name: Debug KEYCHAIN_PASSWORD
+run: |
+echo "=== DEBUG: KEYCHAIN_PASSWORD ==="
+echo "PASS len: ${#KEYCHAIN_PASSWORD}"
+printf "'%s'\n" "$KEYCHAIN_PASSWORD"
+
+
+- name: Decode IOS_CERT_BASE64 → cert.p12
+run: |
+echo "=== DEBUG: IOS_CERT_BASE64 decode ==="
+echo "$IOS_CERT_BASE64" | base64 --decode > cert.p12
+file cert.p12
+ls -l cert.p12
+# 비밀번호로 확인 (실패해도 workflow 중단 안되게 || true)
+openssl pkcs12 -info -in cert.p12 -noout -passin pass:$IOS_CERT_PASSWORD || true
+
+
+- name: Decode IOS_PROVISION_PROFILE_BASE64
+run: |
+echo "=== DEBUG: IOS_PROVISION_PROFILE_BASE64 decode ==="
+echo "$IOS_PROVISION_PROFILE_BASE64" | base64 --decode > profile.mobileprovision
+ls -l profile.mobileprovision
