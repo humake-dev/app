@@ -50,8 +50,19 @@ jobs:
 
       - name: Show keychain list
         run: |
+          KEYCHAIN_PATH="$HOME/Library/Keychains/build.keychain"
+          
+          echo "=== Creating keychain ==="
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          
+          echo "=== Unlocking keychain ==="
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          
+          echo "=== Setting as default keychain ==="
+          security default-keychain -s "$KEYCHAIN_PATH"
+          
+          echo "=== List keychains ==="
           security list-keychains
-          security show-keychain-info build.keychain
           
       - name: Test import with verbose
         run: |
