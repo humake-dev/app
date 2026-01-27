@@ -41,3 +41,18 @@ jobs:
           echo "=== DEBUG: IOS_PROVISION_PROFILE_BASE64 decode ==="
           echo "$IOS_PROVISION_PROFILE_BASE64" | base64 --decode > profile.mobileprovision
           ls -l profile.mobileprovision
+
+      - name: Check p12 checksum
+        run: |
+          shasum cert.p12
+          file cert.p12
+          ls -l cert.p12
+
+      - name: Show keychain list
+        run: |
+          security list-keychains
+          security show-keychain-info build.keychain
+          
+      - name: Test import with verbose
+        run: |
+          security import cert.p12 -k build.keychain -P "$IOS_CERT_PASSWORD" -T /usr/bin/codesign -v                
