@@ -47,3 +47,13 @@ config[:reactNativePath],
 )
 end
 end
+
+post_install do |installer|
+react_native_post_install(installer)
+
+
+# 시뮬레이터 arm64 제외 (Intel Mac CI용)
+installer.pods_project.build_configurations.each do |config|
+config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+end
+end

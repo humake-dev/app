@@ -47,8 +47,9 @@ jobs:
           xcodebuild \
             -workspace ios/humake_app.xcworkspace \
             -scheme humake_app \
-            -configuration Release \
-            -sdk iphoneos \
+            -configuration Debug \            
+            -sdk iphonesimulator \
+            -derivedDataPath ios/build \            
             BUILD_DIR=build \
             CODE_SIGNING_ALLOWED=NO 
 
