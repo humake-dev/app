@@ -18,8 +18,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          yarn install
-          cd ios && pod install
+          yarn install --frozen-lockfile
+          
+      - name: Install CocoaPods
+        run: |
+          cd ios
+          bundle install
+          bundle exec pod install          
           
       # --- Import certificates only ---
       - name: Import Code-Signing Certificates
