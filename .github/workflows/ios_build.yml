@@ -101,12 +101,29 @@ jobs:
             archive \
             -verbose | tee xcodebuild.log
 
+      # 1️⃣ Signing & Provisioning 설치
+      - name: Setup iOS Signing
+        run: |
+          
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$IOS_PROVISION_PROFILE_BASE64" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/humake_app.mobileprovision
+          
+          echo "$IOS_DISTRIBUTION_CERT_BASE64" | base64 --decode > /tmp/dist_cert.p12
+          security import /tmp/dist_cert.p12 -k ~/Library/Keychains/login.keychain -P "$IOS_CERT_PASSWORD" -T /usr/bin/codesign
+          
+          env:
+          IOS_PROVISION_PROFILE_BASE64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
+          IOS_DISTRIBUTION_CERT_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERT_BASE64 }}
+          IOS_CERT_PASSWORD: ${{ secrets.IOS_CERT_PASSWORD }}
+          
+        # 2️⃣ Export IPA
       - name: Export IPA
         run: |
           xcodebuild -exportArchive \
-            -archivePath build/humake_app.xcarchive \
-            -exportPath build \
-            -exportOptionsPlist ios/exportOptions.plist
+          -archivePath build/humake_app.xcarchive \
+          -exportPath build \
+          -exportOptionsPlist ios/exportOptions.plist \
+          -allowProvisioningUpdates
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
