@@ -3,6 +3,12 @@ source 'https://cdn.cocoapods.org/'
 
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 
+platform :ios, '13.0'
+
+
+# Production 모드
+production = true
+
 
 # Resolve react_native_pods.rb with node to allow for hoisting
 require Pod::Executable.execute_command(
