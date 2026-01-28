@@ -34,9 +34,9 @@ jobs:
       # --- Provisioning profile manually ---
       - name: Setup provisioning profile
         run: |
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          chmod 644 ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles         
           echo "${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+          chmod 644 ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision
           
       - name: Check ios folder
         run: |          
