@@ -27,6 +27,15 @@ jobs:
         with:
           ruby-version: '3.2'
           bundler-cache: true
+          
+      - name: Sanitize Ruby env
+        run: |
+          which ruby
+          ruby -v
+          echo "PATH=$PATH"
+          sudo rm -f /opt/homebrew/bin/ruby || true
+          sudo rm -f /opt/homebrew/bin/bundle || true
+          sudo rm -f /opt/homebrew/bin/pod || true          
 
       - name: Clean RN iOS          
         run: |
