@@ -50,11 +50,7 @@ jobs:
           node node_modules/react-native/scripts/generate-codegen-artifacts.js \
           -p . \
           -t ios \
-          -o ios
-          
-      - name: Verify Codegen output
-        run: |
-          ls ios/Pods/Headers/Public/React-Codegen || echo "❌ React-Codegen missing"                           
+          -o ios         
           
       # --- Import certificates only ---
       - name: Import Code-Signing Certificates
@@ -85,11 +81,11 @@ jobs:
         run: |
           ls ~/Library/MobileDevice/Provisioning\ Profiles
           security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep -E "Name|UUID|ApplicationIdentifier|TeamName"
-          
-      - name: Check ios folder
+      
+      - name: Fix React-Codegen path (CI workaround)
         run: |
-          ls -l ios/
-          pwd
+          mkdir -p ios/Pods/Headers/Public
+          ln -sf ../../../build/generated/ios ios/Pods/Headers/Public/React-Codegen
           
       - name: Build archive
         run: |
