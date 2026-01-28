@@ -19,9 +19,7 @@ jobs:
       - name: Install dependencies
         run: |
           yarn install
-          rm -rf ~/Library/Developer/Xcode/DerivedData
-          cd ios
-          pod install --repo-update
+          cd ios && pod install
           
       # --- Import certificates only ---
       - name: Import Code-Signing Certificates
@@ -49,22 +47,11 @@ jobs:
           xcodebuild \
             -workspace ios/humake_app.xcworkspace \
             -scheme humake_app \
-            -configuration Debug \            
-            -sdk iphonesimulator \
-            -derivedDataPath ios/build \            
-            BUILD_DIR=build \
-            CODE_SIGNING_ALLOWED=NO 
-
-     #     xcodebuild \
-     #       -workspace ios/humake_app.xcworkspace \
-     #       -scheme humake_app \
-     #       -configuration Release \
-     #       -archivePath build/humake_app.xcarchive \
-     #       -allowProvisioningUpdates \
-     #       DEVELOPMENT_TEAM=${{ secrets.APPLE_TEAM_ID }} \
-     #       archive
-            
-           
+            -configuration Release \
+            -archivePath build/humake_app.xcarchive \
+            -allowProvisioningUpdates \
+            DEVELOPMENT_TEAM=${{ secrets.APPLE_TEAM_ID }} \
+            archive
 
       - name: Export IPA
         run: |
