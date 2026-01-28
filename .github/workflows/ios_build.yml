@@ -33,7 +33,9 @@ jobs:
           
       - name: List code signing identities
         run: |
-          security find-identity -v -p codesigning          
+          security find-identity -v -p codesigning
+          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | /usr/libexec/PlistBuddy -c "Print :Name" /dev/stdin          
+
         
       # --- Provisioning profile manually ---
       - name: Setup provisioning profile
@@ -62,10 +64,6 @@ jobs:
           -configuration Release \
           -archivePath build/humake_app.xcarchive \
           DEVELOPMENT_TEAM=7FGDKUA4PZ \
-          PRODUCT_BUNDLE_IDENTIFIER=kr.co.humake \
-          CODE_SIGN_STYLE=Manual \
-          CODE_SIGN_IDENTITY="iOS Distribution" \
-          PROVISIONING_PROFILE_SPECIFIER="humake_production" \
           archive
 
       - name: Export IPA
