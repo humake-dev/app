@@ -67,6 +67,7 @@ jobs:
           DEVELOPMENT_TEAM=7FGDKUA4PZ \
           PRODUCT_BUNDLE_IDENTIFIER=kr.co.humake \
           PROVISIONING_PROFILE=5fb10f42-9454-4eb8-9c41-11ff94617b2f \
+          CODE_SIGN_IDENTITY="iPhone Distribution"
           archive
 
       - name: Export IPA
