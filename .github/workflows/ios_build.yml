@@ -41,6 +41,10 @@ jobs:
           export RCT_NEW_ARCH_ENABLED=0
           bundle install
           bundle exec pod install
+          
+      - name: Set REACT_NATIVE_PATH
+        run: |
+          echo "REACT_NATIVE_PATH=$(pwd)/node_modules/react-native" >> $GITHUB_ENV          
 
       # 4️⃣ Symlink 생성 (Pods Headers)
       - name: Fix React-Codegen symlink
