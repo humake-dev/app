@@ -45,13 +45,14 @@ jobs:
       - name: Build archive
         run: |
           xcodebuild \
-            -workspace ios/humake_app.xcworkspace \
-            -scheme humake_app \
-            -configuration Release \
-            -archivePath build/humake_app.xcarchive \
-            DEVELOPMENT_TEAM="7FGDKUA4PZ" \
-            PROVISIONING_PROFILE_SPECIFIER="humake_production" \
-            archive
+          -workspace ios/humake_app.xcworkspace \
+          -scheme humake_app \
+          -configuration Release \
+          -archivePath build/humake_app.xcarchive \
+          DEVELOPMENT_TEAM=TEAM_ID \
+          PROVISIONING_PROFILE_SPECIFIER=humake_production \
+          CODE_SIGN_STYLE=Manual \
+          archive
 
       - name: Export IPA
         run: |
