@@ -35,13 +35,29 @@ jobs:
           export NODE_BINARY=$(which node)
           bundle install
           bundle exec pod install
+          
+      - name: Patch React Native Codegen check (Pods script)
+        run: |
+          set -e
+          SCRIPT="ios/Pods/Target Support Files/Pods-humake_app/Pods-humake_app-frameworks.sh"
+          if [ -f "$SCRIPT" ]; then
+            echo "🔧 Patching Codegen check in $SCRIPT"
+            sed -i '' 's|Headers/Public/React-Codegen|build/generated/ios|g' "$SCRIPT"
+          else
+            echo "⚠️ Pods script not found: $SCRIPT"
+            ls ios/Pods/Target\ Support\ Files
+          fi          
       
       - name: Run RN Codegen manually
         run: |
           node node_modules/react-native/scripts/generate-codegen-artifacts.js \
           -p . \
           -t ios \
-          -o ios/build/generated       
+          -o ios/build/generated   
+          
+      - name: Verify patched script
+        run: |
+          grep -n "Codegen" ios/Pods/Target\ Support\ Files/Pods-humake_app/* || true              
           
       # --- Import certificates only ---
       - name: Import Code-Signing Certificates
