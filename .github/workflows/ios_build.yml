@@ -65,6 +65,16 @@ jobs:
           echo "✅ Symlink created"
 
 
+      # --- Import certificates only ---
+      - name: Import Code-Signing Certificates
+        uses: Apple-Actions/import-codesign-certs@v6.0.0
+        with:
+          p12-file-base64: ${{ secrets.IOS_CERT_BASE64 }}
+          p12-password: ${{ secrets.IOS_CERT_PASSWORD }}
+          keychain: build_keychain           # <-- .keychain 붙이지 마세요
+          create-keychain: true
+          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+
 
       # 5️⃣ Certificates / Provisioning
       - name: Import Code-Signing Certificates
@@ -101,20 +111,6 @@ jobs:
             archive \
             -verbose | tee xcodebuild.log
 
-      # 1️⃣ Signing & Provisioning 설치
-      - name: Setup iOS Signing
-        run: |
-          
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "$IOS_PROVISION_PROFILE_BASE64" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/humake_app.mobileprovision
-          
-          echo "$IOS_DISTRIBUTION_CERT_BASE64" | base64 --decode > /tmp/dist_cert.p12
-          security import /tmp/dist_cert.p12 -k ~/Library/Keychains/login.keychain -P "$IOS_CERT_PASSWORD" -T /usr/bin/codesign
-          
-          env:
-          IOS_PROVISION_PROFILE_BASE64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
-          IOS_DISTRIBUTION_CERT_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERT_BASE64 }}
-          IOS_CERT_PASSWORD: ${{ secrets.IOS_CERT_PASSWORD }}
           
         # 2️⃣ Export IPA
       - name: Export IPA
