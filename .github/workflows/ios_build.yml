@@ -24,15 +24,20 @@ jobs:
         with:
           ruby-version: '3.2'
           bundler-cache: true
-
-      # 1️⃣ RN Codegen 먼저 실행
+          
+      # 1️⃣ Set REACT_NATIVE_PATH 먼저
+      - name: Set REACT_NATIVE_PATH
+        run: |
+          echo "REACT_NATIVE_PATH=$(pwd)/node_modules/react-native" >> $GITHUB_ENV  
+          
+      # 2️⃣ RN Codegen 실행
       - name: Run RN Codegen
         run: |
           mkdir -p ios/build/generated
           node node_modules/react-native/scripts/generate-codegen-artifacts.js \
-            -p . -t ios -o ios/build/generated
-
-      # 2️⃣ CocoaPods 설치
+          -p . -t ios -o ios/build/generated
+          
+      # 3️⃣ CocoaPods 설치
       - name: Install CocoaPods
         run: |
           cd ios
@@ -40,11 +45,7 @@ jobs:
           export NODE_BINARY=$(which node)
           export RCT_NEW_ARCH_ENABLED=0
           bundle install
-          bundle exec pod install
-          
-      - name: Set REACT_NATIVE_PATH
-        run: |
-          echo "REACT_NATIVE_PATH=$(pwd)/node_modules/react-native" >> $GITHUB_ENV          
+          bundle exec pod install       
 
       # 4️⃣ Symlink 생성 (Pods Headers)
       - name: Fix React-Codegen symlink
