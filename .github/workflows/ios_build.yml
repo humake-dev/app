@@ -51,6 +51,7 @@ jobs:
             -archivePath build/humake_app.xcarchive \
             -allowProvisioningUpdates \
             DEVELOPMENT_TEAM=${{ secrets.APPLE_TEAM_ID }} \
+            PROVISIONING_PROFILE_SPECIFIER="humake_production" \
             archive
 
       - name: Export IPA
