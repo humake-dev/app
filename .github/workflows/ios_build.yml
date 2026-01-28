@@ -27,12 +27,13 @@ jobs:
         with:
           ruby-version: '3.2'
           bundler-cache: true
-      
+    
       - name: Install CocoaPods
         run: |
           cd ios
           export BUNDLE_GEMFILE=Gemfile
           export NODE_BINARY=$(which node)
+          export RCT_NEW_ARCH_ENABLED=0
           bundle install
           bundle exec pod install
           
@@ -99,7 +100,6 @@ jobs:
       - name: Build archive
         run: |
           set -o pipefail
-          RCT_NEW_ARCH_ENABLED=0 \
           xcodebuild \
             -workspace ios/humake_app.xcworkspace \
             -scheme humake_app \
