@@ -14,7 +14,7 @@ require Pod::Executable.execute_command(
 ).strip
 
 
-platform :ios, '13.0'
+platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
 
