@@ -126,7 +126,7 @@ jobs:
             echo "⚠️ React-Codegen header dir does NOT exist"
           fi
 
-          echo "✅ Preflight Codegen check passed"          
+          echo "✅ Preflight Codegen check passed"         
           
       - name: Build archive
         run: |
