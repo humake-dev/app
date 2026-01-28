@@ -17,17 +17,22 @@ jobs:
           node-version: '>=20'
 
       - name: Install dependencies
-        run: |
-          yarn install --frozen-lockfile
-
-       
+        run: yarn install --frozen-lockfile
 
       - name: Setup Ruby 
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
           bundler-cache: true
-    
+
+      # 1️⃣ RN Codegen 먼저 실행
+      - name: Run RN Codegen
+        run: |
+          mkdir -p ios/build/generated
+          node node_modules/react-native/scripts/generate-codegen-artifacts.js \
+            -p . -t ios -o ios/build/generated
+
+      # 2️⃣ CocoaPods 설치
       - name: Install CocoaPods
         run: |
           cd ios
@@ -36,104 +41,52 @@ jobs:
           export RCT_NEW_ARCH_ENABLED=0
           bundle install
           bundle exec pod install
-          
-      - name: Run RN Codegen (authoritative)
-        run: |
-          node node_modules/react-native/scripts/generate-codegen-artifacts.js \
-          -p . \
-          -t ios \
-          -o ios/build/generate          
-      
-      - name: Patch app target Codegen check
+
+      # 3️⃣ Preflight check
+      - name: Preflight Codegen sanity
         run: |
           set -e
-          PROJECT="ios/humake_app.xcodeproj/project.pbxproj"
-          
-          echo "🔧 Patching app target Codegen check"
-          
-          # React-Codegen hard check 무력화
-          sed -i '' \
-          's|Headers/Public/React-Codegen|build/generated/ios|g' \
-          "$PROJECT"
-          
-          # 그래도 남아있으면 확인
-          grep -n "Codegen did not run properly" "$PROJECT" || true
-          
-      - name: Verify app target script
+          echo "🔍 Preflight Codegen check started"
+          if grep -R "Codegen did not run properly" ios -n; then
+            echo "❌ Found 'Codegen did not run properly'"
+            exit 1
+          fi
+          if grep -R "FBReactNativeSpec" ios/Pods >/dev/null; then
+            echo "❌ FBReactNativeSpec detected"
+            exit 1
+          fi
+          if grep -R "React-Codegen" ios/Pods >/dev/null; then
+            echo "❌ React-Codegen references detected"
+            exit 1
+          fi
+          echo "✅ Preflight Codegen check passed"
+
+      # 4️⃣ Symlink 생성 (Pods Headers)
+      - name: Fix React-Codegen symlink
         run: |
-          grep -n "React-Codegen" ios/humake_app.xcodeproj/project.pbxproj || true             
-          
-      - name: Verify patched script
-        run: |
-          grep -n "Codegen" ios/Pods/Target\ Support\ Files/Pods-humake_app/* || true              
-          
-      # --- Import certificates only ---
+          mkdir -p ios/Pods/Headers/Public
+          ln -sf ../../build/generated ios/Pods/Headers/Public/React-Codegen
+          echo "✅ Symlink created"
+
+      # 5️⃣ Certificates / Provisioning
       - name: Import Code-Signing Certificates
         uses: Apple-Actions/import-codesign-certs@v6.0.0
         with:
           p12-file-base64: ${{ secrets.IOS_CERT_BASE64 }}
           p12-password: ${{ secrets.IOS_CERT_PASSWORD }}
-          keychain: build_keychain           # <-- .keychain 붙이지 마세요
+          keychain: build_keychain
           create-keychain: true
           keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
-          
-      - name: List code signing identities
-        run: |
-          security find-identity -v -p codesigning 
 
-        
-      # --- Provisioning profile manually ---
       - name: Setup provisioning profile
         run: |
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles          
-          echo "${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}" | base64 --decode > /tmp/profile.mobileprovision          
-          UUID=$(security cms -D -i /tmp/profile.mobileprovision | plutil -extract UUID raw -)          
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}" | base64 --decode > /tmp/profile.mobileprovision
+          UUID=$(security cms -D -i /tmp/profile.mobileprovision | plutil -extract UUID raw -)
           cp /tmp/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
           chmod 644 ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
-          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | plutil -p -
-      
-      - name: Verify provisioning profiles
-        run: |
-          ls ~/Library/MobileDevice/Provisioning\ Profiles
-          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep -E "Name|UUID|ApplicationIdentifier|TeamName"
-          
-      - name: Preflight check React Native Codegen sanity
-        run: |
-          set -e
-          echo "🔍 Preflight Codegen check started"
 
-          echo "1️⃣ Check for forbidden Codegen error message"
-          if grep -R "Codegen did not run properly" ios -n; then
-            echo "❌ Found 'Codegen did not run properly' in project"
-            exit 1
-          fi
-
-          echo "2️⃣ Check for New Architecture pods"
-          if grep -R "FBReactNativeSpec" ios/Pods >/dev/null; then
-            echo "❌ FBReactNativeSpec detected (New Arch still ON)"
-            exit 1
-          fi
-          if grep -R "React-Codegen" ios/Pods >/dev/null; then
-            echo "❌ React-Codegen references detected in Pods"
-            exit 1
-          fi
-
-          echo "3️⃣ Check Codegen output directory (if required)"
-          if [ -d "ios/Pods/Headers/Public/React-Codegen" ]; then
-            echo "ℹ️ React-Codegen header dir exists"
-            ls ios/Pods/Headers/Public/React-Codegen
-          else
-            echo "⚠️ React-Codegen header dir does NOT exist"
-          fi
-
-          echo "✅ Preflight Codegen check passed"
-          
-      - name: Fix React-Codegen symlink for Pods
-        run: |
-          mkdir -p ios/Pods/Headers/Public
-          ln -sf ../../build/generated ios/Pods/Headers/Public/React-Codegen
-          echo "✅ Symlink created: ios/Pods/Headers/Public/React-Codegen"                
-          
+      # 6️⃣ Build
       - name: Build archive
         run: |
           set -o pipefail
@@ -148,12 +101,7 @@ jobs:
             PROVISIONING_PROFILE=5fb10f42-9454-4eb8-9c41-11ff94617b2f \
             CODE_SIGN_IDENTITY="iPhone Distribution" \
             archive \
-            -verbose \
-            | tee xcodebuild.log          
-      - name: Extract errors
-        if: always()
-        run: |
-          grep -E "error:|fatal error|CodeSign|Provisioning|No Accounts" xcodebuild.log || true            
+            -verbose | tee xcodebuild.log
 
       - name: Export IPA
         run: |
