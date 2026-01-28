@@ -19,6 +19,7 @@ jobs:
       - name: Install dependencies
         run: |
           yarn install --frozen-lockfile
+          cd ios
           pod install          
       
       - name: Verify Pods
