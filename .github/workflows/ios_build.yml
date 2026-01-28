@@ -33,8 +33,7 @@ jobs:
           
       - name: List code signing identities
         run: |
-          security find-identity -v -p codesigning
-          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | /usr/libexec/PlistBuddy -c "Print :Name" /dev/stdin          
+          security find-identity -v -p codesigning        
 
         
       # --- Provisioning profile manually ---
