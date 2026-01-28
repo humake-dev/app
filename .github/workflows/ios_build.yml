@@ -49,9 +49,11 @@ jobs:
           -scheme humake_app \
           -configuration Release \
           -archivePath build/humake_app.xcarchive \
-          DEVELOPMENT_TEAM=${{ secrets.APPLE_TEAM_ID }} \
-          PROVISIONING_PROFILE_SPECIFIER=humake_production \
+          DEVELOPMENT_TEAM=7FGDKUA4PZ \
+          PRODUCT_BUNDLE_IDENTIFIER=kr.co.humake \
           CODE_SIGN_STYLE=Manual \
+          CODE_SIGN_IDENTITY="iOS Distribution" \
+          PROVISIONING_PROFILE_SPECIFIER="humake production" \
           archive
 
       - name: Export IPA
