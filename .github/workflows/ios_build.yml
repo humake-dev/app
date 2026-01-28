@@ -19,8 +19,12 @@ jobs:
       - name: Install dependencies
         run: |
           yarn install --frozen-lockfile
+          
+      - name: Install CocoaPods
+        run: |
           cd ios
-          pod install          
+          bundle install
+          bundle exec pod Install
       
       - name: Verify Pods
         run: |
