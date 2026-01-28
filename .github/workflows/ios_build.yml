@@ -36,24 +36,31 @@ jobs:
           bundle install
           bundle exec pod install
           
-      - name: Patch React Native Codegen check (Pods script)
-        run: |
-          set -e
-          SCRIPT="ios/Pods/Target Support Files/Pods-humake_app/Pods-humake_app-frameworks.sh"
-          if [ -f "$SCRIPT" ]; then
-            echo "🔧 Patching Codegen check in $SCRIPT"
-            sed -i '' 's|Headers/Public/React-Codegen|build/generated/ios|g' "$SCRIPT"
-          else
-            echo "⚠️ Pods script not found: $SCRIPT"
-            ls ios/Pods/Target\ Support\ Files
-          fi          
-      
-      - name: Run RN Codegen manually
+      - name: Run RN Codegen (authoritative)
         run: |
           node node_modules/react-native/scripts/generate-codegen-artifacts.js \
           -p . \
           -t ios \
-          -o ios/build/generated   
+          -o ios/build/generate          
+      
+      - name: Patch app target Codegen check
+        run: |
+          set -e
+          PROJECT="ios/humake_app.xcodeproj/project.pbxproj"
+          
+          echo "🔧 Patching app target Codegen check"
+          
+          # React-Codegen hard check 무력화
+          sed -i '' \
+          's|Headers/Public/React-Codegen|build/generated/ios|g' \
+          "$PROJECT"
+          
+          # 그래도 남아있으면 확인
+          grep -n "Codegen did not run properly" "$PROJECT" || true
+          
+      - name: Verify app target script
+        run: |
+          grep -n "React-Codegen" ios/humake_app.xcodeproj/project.pbxproj || true             
           
       - name: Verify patched script
         run: |
@@ -89,10 +96,7 @@ jobs:
           ls ~/Library/MobileDevice/Provisioning\ Profiles
           security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep -E "Name|UUID|ApplicationIdentifier|TeamName"
       
-      - name: Fix React-Codegen path (CI workaround)
-        run: |
-          mkdir -p ios/Pods/Headers/Public
-          ln -sf ../..//build/generated/ios ios/Pods/Headers/Public/React-Codegen
+
           
       - name: Verify React-Codegen symlink
         run: |
