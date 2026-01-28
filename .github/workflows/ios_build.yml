@@ -63,7 +63,7 @@ jobs:
           -configuration Release \
           -archivePath build/humake_app.xcarchive \
           DEVELOPMENT_TEAM=7FGDKUA4PZ \
-          PRODUCT_BUNDLE_IDENTIFIER=com.humake.app \
+          PRODUCT_BUNDLE_IDENTIFIER=kr.co.humake \
           archive
 
       - name: Export IPA
