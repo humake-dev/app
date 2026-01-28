@@ -19,7 +19,9 @@ jobs:
       - name: Install dependencies
         run: |
           yarn install
-          cd ios && pod install
+          rm -rf ~/Library/Developer/Xcode/DerivedData
+          cd ios
+          pod install --repo-update
           
       # --- Import certificates only ---
       - name: Import Code-Signing Certificates
