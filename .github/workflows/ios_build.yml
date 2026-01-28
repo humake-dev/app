@@ -99,6 +99,7 @@ jobs:
       - name: Build archive
         run: |
           set -o pipefail
+          RCT_NEW_ARCH_ENABLED=0 \
           xcodebuild \
             -workspace ios/humake_app.xcworkspace \
             -scheme humake_app \
