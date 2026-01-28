@@ -33,7 +33,8 @@ jobs:
           
       - name: List code signing identities
         run: |
-          security find-identity -v -p codesigning        
+          security find-identity -v -p codesigning
+          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep -A2 "<key>Name</key>"  
 
         
       # --- Provisioning profile manually ---
@@ -63,7 +64,6 @@ jobs:
           -configuration Release \
           -archivePath build/humake_app.xcarchive \
           DEVELOPMENT_TEAM=7FGDKUA4PZ \
-          PRODUCT_BUNDLE_IDENTIFIER=humake fitness club app (kr.co.humake) \
           archive
 
       - name: Export IPA
