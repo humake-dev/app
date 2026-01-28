@@ -27,15 +27,6 @@ jobs:
         with:
           ruby-version: '3.2'
           bundler-cache: true
-          
-      - name: Sanitize Ruby env
-        run: |
-          which ruby
-          ruby -v
-          echo "PATH=$PATH"
-          sudo rm -f /opt/homebrew/bin/ruby || true
-          sudo rm -f /opt/homebrew/bin/bundle || true
-          sudo rm -f /opt/homebrew/bin/pod || true          
       
       - name: Install CocoaPods
         run: |
@@ -50,7 +41,7 @@ jobs:
           node node_modules/react-native/scripts/generate-codegen-artifacts.js \
           -p . \
           -t ios \
-          -o ios         
+          -o ios/build/generated       
           
       # --- Import certificates only ---
       - name: Import Code-Signing Certificates
@@ -85,7 +76,11 @@ jobs:
       - name: Fix React-Codegen path (CI workaround)
         run: |
           mkdir -p ios/Pods/Headers/Public
-          ln -sf ../../../build/generated/ios ios/Pods/Headers/Public/React-Codegen
+          ln -sf ../..//build/generated/ios ios/Pods/Headers/Public/React-Codegen
+          
+      - name: Verify React-Codegen symlink
+        run: |
+          ls -l ios/Pods/Headers/Public/React-Codegen          
           
       - name: Build archive
         run: |
