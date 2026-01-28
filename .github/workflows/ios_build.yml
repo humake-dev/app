@@ -94,13 +94,7 @@ jobs:
       - name: Verify provisioning profiles
         run: |
           ls ~/Library/MobileDevice/Provisioning\ Profiles
-          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep -E "Name|UUID|ApplicationIdentifier|TeamName"
-      
-
-          
-      - name: Verify React-Codegen symlink
-        run: |
-          ls -l ios/Pods/Headers/Public/React-Codegen          
+          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep -E "Name|UUID|ApplicationIdentifier|TeamName"        
           
       - name: Build archive
         run: |
