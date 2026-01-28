@@ -35,12 +35,13 @@ jobs:
       - name: Setup provisioning profile
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          chmod 644 ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision
           echo "${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
           
       - name: Check ios folder
-        run: |
-          ls -l ios/
+        run: |          
           security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep -E "Name|UUID|ApplicationIdentifier"
+          ls -l ios/
           pwd
           
       - name: Build archive
