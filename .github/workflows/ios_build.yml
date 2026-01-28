@@ -36,6 +36,11 @@ jobs:
           mkdir -p ios/build/generated
           node node_modules/react-native/scripts/generate-codegen-artifacts.js \
           -p . -t ios -o ios/build/generated
+
+      - name: Patch React-Codegen check in Pods
+        run: |
+          PROJECT="ios/Pods/Pods.xcodeproj/project.pbxproj"
+          sed -i '' 's|Checking whether Codegen has run|echo "Codegen check skipped"|g' "$PROJECT"           
           
       # 3️⃣ CocoaPods 설치
       - name: Install CocoaPods
@@ -45,12 +50,7 @@ jobs:
           export NODE_BINARY=$(which node)
           export RCT_NEW_ARCH_ENABLED=0
           bundle install
-          bundle exec pod install
-          
-      - name: Patch React-Codegen check in Pods
-        run: |
-          PROJECT="ios/Pods/Pods.xcodeproj/project.pbxproj"
-          sed -i '' 's|Checking whether Codegen has run|echo "Codegen check skipped"|g' "$PROJECT"          
+          bundle exec pod install                   
 
       # 4️⃣ Symlink 생성 (Pods Headers)
       - name: Fix React-Codegen symlink
