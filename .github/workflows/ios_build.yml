@@ -97,8 +97,7 @@ jobs:
           ls ~/Library/MobileDevice/Provisioning\ Profiles
           security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep -E "Name|UUID|ApplicationIdentifier|TeamName"
 
-
-      - name: 🚨 Preflight check: React Native Codegen sanity
+      - name: Preflight check: React Native Codegen sanity
         run: |
           set -e
           echo "🔍 Preflight Codegen check started"
