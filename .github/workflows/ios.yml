@@ -43,7 +43,7 @@ jobs:
           pwd
           
       - name: Build archive
-         run: |
+        run: |
           xcodebuild \
             -workspace ios/humake_app.xcworkspace \
             -scheme humake_app \
