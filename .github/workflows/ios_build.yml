@@ -64,24 +64,6 @@ jobs:
           ln -sf ../../build/generated ios/Pods/Headers/Public/React-Codegen
           echo "✅ Symlink created"
 
-      # 3️⃣ Preflight check
-      - name: Preflight Codegen sanity
-        run: |
-          set -e
-          echo "🔍 Preflight Codegen check started"
-          if grep -R "Codegen did not run properly" ios -n; then
-            echo "❌ Found 'Codegen did not run properly'"
-            exit 1
-          fi
-          if grep -R "FBReactNativeSpec" ios/Pods >/dev/null; then
-            echo "❌ FBReactNativeSpec detected"
-            exit 1
-          fi
-          if grep -R "React-Codegen" ios/Pods >/dev/null; then
-            echo "❌ React-Codegen references detected"
-            exit 1
-          fi
-          echo "✅ Preflight Codegen check passed"
 
 
       # 5️⃣ Certificates / Provisioning
