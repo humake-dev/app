@@ -27,9 +27,11 @@ jobs:
           export NODE_BINARY=$(which node)
           bundle exec pod install
       
-      - name: Verify Pods
+      - name: Run RN Codegen manually
         run: |
-          ls ios/Pods/Target\ Support\ Files || exit 1
+          node node_modules/react-native/scripts/generate-codegen-artifacts.js \
+          -p ios \
+          -o ios
           
       - name: Verify Codegen output
         run: |
