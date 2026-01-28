@@ -1,0 +1,67 @@
+name: iOS Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '>=20'
+
+      - name: Install dependencies
+        run: |
+          yarn install
+          cd ios && pod install
+          
+      # --- Import certificates only ---
+      - name: Import Code-Signing Certificates
+        uses: Apple-Actions/import-codesign-certs@v6.0.0
+        with:
+          p12-file-base64: ${{ secrets.IOS_CERT_BASE64 }}
+          p12-password: ${{ secrets.IOS_CERT_PASSWORD }}
+          keychain: build_keychain           # <-- .keychain 붙이지 마세요
+          create-keychain: true
+          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+        
+      # --- Provisioning profile manually ---
+      - name: Setup provisioning profile
+        run: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+          
+      - name: Check ios folder
+        run: |
+          ls -l ios/
+          pwd
+          
+      - name: Build archive
+        run: |
+          xcodebuild \
+            -workspace ios/humake_app.xcworkspace \
+            -scheme humake_app \
+            -configuration Release \
+            -archivePath build/humake_app.xcarchive \
+            -allowProvisioningUpdates \
+            DEVELOPMENT_TEAM=${{ secrets.APPLE_TEAM_ID }} \
+            archive
+
+      - name: Export IPA
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath build/App.xcarchive \
+            -exportPath build \
+            -exportOptionsPlist ios/exportOptions.plist
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ipa
+          path: build/*.ipa
