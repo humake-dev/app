@@ -1,67 +1,55 @@
 name: iOS Build
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   build-ios:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Set up Ruby for Fastlane
+        uses: ruby/setup-ruby@v1
         with:
-          node-version: '>=20'
+          ruby-version: 3.2
 
-      - name: Install dependencies
+      - name: Install Fastlane
+        run: gem install fastlane
+
+      # --- Import iOS Certificate (.p12) ---
+      - name: Install iOS Certificate
         run: |
-          yarn install
-          cd ios && pod install
-          
-      # --- Import certificates only ---
-      - name: Import Code-Signing Certificates
-        uses: Apple-Actions/import-codesign-certs@v6.0.0
-        with:
-          p12-file-base64: ${{ secrets.IOS_CERT_BASE64 }}
-          p12-password: ${{ secrets.IOS_CERT_PASSWORD }}
-          keychain: build_keychain           # <-- .keychain 붙이지 마세요
-          create-keychain: true
-          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
-        
-      # --- Provisioning profile manually ---
-      - name: Setup provisioning profile
+          echo "${{ secrets.IOS_CERTIFICATE_BASE64 }}" | base64 --decode > certificate.p12
+          security create-keychain -p "" build.keychain
+          security import certificate.p12 -k ~/Library/Keychains/build.keychain -P "${{ secrets.IOS_CERT_PASSWORD }}" -T /usr/bin/codesign
+          security list-keychains -s ~/Library/Keychains/build.keychain
+          security default-keychain -s ~/Library/Keychains/build.keychain
+          security unlock-keychain -p "" ~/Library/Keychains/build.keychain
+
+      # --- Install Provisioning Profile ---
+      - name: Install Provisioning Profile
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           echo "${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
-          
-      - name: Check ios folder
+
+      - name: Verify ios folder
         run: |
           ls -l ios/
           pwd
-          
-      - name: Build archive
+
+      # --- Build Archive ---
+      - name: Build iOS Archive
         run: |
           xcodebuild \
             -workspace ios/humake_app.xcworkspace \
             -scheme humake_app \
             -configuration Release \
             -archivePath build/humake_app.xcarchive \
-            -allowProvisioningUpdates \
-            DEVELOPMENT_TEAM=${{ secrets.APPLE_TEAM_ID }} \
-            archive
-
-      - name: Export IPA
-        run: |
-          xcodebuild -exportArchive \
-            -archivePath build/App.xcarchive \
-            -exportPath build \
-            -exportOptionsPlist ios/exportOptions.plist
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ipa
-          path: build/*.ipa
+            CODE_SIGN_IDENTITY="Apple Distribution: Your Name (TEAMID)" \
+            PROVISIONING_PROFILE_SPECIFIER="profile_name_from_apple" \
+            DEVELOPMENT_TEAM=${{ secrets.APPLE_TEAM_ID }}
