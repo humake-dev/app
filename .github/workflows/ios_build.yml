@@ -36,13 +36,13 @@ jobs:
           sudo rm -f /opt/homebrew/bin/ruby || true
           sudo rm -f /opt/homebrew/bin/bundle || true
           sudo rm -f /opt/homebrew/bin/pod || true          
-
-      - name: Clean RN iOS          
+          
+      - name: Install CocoaPods
         run: |
+          export BUNDLE_GEMFILE=ios/Gemfile
           cd ios
-          rm -rf Pods Podfile.lock build
-          rm -rf ~/Library/Developer/Xcode/DerivedData/*
           export NODE_BINARY=$(which node)
+          bundle install
           bundle exec pod install
       
       - name: Run RN Codegen manually
