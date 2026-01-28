@@ -24,7 +24,7 @@ jobs:
       # --- Import iOS Certificate (.p12) ---
       - name: Install iOS Certificate
         run: |
-          echo "${{ secrets.IOS_CERTIFICATE_BASE64 }}" | base64 --decode > certificate.p12
+          echo "${{ secrets.IOS_CERT_BASE64 }}" | base64 --decode > certificate.p12
           security create-keychain -p "" build.keychain
           security import certificate.p12 -k ~/Library/Keychains/build.keychain -P "${{ secrets.IOS_CERT_PASSWORD }}" -T /usr/bin/codesign
           security list-keychains -s ~/Library/Keychains/build.keychain
@@ -50,6 +50,6 @@ jobs:
             -scheme humake_app \
             -configuration Release \
             -archivePath build/humake_app.xcarchive \
-            CODE_SIGN_IDENTITY="Apple Distribution: Your Name (TEAMID)" \
+            CODE_SIGN_IDENTITY="Apple Distribution: humake_app" \
             PROVISIONING_PROFILE_SPECIFIER="profile_name_from_apple" \
             DEVELOPMENT_TEAM=${{ secrets.APPLE_TEAM_ID }}
