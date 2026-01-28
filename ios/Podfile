@@ -31,9 +31,12 @@ config = use_native_modules!
 
 
 use_react_native!(
-:path => config[:reactNativePath],
-:hermes_enabled => false,
-:app_path => "#{Pod::Config.instance.installation_root}/.."
+  :path => config[:reactNativePath],
+  :app_path => "#{Pod::Config.instance.installation_root}/..",
+  :fabric_enabled => false,
+  :hermes_enabled => true,
+  :production => true,
+  :codegen_path => "../build/generated/ios" # ← 이 줄 추가
 )
 
 

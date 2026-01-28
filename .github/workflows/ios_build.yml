@@ -95,7 +95,39 @@ jobs:
       - name: Verify provisioning profiles
         run: |
           ls ~/Library/MobileDevice/Provisioning\ Profiles
-          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep -E "Name|UUID|ApplicationIdentifier|TeamName"        
+          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep -E "Name|UUID|ApplicationIdentifier|TeamName"
+
+
+      - name: 🚨 Preflight check: React Native Codegen sanity
+        run: |
+          set -e
+          echo "🔍 Preflight Codegen check started"
+
+          echo "1️⃣ Check for forbidden Codegen error message"
+          if grep -R "Codegen did not run properly" ios -n; then
+            echo "❌ Found 'Codegen did not run properly' in project"
+            exit 1
+          fi
+
+          echo "2️⃣ Check for New Architecture pods"
+          if grep -R "FBReactNativeSpec" ios/Pods >/dev/null; then
+            echo "❌ FBReactNativeSpec detected (New Arch still ON)"
+            exit 1
+          fi
+          if grep -R "React-Codegen" ios/Pods >/dev/null; then
+            echo "❌ React-Codegen references detected in Pods"
+            exit 1
+          fi
+
+          echo "3️⃣ Check Codegen output directory (if required)"
+          if [ -d "ios/Pods/Headers/Public/React-Codegen" ]; then
+            echo "ℹ️ React-Codegen header dir exists"
+            ls ios/Pods/Headers/Public/React-Codegen
+          else
+            echo "⚠️ React-Codegen header dir does NOT exist"
+          fi
+
+          echo "✅ Preflight Codegen check passed"          
           
       - name: Build archive
         run: |
