@@ -49,7 +49,7 @@ jobs:
             -scheme humake_app \
             -configuration Release \
             -archivePath build/humake_app.xcarchive \
-            DEVELOPMENT_TEAM="TEAM_ID" \
+            DEVELOPMENT_TEAM="7FGDKUA4PZ" \
             PROVISIONING_PROFILE_SPECIFIER="humake_production" \
             archive
 
