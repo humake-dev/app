@@ -36,11 +36,11 @@ jobs:
           sudo rm -f /opt/homebrew/bin/ruby || true
           sudo rm -f /opt/homebrew/bin/bundle || true
           sudo rm -f /opt/homebrew/bin/pod || true          
-          
+      
       - name: Install CocoaPods
         run: |
-          export BUNDLE_GEMFILE=ios/Gemfile
           cd ios
+          export BUNDLE_GEMFILE=Gemfile
           export NODE_BINARY=$(which node)
           bundle install
           bundle exec pod install
