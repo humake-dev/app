@@ -1,55 +1,28 @@
-source 'https://cdn.cocoapods.org/'
-
-
 require_relative '../node_modules/react-native/scripts/react_native_pods'
+require_relative '../node_modules/react-native/scripts/react_native_codegen_pods'
 
+platform :ios, '13.0'
 
-# Resolve react_native_pods.rb with node to allow for hoisting
-require Pod::Executable.execute_command(
-'node',
-['-p',
-'require.resolve(
-"react-native/scripts/react_native_pods.rb",
-{paths: [process.argv[1]]},
-)', __dir__]
-).strip
-
-
-platform :ios, min_ios_version_supported
-prepare_react_native_project!
-
-
-linkage = ENV['USE_FRAMEWORKS']
-if linkage
-Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
-use_frameworks! :linkage => linkage.to_sym
-end
-
-
-target 'humake_app' do
-config = use_native_modules!
-
+# Production 모드
+production = true
 
 use_react_native!(
   :path => config[:reactNativePath],
   :app_path => "#{Pod::Config.instance.installation_root}/..",
-  :fabric_enabled => false,
-  :hermes_enabled => true,
-  :production => true,
-  :codegen_path => "../build/generated/ios"
+  :fabric_enabled => false,        # Fabric OFF
+  :hermes_enabled => true,         # Hermes ON
+  :production => production,
+  :codegen_path => "../build/generated/ios" # Codegen 출력 경로
 )
 
-
-pod 'react-native-sqlite-storage', :path => '../node_modules/react-native-sqlite-storage'
-
-
+# 모든 Pod 설치 후 RN Codegen 경로 symlink 처리
 post_install do |installer|
-  installer.pods_project.targets.each do |target|
-    target.build_configurations.each do |config|
-      config.build_settings['CODE_SIGN_STYLE'] = 'Manual'
-      config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = 'humake_production'
-      config.build_settings['DEVELOPMENT_TEAM'] = '7FGDKUA4PZ'
-    end
-  end
-end
+  react_native_post_install(installer)
+  
+  # CI에서 Pod headers 문제 방지용 symlink
+  generated_dir = File.join(installer.sandbox.root, 'Headers/Public/React-Codegen')
+  build_dir = File.expand_path('../build/generated/ios', __dir__)
+  FileUtils.mkdir_p(File.dirname(generated_dir))
+  FileUtils.ln_sf(build_dir, generated_dir)
+  puts "✅ React-Codegen symlink created: #{generated_dir} -> #{build_dir}"
 end
