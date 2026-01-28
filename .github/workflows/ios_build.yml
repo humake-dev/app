@@ -42,6 +42,13 @@ jobs:
           bundle install
           bundle exec pod install
 
+      # 4️⃣ Symlink 생성 (Pods Headers)
+      - name: Fix React-Codegen symlink
+        run: |
+          mkdir -p ios/Pods/Headers/Public
+          ln -sf ../../build/generated ios/Pods/Headers/Public/React-Codegen
+          echo "✅ Symlink created"
+
       # 3️⃣ Preflight check
       - name: Preflight Codegen sanity
         run: |
@@ -61,12 +68,6 @@ jobs:
           fi
           echo "✅ Preflight Codegen check passed"
 
-      # 4️⃣ Symlink 생성 (Pods Headers)
-      - name: Fix React-Codegen symlink
-        run: |
-          mkdir -p ios/Pods/Headers/Public
-          ln -sf ../../build/generated ios/Pods/Headers/Public/React-Codegen
-          echo "✅ Symlink created"
 
       # 5️⃣ Certificates / Provisioning
       - name: Import Code-Signing Certificates
