@@ -19,7 +19,7 @@ jobs:
       - name: Install dependencies
         run: |
           yarn install --frozen-lockfile
-          pod Install          
+          pod install          
       
       - name: Verify Pods
         run: |
