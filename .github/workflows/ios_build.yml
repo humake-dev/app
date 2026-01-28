@@ -126,7 +126,13 @@ jobs:
             echo "⚠️ React-Codegen header dir does NOT exist"
           fi
 
-          echo "✅ Preflight Codegen check passed"         
+          echo "✅ Preflight Codegen check passed"
+          
+      - name: Fix React-Codegen symlink for Pods
+        run: |
+          mkdir -p ios/Pods/Headers/Public
+          ln -sf ../../build/generated ios/Pods/Headers/Public/React-Codegen
+          echo "✅ Symlink created: ios/Pods/Headers/Public/React-Codegen"                
           
       - name: Build archive
         run: |

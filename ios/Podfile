@@ -36,7 +36,7 @@ use_react_native!(
   :fabric_enabled => false,
   :hermes_enabled => true,
   :production => true,
-  :codegen_path => "../build/generated/ios" # ← 이 줄 추가
+  :codegen_path => "../build/generated/ios"
 )
 
 
