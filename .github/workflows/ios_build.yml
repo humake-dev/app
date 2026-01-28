@@ -50,10 +50,10 @@ jobs:
       - name: Patch Local Podspecs Codegen check
         run: |
           PROJECT="ios/Pods/Pods.xcodeproj/project.pbxproj"
-          sed -i '' 's|Checking whether Codegen has run\.\.\.|echo "Codegen check skipped"|g' "$PROJECT"
+          sed -i '' 's|Checking whether Codegen has run|echo '"'"'Codegen check skipped'"'"'|g' "$PROJECT"
           
           find ios/Pods/Local\ Podspecs -type f -name "*.podspec.json" -exec \
-          sed -i '' 's|Checking whether Codegen has run\.\.\.|echo "Codegen check skipped"|g' {} +     
+          sed -i '' 's|Checking whether Codegen has run|echo '"'"'Codegen check skipped'"'"'|g' {} +   
 
           grep -R "Codegen did not run properly" ios || echo "Patch applied"
 
