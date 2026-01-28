@@ -22,13 +22,18 @@ jobs:
           
       - name: Install CocoaPods
         run: |
-          cd ios
+          cd ios          
+          rm -rf Pods Podfile.lock
           bundle install
           bundle exec pod install
       
       - name: Verify Pods
         run: |
-          ls ios/Pods/Target\ Support\ Files || exit 1                  
+          ls ios/Pods/Target\ Support\ Files || exit 1
+          
+      - name: Verify Codegen output
+        run: |
+          ls ios/Pods/Headers/Public/React-Codegen || echo "❌ React-Codegen missing"                           
           
       # --- Import certificates only ---
       - name: Import Code-Signing Certificates
