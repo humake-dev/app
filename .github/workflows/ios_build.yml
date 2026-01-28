@@ -24,7 +24,7 @@ jobs:
         run: |
           cd ios
           bundle install
-          bundle exec pod Install
+          bundle exec pod install
       
       - name: Verify Pods
         run: |
