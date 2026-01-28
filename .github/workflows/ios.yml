@@ -1,8 +1,7 @@
 name: iOS Build
 
 on:
-  push:
-    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build-ios:
@@ -44,15 +43,25 @@ jobs:
           pwd
           
       - name: Build archive
-        run: |
+         run: |
           xcodebuild \
             -workspace ios/humake_app.xcworkspace \
             -scheme humake_app \
             -configuration Release \
-            -archivePath build/humake_app.xcarchive \
-            -allowProvisioningUpdates \
-            DEVELOPMENT_TEAM=${{ secrets.APPLE_TEAM_ID }} \
-            archive
+            -sdk iphoneos \
+            BUILD_DIR=build \
+            CODE_SIGNING_ALLOWED=NO 
+
+     #     xcodebuild \
+     #       -workspace ios/humake_app.xcworkspace \
+     #       -scheme humake_app \
+     #       -configuration Release \
+     #       -archivePath build/humake_app.xcarchive \
+     #       -allowProvisioningUpdates \
+     #       DEVELOPMENT_TEAM=${{ secrets.APPLE_TEAM_ID }} \
+     #       archive
+            
+           
 
       - name: Export IPA
         run: |
