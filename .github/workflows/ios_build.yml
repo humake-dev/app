@@ -30,6 +30,10 @@ jobs:
           keychain: build_keychain           # <-- .keychain 붙이지 마세요
           create-keychain: true
           keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+          
+      - name: List code signing identities
+        run: |
+          security find-identity -v -p codesigning          
         
       # --- Provisioning profile manually ---
       - name: Setup provisioning profile
