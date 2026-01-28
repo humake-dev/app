@@ -48,7 +48,8 @@ jobs:
       - name: Run RN Codegen manually
         run: |
           node node_modules/react-native/scripts/generate-codegen-artifacts.js \
-          -p ios \
+          -p . \
+          -t ios \
           -o ios
           
       - name: Verify Codegen output
