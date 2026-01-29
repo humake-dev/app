@@ -106,15 +106,15 @@ jobs:
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store</string>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>provisioningProfiles</key>
             <dict>
-              <key>method</key>
-              <string>app-store</string>
-              <key>signingStyle</key>
-              <string>manual</string>
-              <key>provisioningProfiles</key>
-            <dict>
-              <key>kr.co.humake</key>
-              <string>humake App Store</string>
+            <key>kr.co.humake</key>
+            <string>humake App Store</string>
             </dict>
             <key>compileBitcode</key>
             <true/>
@@ -123,8 +123,8 @@ jobs:
             <key>stripSwiftSymbols</key>
             <true/>
             <key>thinning</key>
-            <string>&lt;none&gt;</string
-            </dict>
+            <string>none</string>
+          </dict>
           </plist>
           EOF
           
