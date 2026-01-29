@@ -83,23 +83,6 @@ jobs:
           cp /tmp/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
           chmod 644 ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
 
-      # 6️⃣ Build
-      - name: Build archive
-        run: |
-          set -o pipefail
-          xcodebuild \
-            -workspace ios/humake_app.xcworkspace \
-            -scheme humake_app \
-            -configuration Release \
-            -archivePath build/humake_app.xcarchive \
-            CODE_SIGN_STYLE=Manual \
-            DEVELOPMENT_TEAM=7FGDKUA4PZ \
-            PRODUCT_BUNDLE_IDENTIFIER=kr.co.humake \
-            PROVISIONING_PROFILE=5fb10f42-9454-4eb8-9c41-11ff94617b2f \
-            CODE_SIGN_IDENTITY="iPhone Distribution" \
-            archive \
-            -verbose | tee xcodebuild.log
-            
       - name: Create exportOptions.plist
         run: |
           cat > ios/exportOptions.plist <<EOF
@@ -127,6 +110,27 @@ jobs:
           </dict>
           </plist>
           EOF
+          
+      - name: Validate exportOptions.plist
+        run: |
+          plutil -lint ios/exportOptions.plist            
+
+      # 6️⃣ Build
+      - name: Build archive
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -workspace ios/humake_app.xcworkspace \
+            -scheme humake_app \
+            -configuration Release \
+            -archivePath build/humake_app.xcarchive \
+            CODE_SIGN_STYLE=Manual \
+            DEVELOPMENT_TEAM=7FGDKUA4PZ \
+            PRODUCT_BUNDLE_IDENTIFIER=kr.co.humake \
+            PROVISIONING_PROFILE=5fb10f42-9454-4eb8-9c41-11ff94617b2f \
+            CODE_SIGN_IDENTITY="iPhone Distribution" \
+            archive \
+            -verbose | tee xcodebuild.log        
           
         # 2️⃣ Export IPA
       - name: Export IPA
