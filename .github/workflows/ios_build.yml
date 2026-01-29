@@ -131,7 +131,12 @@ jobs:
             PROVISIONING_PROFILE=5fb10f42-9454-4eb8-9c41-11ff94617b2f \
             CODE_SIGN_IDENTITY="iPhone Distribution" \
             archive \
-            -verbose | tee xcodebuild.log        
+            -verbose | tee xcodebuild.log
+
+      #- name: Extract errors
+      #  if: always()
+      #  run: |
+      #    grep -E "error:|fatal error|CodeSign|Provisioning|No Accounts" xcodebuild.log || true              
           
         # 2️⃣ Export IPA
       - name: Export IPA
