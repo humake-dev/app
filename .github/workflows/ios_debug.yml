@@ -44,9 +44,12 @@ jobs:
 
       - name: Setup provisioning profile
         run: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}" | base64 --decode > /tmp/profile.mobileprovision
           UUID=$(security cms -D -i /tmp/profile.mobileprovision | plutil -extract UUID raw -)
+          cp /tmp/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
           chmod 644 ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
-          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | plutil -extract Name raw -          
+          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | plutil -extract Name raw -      
 
       - name: Show keychain list
         run: |
