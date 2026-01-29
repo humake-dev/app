@@ -92,7 +92,7 @@ jobs:
           <plist version="1.0">
           <dict>
             <key>method</key>
-            <string>app-store-connect</string>
+            <string>ad-hoc</string>
             <key>signingStyle</key>
             <string>manual</string>
             <key>provisioningProfiles</key>
@@ -142,20 +142,9 @@ jobs:
           -exportOptionsPlist ios/exportOptions.plist \
           -allowProvisioningUpdates
 
-      #- name: Upload artifact
-      #  uses: actions/upload-artifact@v4
-      #  with:
-      #    name: ipa
-      #    path: build/*.ipa
-          
-      - name: Install Gems
-        working-directory: ios
-        run: bundle install
-        
-      - name: Upload to TestFlight via Fastlane
-        working-directory: ios
-        run: bundle exec fastlane beta
-        env:
-          FASTLANE_USER: ${{ secrets.APPSTORE_CONNECT_USER }}
-          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
-          FASTLANE_TEAM_ID: "7FGDKUA4PZ"       
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ipa
+          path: build/*.ipa
+                    
