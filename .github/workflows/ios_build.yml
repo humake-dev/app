@@ -107,7 +107,7 @@ jobs:
             <key>stripSwiftSymbols</key>
             <true/>
             <key>thinning</key>
-            <string>none</string>
+            <string>&lt;none&gt;</string>
           </dict>
           </plist>
           EOF
@@ -147,4 +147,3 @@ jobs:
         with:
           name: ipa
           path: build/*.ipa
-                    
