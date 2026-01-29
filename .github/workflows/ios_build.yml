@@ -148,13 +148,11 @@ jobs:
       #    name: ipa
       #    path: build/*.ipa
 
-      - name: Upload to App Store via Fastlane
-        uses: maierj/fastlane-action@v3.1.0
-        with:
-          lane: "ios upload_to_testflight"
-          subdirectory: "."
-          use_bundle_exec: true
+      # TestFlight 업로드
+      - name: Upload to TestFlight via Fastlane
+        run: bundle exec fastlane ios upload_to_testflight
+        working-directory: .        
         env:
           FASTLANE_USER: ${{ secrets.APPSTORE_CONNECT_USER }}
           FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
-          FASTLANE_TEAM_ID: "7FGDKUA4PZ"          
+          FASTLANE_TEAM_ID: "7FGDKUA4PZ"     
