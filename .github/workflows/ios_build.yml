@@ -147,13 +147,6 @@ jobs:
       #  with:
       #    name: ipa
       #    path: build/*.ipa
-      
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.0'
-          bundler-cache: true
-          working-directory: ios
           
       - name: Install Gems
         working-directory: ios
