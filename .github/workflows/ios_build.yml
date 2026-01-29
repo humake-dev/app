@@ -98,7 +98,7 @@ jobs:
             <key>provisioningProfiles</key>
             <dict>
             <key>kr.co.humake</key>
-            <string>humake App Store</string>
+            <string>humake_production</string>
             </dict>
             <key>compileBitcode</key>
             <true/>
