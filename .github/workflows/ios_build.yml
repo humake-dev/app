@@ -125,11 +125,11 @@ jobs:
             -scheme humake_app \
             -configuration Release \
             -archivePath build/humake_app.xcarchive \
+            -destination "generic/platform=iOS" \
             CODE_SIGN_STYLE=Manual \
             DEVELOPMENT_TEAM=7FGDKUA4PZ \
             CODE_SIGN_IDENTITY="iPhone Distribution" \
             PROVISIONING_PROFILE_SPECIFIER="humake_ad_hoc" \
-            PROVISIONING_PROFILE_SPECIFIER[kr.co.humake]="humake_ad_hoc" \
             archive \
             -verbose | tee xcodebuild.log        
         # PROVISIONING_PROFILE=5fb10f42-9454-4eb8-9c41-11ff94617b2f \                       PRODUCT_BUNDLE_IDENTIFIER=kr.co.humake \
