@@ -92,7 +92,7 @@ jobs:
           <plist version="1.0">
           <dict>
             <key>method</key>
-            <string>ad-hoc</string>
+            <string>release-testing</string>
             <key>signingStyle</key>
             <string>manual</string>
             <key>provisioningProfiles</key>
@@ -101,7 +101,7 @@ jobs:
             <string>humake_ad_hoc</string>
             </dict>
             <key>compileBitcode</key>
-            <true/>
+            <false/>
             <key>destination</key>
             <string>export</string>
             <key>stripSwiftSymbols</key>
@@ -127,12 +127,12 @@ jobs:
             -archivePath build/humake_app.xcarchive \
             CODE_SIGN_STYLE=Manual \
             DEVELOPMENT_TEAM=7FGDKUA4PZ \
-            PRODUCT_BUNDLE_IDENTIFIER=kr.co.humake \
             CODE_SIGN_IDENTITY="iPhone Distribution" \
             PROVISIONING_PROFILE_SPECIFIER="humake_ad_hoc" \
+            PROVISIONING_PROFILE_SPECIFIER[kr.co.humake]="humake_ad_hoc" \
             archive \
             -verbose | tee xcodebuild.log        
-        # PROVISIONING_PROFILE=5fb10f42-9454-4eb8-9c41-11ff94617b2f \          
+        # PROVISIONING_PROFILE=5fb10f42-9454-4eb8-9c41-11ff94617b2f \                       PRODUCT_BUNDLE_IDENTIFIER=kr.co.humake \
 
         # 2️⃣ Export IPA
       - name: Export IPA
