@@ -30,17 +30,24 @@ jobs:
           ls -l cert.p12
           openssl pkcs12 -info -in cert.p12 -noout -passin pass:$IOS_CERT_PASSWORD || true
 
+      - name: Check p12 checksum
+        run: |
+          shasum cert.p12
+          file cert.p12
+          ls -l cert.p12          
+
       - name: Decode IOS_PROVISION_PROFILE_BASE64
         run: |
           echo "=== DEBUG: IOS_PROVISION_PROFILE_BASE64 decode ==="
           echo "$IOS_PROVISION_PROFILE_BASE64" | base64 --decode > profile.mobileprovision
           ls -l profile.mobileprovision
 
-      - name: Check p12 checksum
+      - name: Setup provisioning profile
         run: |
-          shasum cert.p12
-          file cert.p12
-          ls -l cert.p12
+          UUID=$(security cms -D -i /tmp/profile.mobileprovision | plutil -extract UUID raw -)
+          cp /tmp/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
+          chmod 644 ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
+          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | plutil -extract Name raw -          
 
       - name: Show keychain list
         run: |
