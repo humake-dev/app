@@ -151,8 +151,9 @@ jobs:
       - name: Upload to App Store via Fastlane
         uses: maierj/fastlane-action@v3.1.0
         with:
-          lane: "ios upload_to_appstore"
+          lane: "ios upload_to_testflight"
           subdirectory: "."
+          use_bundle_exec: true
         env:
           FASTLANE_USER: ${{ secrets.APPSTORE_CONNECT_USER }}
           FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
