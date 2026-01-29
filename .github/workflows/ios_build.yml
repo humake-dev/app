@@ -149,7 +149,7 @@ jobs:
       #    path: build/*.ipa
 
       - name: Upload to App Store via Fastlane
-        uses: fastlane/fastlane-action@v2
+        uses: maierj/fastlane-action@v3.1.0
         with:
           lane: "ios upload_to_appstore"
           subdirectory: "."
