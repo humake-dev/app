@@ -134,11 +134,11 @@ jobs:
             archive \
             -verbose | tee xcodebuild.log
 
-      #- name: Extract errors
-      #  if: always()
-      #  run: |
-      #    grep -E "error:|fatal error|CodeSign|Provisioning|No Accounts" xcodebuild.log || true
-      #    grep -n "clang: error" -B 20 -A 20 xcodebuild.log         
+      - name: Extract errors
+        if: always()
+        run: |
+          grep -E "error:|fatal error|CodeSign|Provisioning|No Accounts" xcodebuild.log || true
+          grep -n "clang: error" -B 20 -A 20 xcodebuild.log  || true 
 
         # 2️⃣ Export IPA
       - name: Export IPA
