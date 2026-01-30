@@ -175,6 +175,5 @@ jobs:
         working-directory: ./ios/fastlane
         run: bundle exec fastlane upload_ipa
         env:
-          FASTLANE_ITC_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           FASTLANE_ISSUER_ID: ${{ secrets.APPLE_ISSUER_ID }}
           APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
