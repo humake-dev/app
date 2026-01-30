@@ -17,7 +17,14 @@ jobs:
           node-version: '>=20'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: | 
+          yarn install --frozen-lockfile
+          npx react-native bundle \
+          --platform ios \
+          --dev false \
+          --entry-file index.js \
+          --bundle-output ios/main.jsbundle \
+          --assets-dest ios
 
       - name: Setup Ruby 
         uses: ruby/setup-ruby@v1

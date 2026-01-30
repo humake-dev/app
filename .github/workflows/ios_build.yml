@@ -26,7 +26,6 @@ jobs:
           --bundle-output ios/main.jsbundle \
           --assets-dest ios
 
-
       - name: Setup Ruby 
         uses: ruby/setup-ruby@v1
         with:
