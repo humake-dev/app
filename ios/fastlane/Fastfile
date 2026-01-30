@@ -1,0 +1,6 @@
+lane :upload_ipa do
+  upload_to_testflight(
+    ipa: "../build/humake_app.ipa",
+    skip_waiting_for_build_processing: true
+  )
+end

@@ -161,15 +161,19 @@ jobs:
         with:
           name: ipa
           path: build/*.ipa
+
+      - name: Install gems (fastlane)
+        working-directory: ./ios/fastlane
+        run: bundle install --jobs 4 --retry 3          
           
       - name: Decode App Store Connect API Key
+        working-directory: ./ios      
         run: |
-          mkdir -p ./fastlane
           echo "${{ secrets.APPLE_API_KEY_P8 }}" | base64 --decode > ./fastlane/AuthKey.p8
-
+          
       - name: Upload IPA to TestFlight
-        run: bundle exec fastlane run upload_to_testflight ipa:../build/humake_app.ipa
-        working-directory: ./fastlane
+        working-directory: ./ios/fastlane
+        run: bundle exec fastlane upload_ipa
         env:
           FASTLANE_ITC_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           FASTLANE_ISSUER_ID: ${{ secrets.APPLE_ISSUER_ID }}
