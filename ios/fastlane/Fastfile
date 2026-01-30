@@ -1,6 +1,7 @@
 lane :upload_ipa do
   upload_to_testflight(
     ipa: "../build/humake_app.ipa",
+    api_key_path: File.expand_path("AuthKey.p8", __dir__),
     skip_waiting_for_build_processing: true
   )
 end
