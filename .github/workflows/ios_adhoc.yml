@@ -99,7 +99,7 @@ jobs:
             <key>provisioningProfiles</key>
             <dict>
             <key>kr.co.humake</key>
-            <string>humake_ad_hoc</string>
+            <string>humake_production</string>
             </dict>
             <key>compileBitcode</key>
             <false/>
@@ -130,7 +130,7 @@ jobs:
             CODE_SIGN_STYLE=Manual \
             DEVELOPMENT_TEAM=7FGDKUA4PZ \
             CODE_SIGN_IDENTITY="iPhone Distribution" \
-            PROVISIONING_PROFILE_SPECIFIER="humake_ad_hoc" \
+            PROVISIONING_PROFILE_SPECIFIER="humake_production" \
             archive \
             -verbose | tee xcodebuild.log        
         # PROVISIONING_PROFILE=5fb10f42-9454-4eb8-9c41-11ff94617b2f \                       PRODUCT_BUNDLE_IDENTIFIER=kr.co.humake \
@@ -154,18 +154,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ipa
-          path: build/*.ipa
-          
-      - name: Decode App Store Connect API Key
-        run: |
-          mkdir -p ./fastlane
-          echo "${{ secrets.APPLE_API_KEY_P8 }}" | base64 --decode > ./fastlane/AuthKey.p8
-
-      - name: Upload IPA to TestFlight
-        run: bundle exec fastlane upload_ipa
-        working-directory: ./fastlane
-        env:
-          FASTLANE_USER: ${{ secrets.APPLE_ID }}
-          FASTLANE_ITC_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          FASTLANE_ISSUER_ID: ${{ secrets.APPLE_ISSUER_ID }}
-          APP_STORE_CONNECT_API_KEY_PATH: ./fastlane/AuthKey.p8
+          path: build/*.ipa          

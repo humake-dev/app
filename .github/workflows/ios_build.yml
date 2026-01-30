@@ -161,3 +161,17 @@ jobs:
         with:
           name: ipa
           path: build/*.ipa
+          
+      - name: Decode App Store Connect API Key
+        run: |
+          mkdir -p ./fastlane
+          echo "${{ secrets.APPLE_API_KEY_P8 }}" | base64 --decode > ./fastlane/AuthKey.p8
+
+      - name: Upload IPA to TestFlight
+        run: bundle exec fastlane upload_ipa
+        working-directory: ./fastlane
+        env:
+          FASTLANE_USER: ${{ secrets.APPLE_ID }}
+          FASTLANE_ITC_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          FASTLANE_ISSUER_ID: ${{ secrets.APPLE_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_PATH: ./fastlane/AuthKey.p8
