@@ -44,8 +44,9 @@ jobs:
           export BUNDLE_GEMFILE=Gemfile
           export NODE_BINARY=$(which node)
           export RCT_NEW_ARCH_ENABLED=0
-          bundle install
-          bundle exec pod install
+          rm -rf Pods Podfile.lock
+          pod install --repo-update
+        #bundle exec pod install
       
       - name: Patch Local Podspecs Codegen check
         run: |
