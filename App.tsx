@@ -74,6 +74,16 @@ const App = () => {
   const [reservationTotal, setReservationTotal] = useState(0);
   const [enrollInfo, setEnrollInfo] = useState({});
 
+  if ((global as any).__LAST_ERROR__) {
+  return (
+    <View style={{ flex: 1, backgroundColor: 'black' }}>
+      <Text style={{ color: 'red' }}>
+        {String((global as any).__LAST_ERROR__)}
+      </Text>
+    </View>
+  );
+}
+
   const fetchFcmToken = async () => {
     if(!fcmToken) {
       return false;
@@ -104,7 +114,14 @@ const App = () => {
       console.log(JSON.stringify(error));
       //console.error(error);
     });
-  }  
+  } 
+
+  ErrorUtils.setGlobalHandler((error, isFatal) => {
+  console.log('GLOBAL ERROR', error);
+
+  // 화면에 표시
+  global.__LAST_ERROR__ = error;
+});
 
   const requestIOSPermission = async () => {
     const authStatus = await messaging().requestPermission();
