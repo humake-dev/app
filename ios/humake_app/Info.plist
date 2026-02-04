@@ -64,17 +64,21 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>UIApplicationSceneManifest</key>
-    <key>UISceneConfigurations</key>
-    <dict>
-        <key>UIWindowSceneSessionRoleApplication</key>
-        <array>
-            <dict>
-                <key>UISceneClassName</key>
-                <string>UIWindowScene</string>
-                <key>UISceneDelegateClassName</key>
-                <string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
-            </dict>
-        </array>
-    </dict>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<true/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneClassName</key>
+					<string>UIWindowScene</string>
+					<key>UISceneDelegateClassName</key>
+					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
 </dict>
 </plist>
