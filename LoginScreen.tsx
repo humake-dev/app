@@ -29,7 +29,7 @@ const body =
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: body, // ✅ 진짜 key=value&key=value
+      body: body,
     });
 
     if (!res.ok) {
