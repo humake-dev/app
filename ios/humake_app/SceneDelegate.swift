@@ -10,27 +10,40 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         willConnectTo session: UISceneSession,
         options connectionOptions: UIScene.ConnectionOptions
     ) {
-
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
-        // React Native bridge 생성
-        let bridge = RCTBridge(delegate: self as! RCTBridgeDelegate, launchOptions: nil)
+        // 1. React Native JS Bundle 경로
+        let jsCodeLocation: URL
+        #if DEBUG
+        jsCodeLocation = URL(string: "http://localhost:8081/index.bundle?platform=ios")!
+        #else
+        jsCodeLocation = Bundle.main.url(forResource: "main", withExtension: "jsbundle")!
+        #endif
 
-        // rootView 생성
+        // 2. React RootView 생성
         let rootView = RCTRootView(
-            bridge: bridge!,
-            moduleName: "humake_app", // RN JS 모듈 이름
-            initialProperties: nil
+            bundleURL: jsCodeLocation,
+            moduleName: "humake_app", // index.js에서 AppRegistry.registerComponent('humake_app', ...)
+            initialProperties: nil,
+            launchOptions: nil
         )
 
-        // 루트 뷰 컨트롤러 설정
+        // 배경색 지정 (검은 화면 방지)
+        rootView.backgroundColor = UIColor.white
+
+        // 3. UIWindow 생성 및 설정
+        let window = UIWindow(windowScene: windowScene)
         let rootViewController = UIViewController()
         rootViewController.view = rootView
-
-        // UIWindow 설정
-        let window = UIWindow(windowScene: windowScene)
         window.rootViewController = rootViewController
         self.window = window
         window.makeKeyAndVisible()
     }
+
+    // 나머지는 그대로
+    func sceneDidDisconnect(_ scene: UIScene) { }
+    func sceneDidBecomeActive(_ scene: UIScene) { }
+    func sceneWillResignActive(_ scene: UIScene) { }
+    func sceneWillEnterForeground(_ scene: UIScene) { }
+    func sceneDidEnterBackground(_ scene: UIScene) { }
 }

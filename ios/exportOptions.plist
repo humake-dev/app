@@ -8,7 +8,7 @@
 
 
 <key>teamID</key>
-<string>kr.co.humake</string>
+<string>7FGDKUA4PZ</string>
 
 
 <key>signingStyle</key>
@@ -20,5 +20,11 @@
 <key>kr.co.humake</key>
 <string>IOS_PROVISION_PROFILE_BASE64</string>
 </dict>
+
+    <key>compileBitcode</key>
+    <true/> <!-- App Store용은 Bitcode 켜는 게 일반적 -->
+    <key>signingCertificate</key>
+    <string>Apple Distribution</string>
+
 </dict>
 </plist>
