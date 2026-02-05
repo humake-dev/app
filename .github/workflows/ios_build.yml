@@ -51,6 +51,7 @@ jobs:
           export NODE_BINARY=$(which node)
           export RCT_NEW_ARCH_ENABLED=0
           bundle install
+          cd ios
           bundle exec pod install
       
       - name: Patch Local Podspecs Codegen check
