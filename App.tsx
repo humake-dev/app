@@ -49,7 +49,6 @@ import UserScreen from './UserScreen';
 import i18n from './i18n/i18n';
 import { useTranslation } from 'react-i18next'; 
 import {Icon} from 'react-native-elements';
-import { BASE_URL } from './Config';
 import { UserProvider } from './UserContext';
 import { MessageProvider } from "./MessageContext";
 import BarcodeScreen from './BarcodeScreen';
@@ -75,34 +74,25 @@ const App = () => {
   const [enrollInfo, setEnrollInfo] = useState({});
 
   const fetchFcmToken = async () => {
+    console.log('1');
     if(!fcmToken) {
       return false;
     }
-
+    console.log('2');
     if(!isLoggedIn) {
       return false;
     }
-
-    const formData = new FormData();
-    formData.append('token', Buffer.from(fcmToken).toString('base64'));
-    formData.append('os',Platform.OS);
-    formData.append('format','json');
-
-    return fetch(`${BASE_URL}/user-devices/add`,{
-      method : 'POST',
-      body : formData,
+    console.log('3');
+    
+    const response = await authFetch(`/user-devices/add`, {
+      method: 'POST',
+      body: JSON.stringify({
+          token: Buffer.from(fcmToken).toString('base64'),
+          os: Platform.OS
+        }),
       headers: {
-        Authorization: `Bearer ${await AsyncStorage.getItem("accessToken")}`,
         "Content-Type": "application/json",
       },
-    }).then((response) => response.json())
-    .then((responseJson) => {
-      console.log('fetcFcmTokenComplete');
-      console.log(JSON.stringify(responseJson));
-    })
-    .catch((error) => {
-      console.log(JSON.stringify(error));
-      //console.error(error);
     });
   }
 
@@ -133,24 +123,26 @@ const App = () => {
   }
 
   const getFcmToken = async () => {
+    console.log('here');
     const fcmFToken = await messaging().getToken();
+
+    console.log('here2');
     setFcmToken(fcmFToken);
+
+    console.log('here3');
     return fcmFToken;
   };
 
   useEffect(() => {
-    
     if(Platform.OS==='android') {
       requestAndroidPermission();
     } else {
       requestIOSPermission();
     }
 
+    loginCheck();
+    fetchFcmToken();
   }, []);
-
-  useEffect(() => {
-  loginCheck();
-}, [loginCheck]);
 
 useEffect(() => {
   if (!isLoggedIn) return;
@@ -158,6 +150,7 @@ useEffect(() => {
   getPt();
   getEntrance();
   getEnroll();
+  getFcmToken();
 }, [isLoggedIn]);  
 
   useEffect(() => {
@@ -294,8 +287,6 @@ useEffect(() => {
       const date = new Date();
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
-
-      console.log(month);
 
       const response = await authFetch(`/reservations?year=${year}&month=${month}`, {
         method: 'GET',

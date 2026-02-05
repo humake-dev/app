@@ -45,12 +45,12 @@ const HomeScreen = ({navigation, route, attendanceTotal, reservationTotal, enrol
     const user = userContext?.user;
     
     const LAST_TAB_KEY = 'lastTab';
-
-useEffect(() => {
-if (route.params?.targetTab === 'first') {
-setIndex(0);
-}
-}, [route.params]);
+    
+    useEffect(() => {
+      if (route.params?.targetTab === 'first') {
+        setIndex(0);
+      }
+    }, [route.params]);
 
 
       // 앱 시작 시 저장된 탭 인덱스 로딩
