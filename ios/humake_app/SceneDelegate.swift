@@ -1,5 +1,7 @@
 import UIKit
 import React
+import React_RCTAppDelegate
+import ReactAppDependencyProvider
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate, RCTBridgeDelegate {
 
@@ -7,10 +9,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, RCTBridgeDelegate {
 
     func sourceURL(for bridge: RCTBridge!) -> URL! {
         return RCTBundleURLProvider.sharedSettings()
-        .jsBundleURL(forBundleRoot: "index", fallbackResource: "main")
+            .jsBundleURL(forBundleRoot: "index", fallbackResource: "main")
     }
 
-    // ⭐ 여기!
     func isTestFlight() -> Bool {
         guard let receiptURL = Bundle.main.appStoreReceiptURL else {
             return false
@@ -25,17 +26,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, RCTBridgeDelegate {
     ) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
+        // ⭐ RN 필수 초기화
+        RCTAppSetupPrepareApp(UIApplication.shared)
+
         let bridge = RCTBridge(delegate: self, launchOptions: nil)
 
-        // 🔥 TestFlight 전용 Red Screen
         if isTestFlight() {
             bridge?.setValue(true, forKey: "devSupportEnabled")
         }
 
-        let rootView = RCTRootView(
-            bridge: bridge!,
-            moduleName: "humake",
-            initialProperties: nil
+        // ⭐ RN 권장 RootView 생성 방식
+        let rootView = RCTAppSetupDefaultRootView(
+            bridge,
+            "humake_app",
+            nil
         )
 
         let rootVC = UIViewController()
