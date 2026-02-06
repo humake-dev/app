@@ -7,7 +7,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, RCTBridgeDelegate {
 
     func sourceURL(for bridge: RCTBridge!) -> URL! {
         return RCTBundleURLProvider.sharedSettings()
-            .jsBundleURL(forBundleRoot: "index", fallbackResource: nil)
+        .jsBundleURL(forBundleRoot: "index", fallbackResource: "main")
     }
 
     // ⭐ 여기!
