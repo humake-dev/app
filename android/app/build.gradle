@@ -83,8 +83,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         vectorDrawables.useSupportLibrary = true
-        versionCode 1
-        versionName "1.0"
+        versionCode 23
+        versionName "5.0"
               
     }
     signingConfigs {
@@ -95,10 +95,10 @@ android {
             keyPassword 'android'
         }
     release {
-        storeFile file(project.env.get("MY_KEYSTORE_FILE"))
-        storePassword project.env.get("MY_KEYSTORE_PASSWORD")
-        keyAlias project.env.get("MY_KEY_ALIAS")
-        keyPassword project.env.get("MY_KEY_PASSWORD")
+        storeFile file(System.getenv("MY_KEYSTORE_FILE"))
+        storePassword System.getenv("MY_KEYSTORE_PASSWORD")
+        keyAlias System.getenv("MY_KEY_ALIAS")
+        keyPassword System.getenv("MY_KEY_PASSWORD")
     }
     }    
     buildTypes {
@@ -108,7 +108,7 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }

@@ -1,9 +1,22 @@
 import UIKit
 import React
 
-class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+class SceneDelegate: UIResponder, UIWindowSceneDelegate, RCTBridgeDelegate {
 
     var window: UIWindow?
+
+    func sourceURL(for bridge: RCTBridge!) -> URL! {
+        return RCTBundleURLProvider.sharedSettings()
+            .jsBundleURL(forBundleRoot: "index", fallbackResource: nil)
+    }
+
+    // ⭐ 여기!
+    func isTestFlight() -> Bool {
+        guard let receiptURL = Bundle.main.appStoreReceiptURL else {
+            return false
+        }
+        return receiptURL.lastPathComponent == "sandboxReceipt"
+    }
 
     func scene(
         _ scene: UIScene,
@@ -12,27 +25,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     ) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
-        // 1️⃣ React Native 브리지 생성
-        let bridge = RCTBridge(delegate: nil, launchOptions: nil)
+        let bridge = RCTBridge(delegate: self, launchOptions: nil)
 
-        // 2️⃣ React Native 루트 뷰 생성
+        // 🔥 TestFlight 전용 Red Screen
+        if isTestFlight() {
+            bridge?.setValue(true, forKey: "devSupportEnabled")
+        }
+
         let rootView = RCTRootView(
-            bridge: bridge,
-            moduleName: "humake_app",  // 여기에 JS에서 등록한 앱 이름
+            bridge: bridge!,
+            moduleName: "humake",
             initialProperties: nil
         )
 
-        // 3️⃣ 루트 뷰 컨트롤러 생성
-        let rootViewController = UIViewController()
-        rootViewController.view = rootView
+        let rootVC = UIViewController()
+        rootVC.view = rootView
 
-        // 4️⃣ 윈도우 생성 및 루트뷰 컨트롤러 연결
         let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = rootViewController
+        window.rootViewController = rootVC
         self.window = window
         window.makeKeyAndVisible()
-
-        // 5️⃣ (선택) 상태바 스타일 조정
-        rootViewController.overrideUserInterfaceStyle = .light
     }
 }
