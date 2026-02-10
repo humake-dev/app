@@ -3,28 +3,22 @@
 "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-<key>method</key>
-<string>app-store-connect</string>
+  <key>method</key>
+  <string>app-store-connect</string>
 
+  <key>teamID</key>
+  <string>7FGDKUA4PZ</string>
 
-<key>teamID</key>
-<string>7FGDKUA4PZ</string>
+  <key>signingStyle</key>
+  <string>manual</string>
 
+  <key>signingCertificate</key>
+  <string>Apple Distribution</string>
 
-<key>signingStyle</key>
-<string>manual</string>
-
-
-<key>provisioningProfiles</key>
-<dict>
-<key>kr.co.humake</key>
-<string>IOS_PROVISION_PROFILE_BASE64</string>
-</dict>
-
-    <key>compileBitcode</key>
-    <true/> <!-- App Store용은 Bitcode 켜는 게 일반적 -->
-    <key>signingCertificate</key>
-    <string>Apple Distribution</string>
-
+  <key>provisioningProfiles</key>
+  <dict>
+    <key>kr.co.humake</key>
+    <string>Humake AppStore Profile</string>
+  </dict>
 </dict>
 </plist>

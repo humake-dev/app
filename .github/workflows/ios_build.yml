@@ -50,7 +50,9 @@ jobs:
           export RCT_NEW_ARCH_ENABLED=0
           bundle install
           cd ios
-          pod install
+          rm -rf Pods Podfile.lock
+          rm -rf ~/Library/Developer/Xcode/DerivedData/*
+          bundle exec pod install
       
       - name: Patch Local Podspecs Codegen check
         run: |
