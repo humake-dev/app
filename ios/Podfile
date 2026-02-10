@@ -35,7 +35,7 @@ use_react_native!(
   :path => config[:reactNativePath],
   :app_path => "#{Pod::Config.instance.installation_root}/..",
   :fabric_enabled => false,
-  :hermes_enabled => true,
+  :hermes_enabled => false,
   :production => true
 )
 
