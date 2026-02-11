@@ -20,9 +20,7 @@ const LoginScreen = () => {
   
 const handleLogin = async () => {
   try {
-const body =
-  `username=${encodeURIComponent(username)}` +
-  `&password=${encodeURIComponent(password)}`;
+    const body =`username=${encodeURIComponent(username)}` +`&password=${encodeURIComponent(password)}`;
 
     const res = await fetch(`${BASE_URL}/login`, {
       method: "POST",
@@ -75,6 +73,7 @@ const body =
   ref={usernameRef}
   style={styles.input}
   placeholder={t('login.username')}
+  placeholderTextColor="gray"
   value={username}
   onChangeText={setUsername}
   autoCapitalize="none"
@@ -86,6 +85,7 @@ const body =
   ref={passwordRef}
   style={styles.input}
   placeholder={t('login.password')}
+  placeholderTextColor="gray"
   value={password}
   onChangeText={setPassword}
   secureTextEntry

@@ -42,7 +42,7 @@ const NoticeScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     fetchNotices();
-  }, [fetchNotices]);
+  }, []);
 
   if (loading) {
     return (

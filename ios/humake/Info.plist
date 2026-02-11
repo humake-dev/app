@@ -53,6 +53,12 @@
 	<key>NSCameraUsageDescription</key>
 	<string>$(PRODUCT_NAME) 사진을 찍어서 프로필 사진을 만듭니다</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>$(PRODUCT_NAME) 사진을 선택하여 프로필 사진을 만듭니다</string>	
+	<string>$(PRODUCT_NAME) 사진을 선택하여 프로필 사진을 만듭니다</string>
+<key>UIAppFonts</key>
+<array>
+    <string>FontAwesome5_Solid.ttf</string>
+    <string>FontAwesome5_Regular.ttf</string>
+    <string>FontAwesome5_Brands.ttf</string>
+</array>	
 </dict>
 </plist>
