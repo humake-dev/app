@@ -21,6 +21,8 @@ end
 
 target 'humake' do
   config = use_native_modules!
+  
+  pod 'Firebase/Messaging'
 
   use_react_native!(
     :path => config[:reactNativePath],

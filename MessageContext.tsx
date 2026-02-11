@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 import { authFetch } from './src/utils/api';
 
 const MessageContext = createContext();
@@ -30,6 +30,10 @@ fetchedRef.current = false; // 실패 시 다시 허용
 setLoading(false);
 }
 }, []);
+
+  useEffect(() => {
+    fetchMessages();   // 🔥 처음에 한번 로딩
+  }, []);
 
 const refreshMessages = async () => {
 fetchedRef.current = false; // 🔓 잠금 해제
