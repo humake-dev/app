@@ -20,14 +20,14 @@ if linkage != nil
 end
 
 target 'humake' do
+  use_modular_headers!
+
   config = use_native_modules!
-  
-  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+
   pod 'Firebase/Messaging'
 
   use_react_native!(
     :path => config[:reactNativePath],
-    # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
@@ -36,7 +36,7 @@ target 'humake' do
       installer,
       config[:reactNativePath],
       :mac_catalyst_enabled => false,
-      # :ccache_enabled => true
     )
   end
 end
+
