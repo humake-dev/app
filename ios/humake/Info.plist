@@ -56,6 +56,7 @@
 	<string>$(PRODUCT_NAME) 사진을 선택하여 프로필 사진을 만듭니다</string>
 <key>UIAppFonts</key>
 <array>
+ 	<string>Ionicons.ttf</string>
     <string>FontAwesome5_Solid.ttf</string>
     <string>FontAwesome5_Regular.ttf</string>
     <string>FontAwesome5_Brands.ttf</string>

@@ -531,9 +531,9 @@ targetTab: 'first',
                         onPress={handleLogout}
                       >
                         <View style={styles.logoutContent}>
-                          <Icon 
+                          <Icon
                             name="sign-out-alt" 
-                            type="font-awesome-5" 
+                            type="font-awesome-5"
                             color="#fff" 
                             size={16}
                             style={styles.logoutIcon}
