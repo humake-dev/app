@@ -1,4 +1,10 @@
+# ios/Podfile
+platform :ios, '13.0'
+
+# 명시적으로 프로젝트 지정
 project 'humake.xcodeproj'
+
+require_relative '../node_modules/react-native/scripts/react_native_pods'
 
 # Resolve react_native_pods.rb with node to allow for hoisting
 require Pod::Executable.execute_command('node', ['-p',
