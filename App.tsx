@@ -33,7 +33,6 @@ import TrainerScreen from './TrainerScreen';
 import TrainerDetailScreen from './TrainerDetailScreen';
 import AttendanceScreen from './AttendanceScreen';
 import PtScreen from './PtScreen';
-import ExerciseScreen from './ExerciseScreen';
 import CounselScreen from './CounselScreen';
 import CounselDetailScreen from './CounselDetailScreen';
 import CounselFormScreen from './CounselFormScreen';
@@ -448,7 +447,6 @@ const loginCheck = async () => {
                   <Stack.Screen name="Trainer" component={TrainerScreen} options={{ title: t('menu.trainer') }} />
                   <Stack.Screen name="TrainerDetail" component={TrainerDetailScreen} options={{ title: t('menu.trainer') }}/>
                   <Stack.Screen name="Attendance" component={AttendanceScreen} options={{ title: t('menu.attendance') }}/>
-                  <Stack.Screen name="Exercise" component={ExerciseScreen} options={{ title: t('menu.exercise') }}/>
                   <Stack.Screen name="Pt" component={PtScreen} options={{ title: t('menu.pt') }}/>
                   <Stack.Screen name="UserWeight" component={UserWeightScreen} options={{ title: t('menu.user_weight') }}/>
                   <Stack.Screen name="UserWeightForm" component={UserWeightFormScreen} options={{ title: t('menu.user_weight') }}/>

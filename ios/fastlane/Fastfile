@@ -1,6 +1,6 @@
 lane :upload_ipa do
   upload_to_testflight(
-    ipa: "../build/humake_app.ipa",
+    ipa: "../build/humake.ipa",
     api_key: app_store_connect_api_key(
       key_id: ENV["APP_STORE_KEY_ID"],
       issuer_id: ENV["FASTLANE_ISSUER_ID"],
