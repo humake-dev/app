@@ -24,6 +24,8 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>CFBundleIconName</key>
+	<string>AppIcon</string>	
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -61,19 +63,13 @@
 		<string>FontAwesome5_Brands.ttf</string>
 		<string>FontAwesome6_Solid.ttf</string>
 		<string>FontAwesome.ttf</string>
-		<string>Octicons.ttf</string>
-		<string>Fontisto.ttf</string>
-		<string>MaterialIcons.ttf</string>
-		<string>MaterialCommunityIcons.ttf</string>
-		<string>EvilIcons.ttf</string>
-		<string>FontAwesome6_Brands.ttf</string>
-		<string>Zocial.ttf</string>
-		<string>FontAwesome6_Regular.ttf</string>
-		<string>Foundation.ttf</string>
-		<string>Entypo.ttf</string>
-		<string>AntDesign.ttf</string>
-		<string>Feather.ttf</string>
-		<string>SimpleLineIcons.ttf</string>
 	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+		</array>
 </dict>
 </plist>
