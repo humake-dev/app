@@ -20,8 +20,6 @@ if linkage != nil
 end
 
 target 'humake' do
-  use_modular_headers!
-
   config = use_native_modules!
 
   pod 'Firebase/Messaging'
