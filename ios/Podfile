@@ -22,6 +22,8 @@ end
 target 'humake' do
   config = use_native_modules!
 
+  pod 'FirebaseCoreInternal', :modular_headers => true
+  pod 'GoogleUtilities', :modular_headers => true
   pod 'Firebase/Messaging'
 
   use_react_native!(
