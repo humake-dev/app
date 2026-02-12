@@ -12,7 +12,7 @@
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		991A74EA29C75063009DC2B1 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 991A74E929C75063009DC2B1 /* GoogleService-Info.plist */; };
-		4D39716H215061F0HEB7C232 /* exercise.db in Resources */ = {isa = PBXBuildFile; fileRef = XXXXXXXXXXXX /* exercise.db */; };
+		6D3D716H215061F0HEB53213 /* exercise.db in Resources */ = {isa = PBXBuildFile; fileRef = 4D39716H215061F0HEB7C232 /* exercise.db */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -174,7 +174,7 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				991A74EA29C75063009DC2B1 /* GoogleService-Info.plist in Resources */,				
-				4D39716H215061F0HEB7C232 /* exercise.db in Resources */
+				6D3D716H215061F0HEB53213 /* exercise.db in Resources */
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
