@@ -8,7 +8,8 @@ import {
   ScrollView,
   Dimensions,
   Alert,
-  Platform
+  Platform,
+  PermissionsAndroid
 } from 'react-native';
 import {Trans, useTranslation} from 'react-i18next';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
@@ -26,6 +27,7 @@ import { uploadProfileImageFlow } from './src/utils/profileImageUploader';
 import { authFetch } from './src/utils/api';
 import i18n from './i18n/i18n';
 import { useMessageContext } from "./MessageContext";
+import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 
 const HomeScreen = ({navigation, route, attendanceTotal, reservationTotal, enrollInfo}) => {
     const { t } = useTranslation();
@@ -464,20 +466,42 @@ const renderEnrollInfo = (enrollInfo) => {
   const ThirdRoute = ({navigation, t, user}) => {
     const viewShotRef = useRef();
 
-    const downloadBarcode = async () => {
-        try {
-          const uri = await viewShotRef.current.capture();
-          console.log('Captured barcode URI:', uri);
-    
-    
-          // 사진첩에 저장
-          //await CameraRoll.save(uri, { type: 'photo' });
-          Alert.alert('Success', 'Barcode saved to Photos!');
-        } catch (error) {
-          console.error('Error saving barcode:', error);
-          Alert.alert('Error', 'Failed to save barcode');
-        }
-    };
+  const requestPermission = async () => {
+    if (Platform.OS === 'android') {
+      if (Platform.Version >= 33) {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+        );
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      } else {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        );
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      }
+    }
+    return true;
+  };    
+
+const downloadBarcode = async () => {
+  try {
+    const hasPermission = await requestPermission();
+    if (!hasPermission) {
+      Alert.alert('Permission denied');
+      return;
+    }
+
+    const uri = await viewShotRef.current.capture();
+
+    await CameraRoll.save(uri, { type: 'photo' });
+
+    Alert.alert('Success', 'Barcode saved to Photos!');
+  } catch (error) {
+    console.error('Error saving barcode:', error);
+    Alert.alert('Error', 'Failed to save barcode');
+  }
+};
+
 
     return (
       <View style={styles.tabContent}>
@@ -507,7 +531,8 @@ const renderEnrollInfo = (enrollInfo) => {
             width: '90%', 
             maxWidth: 400
           }}>
-            <ViewShot ref={viewShotRef}>
+            <ViewShot ref={viewShotRef} options={{ format: 'png', quality: 1 }}>
+            <View collapsable={false} style={{ backgroundColor: 'white' }}>
             <Barcode 
               value={user.access_card.card_no} 
               format="CODE128" 
@@ -523,6 +548,7 @@ const renderEnrollInfo = (enrollInfo) => {
                 textColor: '#000'
               }}
             />
+            </View>
             </ViewShot>
             <Text style={{ 
               marginTop: 15, 
@@ -532,7 +558,7 @@ const renderEnrollInfo = (enrollInfo) => {
             }}>
               {user.access_card.card_no}
             </Text>
-            {/*<TouchableOpacity 
+            {<TouchableOpacity 
               style={{
                 marginTop: 20,
                 padding: 10,
@@ -549,7 +575,7 @@ const renderEnrollInfo = (enrollInfo) => {
               }}>
                 {t('common.download_barcode')}
               </Text>
-            </TouchableOpacity> */}
+            </TouchableOpacity>}
           </View>
         ) : (
             <Text style={{ 
