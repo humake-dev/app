@@ -21,7 +21,11 @@
       "count": "count",
       "trainer": "trainer",
       "no_enroll": "No Enrolls",
-      "no_rent": "No Lockers"
+      "no_rent": "No Lockers",
+      "insert" : "insert",
+      "edit" : "edit",
+      "barcode_saved" : "Saved!",
+      "error_barcode_saved" : "Error saving barcode"
     },
     "tabMenu": {
       "message": "Message",

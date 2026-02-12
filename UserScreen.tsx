@@ -253,7 +253,7 @@ resizeMode="cover"
       onPress={() => navigation.navigate('UserHeightForm')}
     >
       <Text style={styles.editButtonText}>
-        {user?.user_height?.height ? '수정하기' : '입력'}
+        {user?.user_height?.height ? t('common.edit') : t('common.insert')}
       </Text>
     </TouchableOpacity>
   </View>

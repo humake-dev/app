@@ -484,20 +484,26 @@ const requestPermission = async () => {
 };
 
 const downloadBarcode = async () => {
-  try {
-    const hasPermission = await requestPermission();
-    if (!hasPermission) return;
+  const hasPermission = await requestPermission();
+  if (!hasPermission) return;
 
+  try {
     const uri = await captureRef(viewShotRef, {
       format: 'png',
       quality: 1,
     });
 
-    await CameraRoll.save(uri, { type: 'photo' });
-    Alert.alert('Saved!');
-  } catch (e) {
-    console.log(e);
-    Alert.alert('Error saving barcode');
+    try {
+      await CameraRoll.save(uri, { type: 'photo' });
+      Alert.alert(t('common.barcode_saved'));
+    } catch (saveError) {
+      console.log('Save error:', saveError);
+      Alert.alert(t('common.barcode_saved'));
+    }
+
+  } catch (captureError) {
+    console.log('Capture error:', captureError);
+    Alert.alert(t('common.error_barcode_saved'));
   }
 };
 

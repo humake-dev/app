@@ -21,7 +21,11 @@
       "count": "횟수",
       "trainer": "담당",
       "no_enroll": "수강이 없습니다.",
-      "no_rent": "락커가 없습니다."      
+      "no_rent": "락커가 없습니다.",
+      "insert" : "입력",
+      "edit" : "수정",
+      "barcode_saved" : "저장되었습니다",
+      "error_barcode_saved" : "바코드 저장 애러"   
     },
     "tabMenu": {
       "message": "알림",
