@@ -33,13 +33,12 @@ const MessageDetailScreen = ({ navigation }) => {
 
   const fetchMessageRead = async () => {
     try {
-      const response = await authFetch(`/messages/read/${route.params.id}`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+            const response = await authFetch(`/messages/read/${route.params.id}`, {
+              method: 'POST',
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
 
       if (response.ok) {
       } else {
@@ -52,12 +51,11 @@ const MessageDetailScreen = ({ navigation }) => {
 
   const fetchMessage = async () => {
     try {
-      const response = await authFetch(`/messages/${route.params.id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+            const response = await authFetch(`/messages/${route.params.id}`, {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
 
       if (response.ok) {
         const data = await response.json();
