@@ -16,6 +16,18 @@ buildscript {
         classpath("com.facebook.react:react-native-gradle-plugin")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
     }
+
+    configurations.all {
+        resolutionStrategy {
+            force 'androidx.core:core:1.16.0'
+            eachDependency { details ->
+                if (details.requested.group == 'com.android.support') {
+                    details.useVersion "27.1.1" // 가능한 경우 제거 권장
+                    details.because("AndroidX와 충돌 방지")
+                }
+            }
+        }
+    }    
 }
 
 apply plugin: "com.facebook.react.rootproject"

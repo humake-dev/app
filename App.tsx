@@ -36,6 +36,7 @@ import PtScreen from './PtScreen';
 import CounselScreen from './CounselScreen';
 import CounselDetailScreen from './CounselDetailScreen';
 import CounselFormScreen from './CounselFormScreen';
+import ExerciseScreen from './ExerciseScreen';
 import StopScreen from './StopScreen';
 import StopDetailScreen from './StopDetailScreen';
 import StopFormScreen from './StopFormScreen';
@@ -52,7 +53,10 @@ import { UserProvider } from './UserContext';
 import { MessageProvider } from "./MessageContext";
 import BarcodeScreen from './BarcodeScreen';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getMessaging, getToken } from 'firebase/messaging';
+import { initializeApp } from 'firebase/app';
 import { authFetch, fetchUser } from './src/utils/api';
+
 
 const Stack = createStackNavigator();
 
@@ -122,14 +126,26 @@ const App = () => {
   }
 
   const getFcmToken = async () => {
-    console.log('here');
-    const fcmFToken = await messaging().getToken();
+    /* const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID",
+      measurementId: "YOUR_MEASUREMENT_ID" // optional
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);    
+    const token = await getToken(messaging); */
+    // const fcmFToken = await messaging().getToken();
 
     console.log('here2');
-    setFcmToken(fcmFToken);
+    //setFcmToken(fcmFToken);
 
     console.log('here3');
-    return fcmFToken;
+    //return fcmFToken;
   };
 
   useEffect(() => {
@@ -447,10 +463,11 @@ const loginCheck = async () => {
                   <Stack.Screen name="Trainer" component={TrainerScreen} options={{ title: t('menu.trainer') }} />
                   <Stack.Screen name="TrainerDetail" component={TrainerDetailScreen} options={{ title: t('menu.trainer') }}/>
                   <Stack.Screen name="Attendance" component={AttendanceScreen} options={{ title: t('menu.attendance') }}/>
+                  <Stack.Screen name="Exercise" component={ExerciseScreen} options={{ title: t('menu.exercise') }}/>                  
                   <Stack.Screen name="Pt" component={PtScreen} options={{ title: t('menu.pt') }}/>
                   <Stack.Screen name="UserWeight" component={UserWeightScreen} options={{ title: t('menu.user_weight') }}/>
                   <Stack.Screen name="UserWeightForm" component={UserWeightFormScreen} options={{ title: t('menu.user_weight') }}/>
-                  <Stack.Screen name="UserHeightForm" component={UserHeightFormScreen} options={{ title: t('menu.user_height') }}/>                  
+                  <Stack.Screen name="UserHeightForm" component={UserHeightFormScreen} options={{ title: t('menu.user_height') }}/>                              
                   <Stack.Screen name="Counsel" component={CounselScreen} options={{ title: t('menu.counsel') }}/>
                   <Stack.Screen name="CounselForm" component={CounselFormScreen} options={{ title: t('menu.counsel') }}/>
                   <Stack.Screen name="CounselDetail" component={CounselDetailScreen} options={{ title: t('menu.counsel') }}/>
