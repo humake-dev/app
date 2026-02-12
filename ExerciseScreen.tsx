@@ -12,7 +12,7 @@ import {
 import SQLite from 'react-native-sqlite-storage';
 
   
-SQLite.DEBUG(true);
+// SQLite.DEBUG(true);
 SQLite.enablePromise(true);
 
 const openDatabase = async () => {
@@ -30,7 +30,8 @@ const openDatabase = async () => {
     const opts: any = {
       name,
       location: 'default',
-      createFromLocation: 1,
+      createFromLocation:
+      Platform.OS === 'ios' ? '~exercise.db' : 1,
     };
 
     // assetFilename is only used in some platforms/versions; include for iOS fallback
