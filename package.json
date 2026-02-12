@@ -24,6 +24,7 @@
     "@react-navigation/native": "^7.0.17",
     "@react-navigation/stack": "^7.2.1",
     "base-64": "^1.0.0",
+    "bwip-js": "^4.8.0",
     "i18next": "^25.8.4",
     "install": "^0.13.0",
     "jwt-decode": "^4.0.0",
@@ -35,6 +36,7 @@
     "react-native-chart-kit": "^6.12.0",
     "react-native-config": "^1.5.5",
     "react-native-elements": "^3.4.3",
+    "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "^2.24.0",
     "react-native-image-picker": "^8.2.1",
     "react-native-image-resizer": "^1.4.5",
@@ -48,7 +50,8 @@
     "react-native-svg": "^15.12.0",
     "react-native-tab-view": "^4.0.10",
     "react-native-vector-icons": "^10.2.0",
-    "react-native-view-shot": "3.8.0",
+    "react-native-view-shot": "^4.0.3",
+    "react-zlib-js": "^2.0.0",
     "yarn": "^1.22.22"
   },
   "devDependencies": {
