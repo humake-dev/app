@@ -150,7 +150,7 @@ useEffect(() => {
   getPt();
   getEntrance();
   getEnroll();
-//  initPush();  
+  initPush();  
 }, [isLoggedIn]);  
 
   useEffect(() => {
