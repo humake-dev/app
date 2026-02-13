@@ -36,7 +36,6 @@ import PtScreen from './PtScreen';
 import CounselScreen from './CounselScreen';
 import CounselDetailScreen from './CounselDetailScreen';
 import CounselFormScreen from './CounselFormScreen';
-import ExerciseScreen from './ExerciseScreen';
 import StopScreen from './StopScreen';
 import StopDetailScreen from './StopDetailScreen';
 import StopFormScreen from './StopFormScreen';
@@ -518,15 +517,6 @@ targetTab: 'first',
 });
 }}>
                         <Text style={styles.sideMenuItemText}>{t('menu.message')}</Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity 
-                        style={styles.sideMenuItem}
-                        onPress={() => {
-                          closeMenu();
-                          navigation.current.navigate('Exercise');
-                        }}>
-                        <Text style={styles.sideMenuItemText}>{t('menu.exercise')}</Text>
                       </TouchableOpacity>
 
                       <TouchableOpacity 
