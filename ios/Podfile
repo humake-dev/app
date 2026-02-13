@@ -1,3 +1,4 @@
+ENV['RCT_NEW_ARCH_ENABLED'] = '0'
 # 명시적으로 프로젝트 지정
 project 'humake.xcodeproj'
 
@@ -28,9 +29,7 @@ target 'humake' do
 
   use_react_native!(
     :path => config[:reactNativePath],
-    :app_path => "#{Pod::Config.instance.installation_root}/..",
-    :hermes_enabled => true,
-    :fabric_enabled => false
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
   post_install do |installer|
