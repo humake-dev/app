@@ -54,6 +54,7 @@ import { MessageProvider } from "./MessageContext";
 import BarcodeScreen from './BarcodeScreen';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import messaging from '@react-native-firebase/messaging';
+import { Buffer } from 'buffer';
 import { authFetch, fetchUser } from './src/utils/api';
 
 
@@ -78,11 +79,10 @@ const App = () => {
     if(!fcmToken) {
       return false;
     }
-    console.log('2');
+    
     if(!isLoggedIn) {
       return false;
     }
-    console.log('3');
     
     const response = await authFetch(`/user-devices/add`, {
       method: 'POST',
