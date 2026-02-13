@@ -53,8 +53,7 @@ import { UserProvider } from './UserContext';
 import { MessageProvider } from "./MessageContext";
 import BarcodeScreen from './BarcodeScreen';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getMessaging, getToken } from 'firebase/messaging';
-import { initializeApp } from 'firebase/app';
+import messaging from '@react-native-firebase/messaging';
 import { authFetch, fetchUser } from './src/utils/api';
 
 
@@ -76,7 +75,7 @@ const App = () => {
   const [reservationTotal, setReservationTotal] = useState(0);
   const [enrollInfo, setEnrollInfo] = useState({});
 
-  const fetchFcmToken = async () => {
+  const fetchFcmToken = async (fcmToken) => {
     console.log('1');
     if(!fcmToken) {
       return false;
@@ -99,65 +98,53 @@ const App = () => {
     });
   }
 
-  const requestIOSPermission = async () => {
-    const authStatus = await messaging().requestPermission();
-    const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-  
-    if (enabled) {
-      fetchFcmToken(getFcmToken());
+const initPush = async () => {
+  let granted = false;
 
-      messaging().onMessage(async remoteMessage => {
-        Alert.alert(remoteMessage.notification.title, remoteMessage.notification.body);
-      });
-    }
-  }
+  if (Platform.OS === 'android') {
+    const hasPermission = await PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+    );
 
-  const requestAndroidPermission = async () => {
-    const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      fetchFcmToken(getFcmToken());
-
-      messaging().onMessage(async remoteMessage => {
-        Alert.alert(remoteMessage.notification.title, remoteMessage.notification.body);
-      });
-    }
-  }
-
-  const getFcmToken = async () => {
-    /* const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID",
-      measurementId: "YOUR_MEASUREMENT_ID" // optional
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const messaging = getMessaging(app);    
-    const token = await getToken(messaging); */
-    // const fcmFToken = await messaging().getToken();
-
-    console.log('here2');
-    //setFcmToken(fcmFToken);
-
-    console.log('here3');
-    //return fcmFToken;
-  };
-
-  useEffect(() => {
-    if(Platform.OS==='android') {
-      requestAndroidPermission();
+    if (!hasPermission) {
+      const result = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+      );
+      granted = result === PermissionsAndroid.RESULTS.GRANTED;
     } else {
-      requestIOSPermission();
+      granted = true;
     }
 
-    loginCheck();
-    fetchFcmToken();
-  }, []);
+  } else {
+    const authStatus = await messaging().hasPermission?.();
+    if (!authStatus) {
+      const newStatus = await messaging().requestPermission();
+      granted =
+        newStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        newStatus === messaging.AuthorizationStatus.PROVISIONAL;
+    } else {
+      granted = true;
+    }
+  }
+
+  if (!granted) return;
+
+  const token = await messaging().getToken();
+  await fetchFcmToken(token);
+};
+
+
+useEffect(() => {
+  const unsubscribe = messaging().onTokenRefresh(token => {
+    fetchFcmToken(token);
+  });
+
+  return unsubscribe;
+}, []);
+
+useEffect(() => {
+  loginCheck();
+}, []);
 
 useEffect(() => {
   if (!isLoggedIn) return;
@@ -165,7 +152,7 @@ useEffect(() => {
   getPt();
   getEntrance();
   getEnroll();
-  getFcmToken();
+  initPush();  
 }, [isLoggedIn]);  
 
   useEffect(() => {
@@ -364,9 +351,10 @@ const loginCheck = async () => {
     const userData = await fetchUser();
     setUser(userData);
 
-    // ✅ 여기서 유저 상태 복구
     setIsLoggedIn(true);
-    if (userContext && userContext.setUser) userContext.setUser(userData);
+    if (userContext && userContext.setUser) {
+      userContext.setUser(userData);
+    }
     
   } catch (e) {
     console.log("토큰 파싱 실패", e);

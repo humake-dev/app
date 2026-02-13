@@ -84,6 +84,9 @@
     "message" : {
       "no_items": "메시지가 없습니다"
     },
+    "user" : {
+      "enroll_info_failed": "현재 수강이 없습니다."
+    },    
     "user_weight": {
       "weight": "몸무게",
       "bmi": "BMI",

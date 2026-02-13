@@ -82,6 +82,9 @@
       "message" : {
         "no_items": "No Message"
       },
+      "user" : {
+        "enroll_info_failed": "enroll not exist"
+      },          
       "user_weight": {
         "weight": "Weight",
         "bmi": "BMI",
