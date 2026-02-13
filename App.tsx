@@ -53,8 +53,7 @@ import { MessageProvider } from "./MessageContext";
 import BarcodeScreen from './BarcodeScreen';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Buffer } from 'buffer';
-import { getMessaging, getToken } from 'firebase/messaging';
-import { initializeApp } from 'firebase/app';
+import messaging from '@react-native-firebase/messaging';
 import { authFetch, fetchUser } from './src/utils/api';
 
 
@@ -70,7 +69,6 @@ const App = () => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [fcmToken, setFcmToken] = useState(false);
   const navigation = useRef();
-  const messaging = useRef(null);
   const [user, setUser] = useState(null);
   const [attendanceTotal, setAttendanceTotal] = useState(0);
   const [reservationTotal, setReservationTotal] = useState(0);
