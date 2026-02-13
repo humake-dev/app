@@ -52,8 +52,9 @@ import { UserProvider } from './UserContext';
 import { MessageProvider } from "./MessageContext";
 import BarcodeScreen from './BarcodeScreen';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import messaging from '@react-native-firebase/messaging';
 import { Buffer } from 'buffer';
+import { getMessaging, getToken } from 'firebase/messaging';
+import { initializeApp } from 'firebase/app';
 import { authFetch, fetchUser } from './src/utils/api';
 
 
@@ -67,21 +68,24 @@ const App = () => {
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [fcmToken, setFcmToken] = useState(false);
   const navigation = useRef();
+  const messaging = useRef(null);
   const [user, setUser] = useState(null);
   const [attendanceTotal, setAttendanceTotal] = useState(0);
   const [reservationTotal, setReservationTotal] = useState(0);
   const [enrollInfo, setEnrollInfo] = useState({});
 
-  const fetchFcmToken = async (fcmToken) => {
+  const fetchFcmToken = async () => {
     console.log('1');
     if(!fcmToken) {
       return false;
     }
-    
+    console.log('2');
     if(!isLoggedIn) {
       return false;
     }
+    console.log('3');
     
     const response = await authFetch(`/user-devices/add`, {
       method: 'POST',
@@ -95,52 +99,47 @@ const App = () => {
     });
   }
 
-const initPush = async () => {
-  let granted = false;
+  const requestIOSPermission = async () => {
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  
+    if (enabled) {
+      fetchFcmToken(getFcmToken());
 
-  if (Platform.OS === 'android') {
-    const hasPermission = await PermissionsAndroid.check(
-      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
-    );
-
-    if (!hasPermission) {
-      const result = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
-      );
-      granted = result === PermissionsAndroid.RESULTS.GRANTED;
-    } else {
-      granted = true;
-    }
-
-  } else {
-    const authStatus = await messaging().hasPermission?.();
-    if (!authStatus) {
-      const newStatus = await messaging().requestPermission();
-      granted =
-        newStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        newStatus === messaging.AuthorizationStatus.PROVISIONAL;
-    } else {
-      granted = true;
+      messaging().onMessage(async remoteMessage => {
+        Alert.alert(remoteMessage.notification.title, remoteMessage.notification.body);
+      });
     }
   }
 
-  if (!granted) return;
+  const requestAndroidPermission = async () => {
+    const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      fetchFcmToken(getFcmToken());
 
-  const token = await messaging().getToken();
-  await fetchFcmToken(token);
-};
+      messaging().onMessage(async remoteMessage => {
+        Alert.alert(remoteMessage.notification.title, remoteMessage.notification.body);
+      });
+    }
+  }
 
-useEffect(() => {
-  const unsubscribe = messaging().onTokenRefresh(token => {
-    fetchFcmToken(token);
-  });
+  const getFcmToken = async () => {
+    const fcmFToken = await messaging().getToken();
+    setFcmToken(fcmFToken);
+    return fcmFToken;
+  };
 
-  return unsubscribe;
-}, []);
+  useEffect(() => {
+    
+    if(Platform.OS==='android') {
+      requestAndroidPermission();
+    } else {
+      requestIOSPermission();
+    }
 
-useEffect(() => {
-  loginCheck();
-}, []);
+  }, []);
 
 useEffect(() => {
   if (!isLoggedIn) return;
@@ -148,7 +147,7 @@ useEffect(() => {
   getPt();
   getEntrance();
   getEnroll();
-  initPush();  
+  getFcmToken();
 }, [isLoggedIn]);  
 
   useEffect(() => {
