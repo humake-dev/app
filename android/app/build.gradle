@@ -82,7 +82,7 @@ android {
         applicationId "kr.co.humake"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 24
+        versionCode 23
         versionName "5.0"
     }
     signingConfigs {
@@ -97,7 +97,7 @@ android {
         storePassword System.getenv("MY_KEYSTORE_PASSWORD")
         keyAlias System.getenv("MY_KEY_ALIAS")
         keyPassword System.getenv("MY_KEY_PASSWORD")
-    }        
+    }          
     }
     buildTypes {
         debug {

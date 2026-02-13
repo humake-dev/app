@@ -52,8 +52,8 @@ import { UserProvider } from './UserContext';
 import { MessageProvider } from "./MessageContext";
 import BarcodeScreen from './BarcodeScreen';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import messaging from '@react-native-firebase/messaging';
-import { Buffer } from 'buffer';
+import { getMessaging, getToken } from 'firebase/messaging';
+import { initializeApp } from 'firebase/app';
 import { authFetch, fetchUser } from './src/utils/api';
 
 
@@ -67,21 +67,24 @@ const App = () => {
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [fcmToken, setFcmToken] = useState(false);
   const navigation = useRef();
+  const messaging = useRef(null);
   const [user, setUser] = useState(null);
   const [attendanceTotal, setAttendanceTotal] = useState(0);
   const [reservationTotal, setReservationTotal] = useState(0);
   const [enrollInfo, setEnrollInfo] = useState({});
 
-  const fetchFcmToken = async (fcmToken) => {
+  const fetchFcmToken = async () => {
     console.log('1');
     if(!fcmToken) {
       return false;
     }
-    
+    console.log('2');
     if(!isLoggedIn) {
       return false;
     }
+    console.log('3');
     
     const response = await authFetch(`/user-devices/add`, {
       method: 'POST',
@@ -95,53 +98,65 @@ const App = () => {
     });
   }
 
-const initPush = async () => {
-  let granted = false;
+  const requestIOSPermission = async () => {
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  
+    if (enabled) {
+      fetchFcmToken(getFcmToken());
 
-  if (Platform.OS === 'android') {
-    const hasPermission = await PermissionsAndroid.check(
-      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
-    );
-
-    if (!hasPermission) {
-      const result = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
-      );
-      granted = result === PermissionsAndroid.RESULTS.GRANTED;
-    } else {
-      granted = true;
-    }
-
-  } else {
-    const authStatus = await messaging().hasPermission?.();
-    if (!authStatus) {
-      const newStatus = await messaging().requestPermission();
-      granted =
-        newStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        newStatus === messaging.AuthorizationStatus.PROVISIONAL;
-    } else {
-      granted = true;
+      messaging().onMessage(async remoteMessage => {
+        Alert.alert(remoteMessage.notification.title, remoteMessage.notification.body);
+      });
     }
   }
 
-  if (!granted) return;
+  const requestAndroidPermission = async () => {
+    const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      fetchFcmToken(getFcmToken());
 
-  const token = await messaging().getToken();
-  await fetchFcmToken(token);
-};
+      messaging().onMessage(async remoteMessage => {
+        Alert.alert(remoteMessage.notification.title, remoteMessage.notification.body);
+      });
+    }
+  }
 
+  const getFcmToken = async () => {
+    /* const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID",
+      measurementId: "YOUR_MEASUREMENT_ID" // optional
+    };
 
-useEffect(() => {
-  const unsubscribe = messaging().onTokenRefresh(token => {
-    fetchFcmToken(token);
-  });
+    const app = initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);    
+    const token = await getToken(messaging); */
+    // const fcmFToken = await messaging().getToken();
 
-  return unsubscribe;
-}, []);
+    console.log('here2');
+    //setFcmToken(fcmFToken);
 
-useEffect(() => {
-  loginCheck();
-}, []);
+    console.log('here3');
+    //return fcmFToken;
+  };
+
+  useEffect(() => {
+    if(Platform.OS==='android') {
+      requestAndroidPermission();
+    } else {
+      requestIOSPermission();
+    }
+
+    loginCheck();
+    fetchFcmToken();
+  }, []);
 
 useEffect(() => {
   if (!isLoggedIn) return;
@@ -149,7 +164,7 @@ useEffect(() => {
   getPt();
   getEntrance();
   getEnroll();
-  initPush();  
+  getFcmToken();
 }, [isLoggedIn]);  
 
   useEffect(() => {
@@ -348,10 +363,9 @@ const loginCheck = async () => {
     const userData = await fetchUser();
     setUser(userData);
 
+    // ✅ 여기서 유저 상태 복구
     setIsLoggedIn(true);
-    if (userContext && userContext.setUser) {
-      userContext.setUser(userData);
-    }
+    if (userContext && userContext.setUser) userContext.setUser(userData);
     
   } catch (e) {
     console.log("토큰 파싱 실패", e);
@@ -448,7 +462,6 @@ const loginCheck = async () => {
                   <Stack.Screen name="Trainer" component={TrainerScreen} options={{ title: t('menu.trainer') }} />
                   <Stack.Screen name="TrainerDetail" component={TrainerDetailScreen} options={{ title: t('menu.trainer') }}/>
                   <Stack.Screen name="Attendance" component={AttendanceScreen} options={{ title: t('menu.attendance') }}/>
-                  <Stack.Screen name="Exercise" component={ExerciseScreen} options={{ title: t('menu.exercise') }}/>                  
                   <Stack.Screen name="Pt" component={PtScreen} options={{ title: t('menu.pt') }}/>
                   <Stack.Screen name="UserWeight" component={UserWeightScreen} options={{ title: t('menu.user_weight') }}/>
                   <Stack.Screen name="UserWeightForm" component={UserWeightFormScreen} options={{ title: t('menu.user_weight') }}/>
@@ -517,6 +530,15 @@ targetTab: 'first',
 });
 }}>
                         <Text style={styles.sideMenuItemText}>{t('menu.message')}</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity 
+                        style={styles.sideMenuItem}
+                        onPress={() => {
+                          closeMenu();
+                          navigation.current.navigate('Exercise');
+                        }}>
+                        <Text style={styles.sideMenuItemText}>{t('menu.exercise')}</Text>
                       </TouchableOpacity>
 
                       <TouchableOpacity 

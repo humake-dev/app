@@ -81,7 +81,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 		</array>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>We need access to save barcode to your photo library</string>
 </dict>
 </plist>
