@@ -137,6 +137,7 @@ const App = () => {
       requestIOSPermission();
     }
 
+    loginCheck();
   }, []);
 
 useEffect(() => {
@@ -145,8 +146,7 @@ useEffect(() => {
   getPt();
   getEntrance();
   getEnroll();
-  getFcmToken();
-}, [isLoggedIn]);  
+}, [isLoggedIn]);
 
   useEffect(() => {
     const updateDimensions = () => {
