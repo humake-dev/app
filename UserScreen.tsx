@@ -253,7 +253,7 @@ resizeMode="cover"
       onPress={() => navigation.navigate('UserHeightForm')}
     >
       <Text style={styles.editButtonText}>
-        {user?.user_height?.height ? '수정하기' : '입력'}
+        {user?.user_height?.height ? t('common.edit') : t('common.insert')}
       </Text>
     </TouchableOpacity>
   </View>
@@ -456,7 +456,7 @@ editButtonText: {
 
 userNumberRow: {
 flexDirection: 'row',
-alignItems: 'center', // ⭐ 세로 중앙 정렬
+alignItems: 'center',
 margin: 10,
 },
 
@@ -481,7 +481,7 @@ fontWeight: '600',
         resizeMode: 'contain',
       },
 addButton: {
-  backgroundColor: '#34C759', // 미입력일 때 강조
+  backgroundColor: '#34C759',
 },
   itemTitle: {
     fontSize: 16,

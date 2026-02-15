@@ -10,6 +10,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useMessageContext } from './MessageContext';
 import { authFetch } from './src/utils/api';
 
 const MessageDetailScreen = ({ navigation }) => {
@@ -17,6 +18,7 @@ const MessageDetailScreen = ({ navigation }) => {
   const route = useRoute();
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { handleDeleteMessage } = useMessageContext();  
 
   // 상담 ID가 없을 때
   if (!route.params?.id) {
@@ -78,26 +80,6 @@ const MessageDetailScreen = ({ navigation }) => {
     }
   };
 
-  const hideMessage = async () => {
-    try {
-      const response = await authFetch(`/messages/hide/${route.params.id}`, {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        // Refresh the previous screen before going back
-        navigation.setParams({ refresh: true });
-        goBackToList();
-      } else {
-        throw new Error('Failed to hide message');
-      }
-    } catch (error) {
-      console.error('Error hiding message:', error);
-    }
-  };
 
   const goBackToList = () => {
     navigation.setParams({ refresh: true });
@@ -129,15 +111,6 @@ const MessageDetailScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Ionicons 
-          name="close-circle" 
-          size={24} 
-          color="#666"
-          style={styles.closeButton}
-          onPress={hideMessage}
-        />
-      </View>
       <ScrollView style={styles.scrollView}>
         <View style={styles.content}>
           <View style={styles.contentContainer}>
@@ -162,57 +135,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1
   },
-  header: {
-    height: 50,
-    justifyContent: 'flex-end',
-    paddingRight: 16,
-  },
-  closeButton: {
-    position: 'absolute',
-    right: 8,
-    top: 55,
-    zIndex: 99,
-  },
-  categoryContainer: {
-    height: 40,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  categoryScroll: {
-    paddingVertical: 8,
-  },
-  categoryButton: {
-    marginRight: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  categoryButtonActive: {
-    backgroundColor: '#007AFF',
-  },
-  categoryText: {
-    fontSize: 16,
-    color: '#666',
-  },
-  categoryTextActive: {
-    color: '#fff',
-  },
   scrollView: {
     flex: 1,
   },
   content: {
     padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  date: {
-    fontSize: 14,
-    color: '#666',
-    alignSelf: 'flex-end',
   },
   contentContainer: {
     backgroundColor: '#f8f9fa',
@@ -270,6 +197,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 32,
   },
+  closeButton: {
+    position: 'absolute',
+    right: 8,
+    top: 10,
+    zIndex: 99,
+  },  
 });
 
 export default MessageDetailScreen;

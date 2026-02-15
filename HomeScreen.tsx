@@ -42,6 +42,7 @@ const HomeScreen = ({navigation, route, attendanceTotal, reservationTotal, enrol
     const [changeBrightness, setChangeBrightness] = useState(false);
     const windowWidth = Dimensions.get('window').width;
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const [branch, setBranch] = useState();    
 
     const userContext = useUser();
     const user = userContext?.user;
@@ -54,7 +55,35 @@ const HomeScreen = ({navigation, route, attendanceTotal, reservationTotal, enrol
       }
     }, [route.params]);
 
+useEffect(() => {
+  const fetchBranch = async () => {
+    try {
+      const response = await authFetch(`/branches/me`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
+      if (!response.ok) {
+        throw new Error('Failed to fetch trainers data');
+      }
+
+
+
+      const data = await response.json();
+      console.log(data);      
+      setBranch(data);
+
+
+    } catch (error) {
+      console.error('Error fetching trainers:', error);
+    }
+  };
+
+  fetchBranch();
+}, []);
+
+    
       // 앱 시작 시 저장된 탭 인덱스 로딩
   useEffect(() => {
     const loadLastTab = async () => {
@@ -105,7 +134,7 @@ const HomeScreen = ({navigation, route, attendanceTotal, reservationTotal, enrol
             setBrightness(luminous);
           });
         }
-    }, [brightness]);
+    }, []);
 
 
 
@@ -129,11 +158,22 @@ const HomeScreen = ({navigation, route, attendanceTotal, reservationTotal, enrol
   return (
     <View style={styles.container}>
       <View style={styles.imageContainer}>
+
+            {branch?.picture?.picture_url ? (
+              <Image
+                source={{uri: `https://humake.blob.core.windows.net/humake/branch/${branch.id}/${branch.picture.picture_url}`}}
+                style={styles.mainImage}
+                resizeMode="cover"
+              />
+            ) : (
     <Image
       source={require('./assets/main.jpg')}
       style={[styles.mainImage, { width: windowWidth }]}
       resizeMode="cover"
     />
+            )}
+
+
   </View>
       {/* Tab View */}
       <View style={styles.tabContainer}>
