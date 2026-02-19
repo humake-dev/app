@@ -83,7 +83,7 @@ const fetchFcmToken = async (token) => {
     body: JSON.stringify({
       token: token,
       os: Platform.OS
-    })
+    }),
     headers: {
       "Content-Type": "application/json",
     },
