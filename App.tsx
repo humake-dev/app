@@ -67,7 +67,7 @@ const App = () => {
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [isMenuVisible, setIsMenuVisible] = useState(false);
-  const [fcmToken, setFcmToken] = useState(false);
+  const [fcmToken, setFcmToken] = useState(null);
   const navigation = useRef();
   const [user, setUser] = useState(null);
   const [attendanceTotal, setAttendanceTotal] = useState(0);
@@ -81,9 +81,9 @@ const fetchFcmToken = async (token) => {
   await authFetch(`/user-devices/add`, {
     method: 'POST',
     body: JSON.stringify({
-      token: Buffer.from(token).toString('base64'),
+      token: token,
       os: Platform.OS
-    }),
+    })
     headers: {
       "Content-Type": "application/json",
     },
@@ -99,7 +99,6 @@ const requestIOSPermission = async () => {
 
   if (enabled) {
     const token = await getFcmToken();
-    fetchFcmToken(token);
 
     messaging().onMessage(async remoteMessage => {
       Alert.alert(remoteMessage.notification.title, remoteMessage.notification.body);
@@ -111,7 +110,6 @@ const requestIOSPermission = async () => {
     const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
     const token = await getFcmToken();
-    fetchFcmToken(token);
 
       messaging().onMessage(async remoteMessage => {
         Alert.alert(remoteMessage.notification.title, remoteMessage.notification.body);
@@ -122,8 +120,13 @@ const requestIOSPermission = async () => {
 const getFcmToken = async () => {
   const token = await messaging().getToken();
   setFcmToken(token);
-  return token;
+    return token;
 };
+
+useEffect(() => {
+  if (!isLoggedIn || !fcmToken) return;
+  fetchFcmToken(fcmToken);
+}, [isLoggedIn, fcmToken]);
 
   useEffect(() => {
     
@@ -142,7 +145,18 @@ useEffect(() => {
   getPt();
   getEntrance();
   getEnroll();
+  if (!fcmToken) {
+    getFcmToken();
+  }
 }, [isLoggedIn]);
+
+useEffect(() => {
+  const unsubscribe = messaging().onTokenRefresh(token => {
+    setFcmToken(token);
+  });
+
+  return unsubscribe;
+}, [])
 
   useEffect(() => {
     const updateDimensions = () => {
