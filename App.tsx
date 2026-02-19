@@ -130,7 +130,7 @@ useEffect(() => {
 
   const sendToken = async () => {
     try {
-      await authFetch(`/user-devices/add`, {
+      await authFetch(`/user-devices`, {
         method: 'POST',
         body: JSON.stringify({
           token: fcmToken,
@@ -155,9 +155,6 @@ useEffect(() => {
   getPt();
   getEntrance();
   getEnroll();
-  if (!fcmToken) {
-    getFcmToken();
-  }
 }, [isLoggedIn]);
 
 
