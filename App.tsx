@@ -74,48 +74,44 @@ const App = () => {
   const [reservationTotal, setReservationTotal] = useState(0);
   const [enrollInfo, setEnrollInfo] = useState({});
 
-  const fetchFcmToken = async () => {
-    console.log('1');
-    if(!fcmToken) {
-      return false;
-    }
-    console.log('2');
-    if(!isLoggedIn) {
-      return false;
-    }
-    console.log('3');
-    
-    const response = await authFetch(`/user-devices/add`, {
-      method: 'POST',
-      body: JSON.stringify({
-          token: Buffer.from(fcmToken).toString('base64'),
-          os: Platform.OS
-        }),
-      headers: {
-        "Content-Type": "application/json",
-      },
+const fetchFcmToken = async (token) => {
+  if(!token) return;
+  if(!isLoggedIn) return;
+
+  await authFetch(`/user-devices/add`, {
+    method: 'POST',
+    body: JSON.stringify({
+      token: Buffer.from(token).toString('base64'),
+      os: Platform.OS
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+};
+
+const requestIOSPermission = async () => {
+  const authStatus = await messaging().requestPermission();
+
+  const enabled =
+    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+  if (enabled) {
+    const token = await getFcmToken();
+    fetchFcmToken(token);
+
+    messaging().onMessage(async remoteMessage => {
+      Alert.alert(remoteMessage.notification.title, remoteMessage.notification.body);
     });
   }
-
-  const requestIOSPermission = async () => {
-    const authStatus = await messaging().requestPermission();
-    const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-  
-    if (enabled) {
-      fetchFcmToken(getFcmToken());
-
-      messaging().onMessage(async remoteMessage => {
-        Alert.alert(remoteMessage.notification.title, remoteMessage.notification.body);
-      });
-    }
-  }
+};
 
   const requestAndroidPermission = async () => {
     const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      fetchFcmToken(getFcmToken());
+    const token = await getFcmToken();
+    fetchFcmToken(token);
 
       messaging().onMessage(async remoteMessage => {
         Alert.alert(remoteMessage.notification.title, remoteMessage.notification.body);
@@ -123,11 +119,11 @@ const App = () => {
     }
   }
 
-  const getFcmToken = async () => {
-    const fcmFToken = await messaging().getToken();
-    setFcmToken(fcmFToken);
-    return fcmFToken;
-  };
+const getFcmToken = async () => {
+  const token = await messaging().getToken();
+  setFcmToken(token);
+  return token;
+};
 
   useEffect(() => {
     
