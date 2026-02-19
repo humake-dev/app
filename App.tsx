@@ -67,77 +67,87 @@ const App = () => {
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [isMenuVisible, setIsMenuVisible] = useState(false);
-  const [fcmToken, setFcmToken] = useState(null);
   const navigation = useRef();
   const [user, setUser] = useState(null);
   const [attendanceTotal, setAttendanceTotal] = useState(0);
   const [reservationTotal, setReservationTotal] = useState(0);
   const [enrollInfo, setEnrollInfo] = useState({});
+  const [fcmToken, setFcmToken] = useState(null);
+//
+useEffect(() => {
+  let unsubscribeTokenRefresh;
 
-const fetchFcmToken = async (token) => {
-  if(!token) return;
-  if(!isLoggedIn) return;
+  const initFCM = async () => {
+    try {
+      // ✅ iOS 전용 (필수)
+      if (Platform.OS === 'ios') {
+        await messaging().registerDeviceForRemoteMessages();
+        await messaging().requestPermission();
+      }
 
-  await authFetch(`/user-devices/add`, {
-    method: 'POST',
-    body: JSON.stringify({
-      token: token,
-      os: Platform.OS
-    }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-};
+      // ✅ Android 13+ 권한
+      if (Platform.OS === 'android') {
+        await messaging().requestPermission();
+      }
 
-const requestIOSPermission = async () => {
-  const authStatus = await messaging().requestPermission();
+      // ✅ 토큰 획득
+      const token = await messaging().getToken();
+      setFcmToken(token);
 
-  const enabled =
-    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-
-  if (enabled) {
-    const token = await getFcmToken();
-
-    messaging().onMessage(async remoteMessage => {
-      Alert.alert(remoteMessage.notification.title, remoteMessage.notification.body);
-    });
-  }
-};
-
-  const requestAndroidPermission = async () => {
-    const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-    const token = await getFcmToken();
-
+      // ✅ 포그라운드 메시지
       messaging().onMessage(async remoteMessage => {
-        Alert.alert(remoteMessage.notification.title, remoteMessage.notification.body);
+        Alert.alert(
+          remoteMessage.notification?.title ?? '',
+          remoteMessage.notification?.body ?? ''
+        );
       });
+
+      // ✅ 토큰 갱신 리스너
+      unsubscribeTokenRefresh = messaging().onTokenRefresh(token => {
+        setFcmToken(token);
+      });
+
+    } catch (e) {
+      console.log('FCM INIT ERROR:', e);
     }
-  }
+  };
 
-const getFcmToken = async () => {
-  const token = await messaging().getToken();
-  setFcmToken(token);
-    return token;
-};
+  initFCM();
 
+  return () => {
+    if (unsubscribeTokenRefresh) {
+      unsubscribeTokenRefresh();
+    }
+  };
+}, []);
+
+
+//
+// 2️⃣ 로그인 + 토큰 둘 다 준비되면 서버 전송
+//
 useEffect(() => {
   if (!isLoggedIn || !fcmToken) return;
-  fetchFcmToken(fcmToken);
-}, [isLoggedIn, fcmToken]);
 
-  useEffect(() => {
-    
-    if(Platform.OS==='android') {
-      requestAndroidPermission();
-    } else {
-      requestIOSPermission();
+  const sendToken = async () => {
+    try {
+      await authFetch(`/user-devices/add`, {
+        method: 'POST',
+        body: JSON.stringify({
+          token: fcmToken,
+          os: Platform.OS
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (e) {
+      console.log('FCM SEND ERROR:', e);
     }
+  };
 
-    loginCheck();
-  }, []);
+  sendToken();
+
+}, [isLoggedIn, fcmToken]);
 
 useEffect(() => {
   if (!isLoggedIn) return;
@@ -150,13 +160,6 @@ useEffect(() => {
   }
 }, [isLoggedIn]);
 
-useEffect(() => {
-  const unsubscribe = messaging().onTokenRefresh(token => {
-    setFcmToken(token);
-  });
-
-  return unsubscribe;
-}, [])
 
   useEffect(() => {
     const updateDimensions = () => {
