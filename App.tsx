@@ -114,6 +114,7 @@ useEffect(() => {
 
   initFCM();
 
+
   return () => {
     if (unsubscribeTokenRefresh) {
       unsubscribeTokenRefresh();
@@ -121,6 +122,9 @@ useEffect(() => {
   };
 }, []);
 
+useEffect(() => {
+  loginCheck();
+}, []);
 
 //
 // 2️⃣ 로그인 + 토큰 둘 다 준비되면 서버 전송
