@@ -51,7 +51,11 @@
     },
     "login": {
       "username": "Username",
-      "password": "Password"
+      "password": "Password",
+      "id_not_valid": "The ID is in the format branch number#user number",
+      "password_not_valid": "Please enter only numbers for your password",
+      "not_exists": "The user does not exist or the password is incorrect",
+      "fail": "Login connect fail"
     },
       "counsel":   {
         "add": "Counsel Add",

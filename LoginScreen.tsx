@@ -1,5 +1,16 @@
 import React, { useState, useContext, useRef } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
+import { 
+  View, 
+  TextInput, 
+  TouchableOpacity, 
+  Text, 
+  StyleSheet, 
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -16,10 +27,34 @@ const LoginScreen = () => {
 
   const usernameRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
+
+  const [usernameError, setUsernameError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   
   
 const handleLogin = async () => {
   try {
+  const usernameRegex = /^\d+#\d+$/;
+  const passwordRegex = /^\d+$/;
+
+  let valid = true;
+
+  if (!usernameRegex.test(username)) {
+    setUsernameError(t('login.id_not_valid'));
+    valid = false;
+  } else {
+    setUsernameError('');
+  }
+
+  if (!passwordRegex.test(password)) {
+    setPasswordError(t('login.password_not_valid'));
+    valid = false;
+  } else {
+    setPasswordError('');
+  }
+
+  if (!valid) return;
+
     const body =`username=${encodeURIComponent(username)}` +`&password=${encodeURIComponent(password)}`;
 
     const res = await fetch(`${BASE_URL}/login`, {
@@ -32,8 +67,7 @@ const handleLogin = async () => {
 
     if (!res.ok) {
       const text = await res.text();
-      console.error(text);
-      throw new Error("로그인 실패");
+      throw new Error(t('login.not_exists'));
     }
 
     const data = await res.json();
@@ -48,7 +82,7 @@ const handleLogin = async () => {
     });
 
     if (!resUserData.ok) {
-      throw new Error("유저 정보 조회 실패");
+      throw new Error(t('login.not_exists'));
     }
 
     const userData = await resUserData.json();
@@ -59,44 +93,75 @@ const handleLogin = async () => {
     }
 
   } catch (error) {
-    Alert.alert("Error", "로그인 실패");
+    Alert.alert("Error", t('login.fail'));
     console.error(error);
   }
 };
 
 
   return (
+<KeyboardAvoidingView
+  style={{ flex: 1 }}
+  behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+  keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
+>
+  <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
     <View style={styles.container}>
       <Text style={styles.title}>{t('menu.login')}</Text>
       
 <TextInput
   ref={usernameRef}
-  style={styles.input}
+  style={[
+    styles.input,
+    usernameError ? styles.inputError : null
+  ]}
   placeholder={t('login.username')}
   placeholderTextColor="gray"
   value={username}
-  onChangeText={setUsername}
+  onChangeText={(text) => {
+    const filtered = text.replace(/[^0-9#]/g, '');
+    setUsername(filtered);
+    setUsernameError('');
+  }}
   autoCapitalize="none"
   returnKeyType="next"
-  onSubmitEditing={() => passwordRef.current?.focus()} // Enter 누르면 다음 필드로
+  onSubmitEditing={() => passwordRef.current?.focus()}
 />
+
+{usernameError ? (
+  <Text style={styles.errorText}>{usernameError}</Text>
+) : null}
 
 <TextInput
   ref={passwordRef}
-  style={styles.input}
+  style={[
+    styles.input,
+    passwordError ? styles.inputError : null
+  ]}
   placeholder={t('login.password')}
   placeholderTextColor="gray"
   value={password}
-  onChangeText={setPassword}
+  onChangeText={(text) => {
+    const onlyNumbers = text.replace(/[^0-9]/g, '');
+    setPassword(onlyNumbers);
+    setPasswordError('');
+  }}
   secureTextEntry
+  keyboardType="number-pad"
   returnKeyType="done"
-  onSubmitEditing={handleLogin} // Enter 누르면 로그인
+  onSubmitEditing={handleLogin}
 />
+
+{passwordError ? (
+  <Text style={styles.errorText}>{passwordError}</Text>
+) : null}
       
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>{t('menu.login')}</Text>
       </TouchableOpacity>
     </View>
+  </TouchableWithoutFeedback>
+</KeyboardAvoidingView>
   );
 };
 
@@ -130,6 +195,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  inputError: {
+    borderColor: 'red',
+  },
+  errorText: {
+    color: 'red',
+    marginTop: -10,
+    marginBottom: 10,
+    fontSize: 12,
+  }
 });
 
 export default LoginScreen;

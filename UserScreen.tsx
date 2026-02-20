@@ -190,12 +190,7 @@ return (
 
 <View style={styles.userNumberRow}>
 <View style={styles.memberImageContainer}>
-<TouchableOpacity
-onPress={() =>
-uploadProfileImageFlow(handleUploadProfileImage, user.id)
-}
-activeOpacity={0.8}
->
+<TouchableOpacity activeOpacity={0.8}>
 {user?.picture?.picture_url ? (
 <Lightbox activeProps={{ style: styles.fullScreenImage }}>
 <Image

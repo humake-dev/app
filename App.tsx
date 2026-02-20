@@ -52,7 +52,6 @@ import { UserProvider } from './UserContext';
 import { MessageProvider } from "./MessageContext";
 import BarcodeScreen from './BarcodeScreen';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Buffer } from 'buffer';
 import messaging from '@react-native-firebase/messaging';
 import { authFetch, fetchUser } from './src/utils/api';
 

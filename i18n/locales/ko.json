@@ -51,7 +51,11 @@
     },
     "login": {
       "username": "아이디",
-      "password": "비밀번호"
+      "password": "비밀번호(전화번호)",
+      "id_not_valid": "아이디는 지점번호#사용자번호 형식입니다",
+      "password_not_valid": "비밀번호는 숫자만 입력해주세요",
+      "not_exists": "해당사용자가 없거나 비밀번호가 맞지 않습니다",
+      "fail": "로그인 접속실패"
     },
     "counsel": {
       "form": "상담 내용을 작성해주세요",
