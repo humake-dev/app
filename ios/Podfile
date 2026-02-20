@@ -22,6 +22,9 @@ end
 target 'humake' do
   config = use_native_modules!
 
+  pod 'GoogleUtilities', :modular_headers => true
+  pod 'FirebaseCoreInternal', :modular_headers => true
+
   use_react_native!(
     :path => config[:reactNativePath],
     :app_path => "#{Pod::Config.instance.installation_root}/.."
@@ -34,5 +37,6 @@ target 'humake' do
       :mac_catalyst_enabled => false,
     )
   end
+end
 end
 
