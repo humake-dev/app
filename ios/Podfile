@@ -38,5 +38,4 @@ target 'humake' do
     )
   end
 end
-end
 
