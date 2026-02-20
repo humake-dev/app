@@ -19,13 +19,11 @@ if linkage != nil
   use_frameworks! :linkage => :static
 end
 
+use_modular_headers!
+
 target 'humake' do
   config = use_native_modules!
-<<<<<<< HEAD
 
-=======
-  
->>>>>>> 1f3069c2a0d319af10d41356918c29e8a981f4ea
   use_react_native!(
     :path => config[:reactNativePath],
     :app_path => "#{Pod::Config.instance.installation_root}/.."
