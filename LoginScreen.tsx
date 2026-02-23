@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef } from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 import { 
   View, 
   TextInput, 
@@ -30,6 +30,29 @@ const LoginScreen = () => {
 
   const [usernameError, setUsernameError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  
+  useEffect(() => {
+    autoLogin();
+  }, []);
+  
+  const autoLogin = async () => {
+    try {
+      const result = await AsyncStorage.getItem("@Common:login_token");
+      console.log(result);
+
+      if (!result) return;
+
+      const ls = result.split("||");
+
+      const uid = ls[0] + "#" + ls[1];
+      const phone = ls[2];
+
+      setUsername(uid);
+      setPassword(phone);
+    }   catch (e) {
+      console.log("autoLogin error", e);
+    }
+  };
   
   
 const handleLogin = async () => {
@@ -86,6 +109,9 @@ const handleLogin = async () => {
     }
 
     const userData = await resUserData.json();
+
+    AsyncStorage.setItem('@Common:login_token', userData.branch_id.toString()+'||'+userData.id.toString()+'||'+userData.phone.toString());
+
     setUser(userData);
     if (userContext) {
       if (userContext.setIsLoggedIn) userContext.setIsLoggedIn(true);
