@@ -45,7 +45,7 @@ const UserScreen = () => {
   useEffect(() => {
     const fetchEnrolls = async () => {
       try {
-        const response = await authFetch('/enrolls?primary_only=false', {
+        const response = await authFetch('/enrolls?primary_only=false&current_only=false', {
           headers: { "Content-Type": "application/json" },
         });
         if (response.ok) {
@@ -177,8 +177,6 @@ return (
   const ThirdRoute = ({navigation, t, user}) => {
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
-        </View>
         <ScrollView style={styles.scrollView}>
           <View style={styles.content}>
 
@@ -211,20 +209,9 @@ resizeMode="cover"
 </TouchableOpacity>
 </View>
 
-
-{/* 👉 이름을 같은 row 안으로 */}
 <Text style={styles.userName}>
 {user?.name}
 </Text>
-</View>
-
-
-
-
-<View style={styles.userNumberRow}>
-  <Text>
-    사용자번호 : {user?.branch_id}#{user?.id}
-  </Text>
 </View>
 
 <View style={styles.trainerRow}>
@@ -299,11 +286,6 @@ resizeMode="cover"
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    height: 50,
-    justifyContent: 'flex-end',
-    paddingRight: 16,
   },
   scrollView: {
     flex: 1,

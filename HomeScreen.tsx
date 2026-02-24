@@ -596,14 +596,6 @@ const downloadBarcode = async () => {
               }}
             />
             </View>
-            <Text style={{ 
-              marginTop: 15, 
-              fontSize: 20, 
-              color: '#333',
-              fontWeight: 'bold'
-            }}>
-              {user.access_card.card_no}
-            </Text>
             <TouchableOpacity 
               style={{
                 marginTop: 20,

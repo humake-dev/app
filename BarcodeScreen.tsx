@@ -45,14 +45,6 @@ const BarcodeScreen = () => {
                 textColor: '#000'
               }}
             />
-                        <Text style={{ 
-                          marginTop: 15, 
-                          fontSize: 20, 
-                          color: '#333',
-                          fontWeight: 'bold'
-                        }}>
-                          {user.access_card.card_no}
-                        </Text>
       </View>
     </SafeAreaView>
   );
