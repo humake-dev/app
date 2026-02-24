@@ -59,13 +59,14 @@
     },
       "counsel":   {
         "add": "Counsel Add",
+        "selectCourse": "Select Course",
         "selectDate": "Select Date",
         "selectOption": "Select Option",
-        "option1": "Option 1",
-        "option2": "Option 2",
-        "content": "Counsel Content",
-        "contentPlaceholder": "Counsel Content",
-        "no_items": "No Counsel"
+        "content": "Content",
+        "contentPlaceholder": "",
+        "no_items": "No Counsel",
+        "default": "default",
+        "pt": "pt"
       },
       "notice": {
         "no_items": "No Notice"

@@ -16,6 +16,13 @@ const CounselFormScreen = ({ navigation }) => {
   const [content, setContent] = useState('');
   const [selectedCourse, setSelectedCourse] = useState('default');
 
+
+  const courses = [
+    { label: t('counsel.default'), value: 'default' },
+    { label: t('counsel.pt'), value: 'pt' },
+  ];
+  const selectedLabel = courses.find(c => c.value === selectedCourse)?.label ?? '';
+
   const handleSubmit = async () => {
     try {   
       const response = await authFetch('/counsels', {
@@ -47,16 +54,71 @@ const CounselFormScreen = ({ navigation }) => {
     <ScrollView style={styles.container}>
       <View style={styles.formContainer}>
         <Text style={styles.label}>{t('counsel.selectCourse')}</Text>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={selectedCourse}
-            onValueChange={(itemValue) => setSelectedCourse(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item label={t('counsel.course1')} value="default" />
-            <Picker.Item label={t('counsel.course2')} value="pt" />
-          </Picker>
-        </View>
+
+        {/* ANDROID */}
+        {Platform.OS === 'android' && (
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={selectedCourse}
+              onValueChange={setSelectedCourse}
+              mode="dropdown"
+              style={styles.picker}
+            >
+              {courses.map(course => (
+                <Picker.Item
+                  key={course.value}
+                  label={course.label}
+                  value={course.value}
+                />
+              ))}
+            </Picker>
+          </View>
+        )}
+
+        {/* IOS */}
+        {Platform.OS === 'ios' && (
+          <>
+            <TouchableOpacity
+              style={styles.iosPickerButton}
+              onPress={() => setShowPicker(true)}
+            >
+              <Text style={styles.iosPickerText}>{selectedLabel}</Text>
+            </TouchableOpacity>
+
+            <Modal
+              visible={showPicker}
+              transparent
+              animationType="slide"
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                  <View style={styles.modalHeader}>
+                    <TouchableOpacity
+                      onPress={() => setShowPicker(false)}
+                    >
+                      <Text style={styles.doneText}>
+                        {t('common.done')}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  <Picker
+                    selectedValue={selectedCourse}
+                    onValueChange={setSelectedCourse}
+                  >
+                    {courses.map(course => (
+                      <Picker.Item
+                        key={course.value}
+                        label={course.label}
+                        value={course.value}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+              </View>
+            </Modal>
+          </>
+        )}
 
         <Text style={styles.label}>{t('counsel.content')}</Text>
         <TextInput
@@ -79,7 +141,6 @@ const CounselFormScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f4f4f4 ',
   },
   formContainer: {
     padding: 20,
@@ -131,6 +192,46 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+
+  iosPickerButton: {
+  backgroundColor: '#fff',
+  borderWidth: 1,
+  borderColor: '#ddd',
+  borderRadius: 8,
+  padding: 16,
+  marginBottom: 20,
+},
+
+iosPickerText: {
+  fontSize: 16,
+  color: '#333',
+},
+
+modalOverlay: {
+  flex: 1,
+  justifyContent: 'flex-end',
+  backgroundColor: 'rgba(0,0,0,0.4)',
+},
+
+modalContent: {
+  backgroundColor: '#fff',
+  borderTopLeftRadius: 20,
+  borderTopRightRadius: 20,
+  paddingBottom: 20,
+},
+
+modalHeader: {
+  alignItems: 'flex-end',
+  padding: 16,
+  borderBottomWidth: 1,
+  borderColor: '#eee',
+},
+
+doneText: {
+  fontSize: 16,
+  color: '#007AFF',
+  fontWeight: '600',
+},
 });
 
 export default CounselFormScreen;
