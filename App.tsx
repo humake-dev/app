@@ -248,18 +248,26 @@ useEffect(() => {
   if (isMenuOpen) toggleMenu();
 };
 
-  const handleLogout = async () => {
-    try {
-        await AsyncStorage.multiRemove(["accessToken", "refreshToken"]);
-        
-        // Reset menu state
-        setIsMenuVisible(false);
-        setIsLoggedIn(false);
-    } catch (error) {
-      console.error('Logout error:', error);
-      Alert.alert('Error', 'An error occurred during logout');
-    }
-  };
+const handleLogout = async () => {
+  try {
+    // 1️⃣ 햄버거 즉시 복구
+    slideAnim.setValue(Dimensions.get('window').width);
+    fadeAnim.setValue(0);
+
+    setIsMenuOpen(false);
+    setIsMenuVisible(false);
+
+    // 2️⃣ 토큰 삭제
+    await AsyncStorage.multiRemove(["accessToken", "refreshToken"]);
+
+    // 3️⃣ 로그인 상태 변경
+    setIsLoggedIn(false);
+
+  } catch (error) {
+    console.error('Logout error:', error);
+    Alert.alert('Error', 'An error occurred during logout');
+  }
+};
 
 
   const getEnroll = async () => {
@@ -349,7 +357,6 @@ const loginCheck = async () => {
   const token = await AsyncStorage.getItem("accessToken");
 
   if (!token) {
-    console.log("토큰 없음 → 로그인 화면 유지");
     return;
   }
 

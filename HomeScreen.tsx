@@ -9,7 +9,8 @@ import {
   Dimensions,
   Alert,
   Platform,
-  PermissionsAndroid
+  PermissionsAndroid,
+  AppState
 } from 'react-native';
 import {Trans, useTranslation} from 'react-i18next';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
@@ -39,15 +40,17 @@ const HomeScreen = ({navigation, route, attendanceTotal, reservationTotal, enrol
       { key: 'third', title: t('tabMenu.barcode') },
     ]);
     const [brightness, setBrightness] = useState();
-    const [changeBrightness, setChangeBrightness] = useState(false);
     const windowWidth = Dimensions.get('window').width;
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const originalBrightnessRef = useRef(null);    
     const [branch, setBranch] = useState();    
 
     const userContext = useUser();
     const user = userContext?.user;
     
     const LAST_TAB_KEY = 'lastTab';
+
+
     
     useEffect(() => {
       if (route.params?.targetTab === 'first') {
@@ -99,24 +102,66 @@ useEffect(() => {
     await AsyncStorage.setItem(LAST_TAB_KEY, newIndex.toString());
   };
     
-    useEffect(() => {
-        if (index === 2) {
-         // console.log('Second 탭 보임');
-         DeviceBrightness.setBrightnessLevel(1);
-         setChangeBrightness(true);
-         timeoutRef.current = setTimeout(() => {DeviceBrightness.setBrightnessLevel(brightness)}, 17200);
-        } else  {
-          // console.log('First 탭 보임');
-          if(changeBrightness) {
-            DeviceBrightness.setBrightnessLevel(brightness);
-          }
-          
-          if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-            timeoutRef.current = null;
-          }
+
+useEffect(() => {
+  const setupBrightness = async () => {
+    if (index === 2) {
+      // 원래 밝기 저장 (한 번만)
+      if (originalBrightnessRef.current === null) {
+        originalBrightnessRef.current =
+          await DeviceBrightness.getBrightnessLevel();
+      }
+
+      await DeviceBrightness.setBrightnessLevel(1);
+
+      timeoutRef.current = setTimeout(() => {
+        if (originalBrightnessRef.current !== null) {
+          DeviceBrightness.setBrightnessLevel(
+            originalBrightnessRef.current
+          );
         }
-      }, [index]);
+      }, 17200);
+    } else {
+      restoreBrightness();
+    }
+  };
+
+  const restoreBrightness = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+
+    if (originalBrightnessRef.current !== null) {
+      DeviceBrightness.setBrightnessLevel(
+        originalBrightnessRef.current
+      );
+      originalBrightnessRef.current = null;
+    }
+  };
+
+  setupBrightness();
+
+  // 화면 사라질 때
+  return () => {
+    restoreBrightness();
+  };
+}, [index]);
+
+// 앱 백그라운드 감지
+useEffect(() => {
+  const subscription = AppState.addEventListener('change', state => {
+    if (state !== 'active') {
+      if (originalBrightnessRef.current !== null) {
+        DeviceBrightness.setBrightnessLevel(
+          originalBrightnessRef.current
+        );
+      }
+    }
+  });
+
+  return () => subscription.remove();
+}, []);
 
     const renderScene = SceneMap({
       first: () => <FirstRoute navigation={navigation} t={t} user={user} />,
@@ -384,11 +429,25 @@ const renderEnrollInfo = (enrollInfo) => {
             />
           </Lightbox>
         ) : (  */}
-          <Image
-            source={user?.picture?.picture_url ? {uri: `https://humake.blob.core.windows.net/humake/user/${user?.branch_id}/${user.picture.picture_url}`} : (require('./assets/photo_none.gif'))}
-            style={styles.memberImage}
-            resizeMode="cover"
-          />
+<TouchableOpacity activeOpacity={0.8}>
+{user?.picture?.picture_url ? (
+<Lightbox activeProps={{ style: styles.fullScreenImage }}>
+<Image
+source={{
+uri: `https://humake.blob.core.windows.net/humake/user/${user?.branch_id}/${user.picture.picture_url}`,
+}}
+style={styles.memberImage}
+resizeMode="cover"
+/>
+</Lightbox>
+) : (
+<Image
+source={require('./assets/photo_none.gif')}
+style={styles.memberImage}
+resizeMode="cover"
+/>
+)}
+</TouchableOpacity>
        {/*  )}  
       </TouchableOpacity>*/}
     </View>
