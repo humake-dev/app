@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Platform,
+  Modal,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Picker } from '@react-native-picker/picker';
@@ -15,7 +17,7 @@ const CounselFormScreen = ({ navigation }) => {
   const { t } = useTranslation();
   const [content, setContent] = useState('');
   const [selectedCourse, setSelectedCourse] = useState('default');
-
+  const [showPicker, setShowPicker] = useState(false);
 
   const courses = [
     { label: t('counsel.default'), value: 'default' },
@@ -89,6 +91,7 @@ const CounselFormScreen = ({ navigation }) => {
               visible={showPicker}
               transparent
               animationType="slide"
+              onRequestClose={() => setShowPicker(false)}
             >
               <View style={styles.modalOverlay}>
                 <View style={styles.modalContent}>
