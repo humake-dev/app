@@ -110,7 +110,7 @@ const CounselFormScreen = ({ navigation }) => {
     selectedValue={selectedCourse}
     onValueChange={setSelectedCourse}
     style={{ flex: 1 }}
-    itemStyle={{ fontSize: 18 }}
+    itemStyle={{ color: 'black', fontSize: 18 }}
   >
     {courses.map(course => (
       <Picker.Item
