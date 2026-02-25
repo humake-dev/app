@@ -100,23 +100,25 @@ const CounselFormScreen = ({ navigation }) => {
                       onPress={() => setShowPicker(false)}
                     >
                       <Text style={styles.doneText}>
-                        {t('common.done')}
+                        {t('common.select')}
                       </Text>
                     </TouchableOpacity>
                   </View>
 
-                  <Picker
-                    selectedValue={selectedCourse}
-                    onValueChange={setSelectedCourse}
-                  >
-                    {courses.map(course => (
-                      <Picker.Item
-                        key={course.value}
-                        label={course.label}
-                        value={course.value}
-                      />
-                    ))}
-                  </Picker>
+<View style={{ height: 250 }}>
+  <Picker
+    selectedValue={selectedCourse}
+    onValueChange={setSelectedCourse}
+  >
+    {courses.map(course => (
+      <Picker.Item
+        key={course.value}
+        label={course.label}
+        value={course.value}
+      />
+    ))}
+  </Picker>
+</View>
                 </View>
               </View>
             </Modal>

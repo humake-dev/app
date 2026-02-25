@@ -25,7 +25,8 @@
       "insert" : "insert",
       "edit" : "edit",
       "barcode_saved" : "Saved!",
-      "error_barcode_saved" : "Error saving barcode"
+      "error_barcode_saved" : "Error saving barcode",
+      "select" : "Select"
     },
     "tabMenu": {
       "message": "Message",

@@ -25,7 +25,8 @@
       "insert" : "입력",
       "edit" : "수정",
       "barcode_saved" : "저장되었습니다",
-      "error_barcode_saved" : "바코드 저장 애러"   
+      "error_barcode_saved" : "바코드 저장 애러",
+      "select" : "선택"
     },
     "tabMenu": {
       "message": "알림",
