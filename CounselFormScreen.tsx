@@ -105,10 +105,12 @@ const CounselFormScreen = ({ navigation }) => {
                     </TouchableOpacity>
                   </View>
 
-<View style={{ height: 250 }}>
+<View style={{ height: 250, justifyContent: 'center' }}>
   <Picker
     selectedValue={selectedCourse}
     onValueChange={setSelectedCourse}
+    style={{ flex: 1 }}
+    itemStyle={{ fontSize: 18 }}
   >
     {courses.map(course => (
       <Picker.Item
@@ -223,6 +225,7 @@ modalContent: {
   borderTopLeftRadius: 20,
   borderTopRightRadius: 20,
   paddingBottom: 20,
+  height: 320,  
 },
 
 modalHeader: {
