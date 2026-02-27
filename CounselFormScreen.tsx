@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Platform,
+  Modal,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Picker } from '@react-native-picker/picker';
@@ -15,7 +17,7 @@ const CounselFormScreen = ({ navigation }) => {
   const { t } = useTranslation();
   const [content, setContent] = useState('');
   const [selectedCourse, setSelectedCourse] = useState('default');
-
+  const [showPicker, setShowPicker] = useState(false);
 
   const courses = [
     { label: t('counsel.default'), value: 'default' },
@@ -89,6 +91,7 @@ const CounselFormScreen = ({ navigation }) => {
               visible={showPicker}
               transparent
               animationType="slide"
+              onRequestClose={() => setShowPicker(false)}
             >
               <View style={styles.modalOverlay}>
                 <View style={styles.modalContent}>
@@ -97,23 +100,27 @@ const CounselFormScreen = ({ navigation }) => {
                       onPress={() => setShowPicker(false)}
                     >
                       <Text style={styles.doneText}>
-                        {t('common.done')}
+                        {t('common.select')}
                       </Text>
                     </TouchableOpacity>
                   </View>
 
-                  <Picker
-                    selectedValue={selectedCourse}
-                    onValueChange={setSelectedCourse}
-                  >
-                    {courses.map(course => (
-                      <Picker.Item
-                        key={course.value}
-                        label={course.label}
-                        value={course.value}
-                      />
-                    ))}
-                  </Picker>
+<View style={{ height: 250, justifyContent: 'center' }}>
+  <Picker
+    selectedValue={selectedCourse}
+    onValueChange={setSelectedCourse}
+    style={{ flex: 1 }}
+    itemStyle={{ color: 'black', fontSize: 18 }}
+  >
+    {courses.map(course => (
+      <Picker.Item
+        key={course.value}
+        label={course.label}
+        value={course.value}
+      />
+    ))}
+  </Picker>
+</View>
                 </View>
               </View>
             </Modal>
@@ -218,6 +225,7 @@ modalContent: {
   borderTopLeftRadius: 20,
   borderTopRightRadius: 20,
   paddingBottom: 20,
+  height: 320,  
 },
 
 modalHeader: {

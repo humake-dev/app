@@ -25,7 +25,8 @@
       "insert" : "입력",
       "edit" : "수정",
       "barcode_saved" : "저장되었습니다",
-      "error_barcode_saved" : "바코드 저장 애러"   
+      "error_barcode_saved" : "바코드 저장 애러",
+      "select" : "선택"
     },
     "tabMenu": {
       "message": "알림",
@@ -64,8 +65,8 @@
       "content": "상담 내용",
       "contentPlaceholder": "상담 내용을 입력해주세요",
       "no_items": "상담이 없습니다",
-      "default": "default",
-      "pt": "pt"
+      "default": "기본",
+      "pt": "PT"
     },
     "notice": {
       "no_items": "공지사항이 없습니다"
