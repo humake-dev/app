@@ -66,6 +66,9 @@ const DatePickerModal = ({ visible, date, onConfirm, onCancel }: Props) => {
             mode="date"
             display="spinner"
             locale="ko-KR"
+            themeVariant="light"
+            style={{ flex: 1 }}
+            itemStyle={{ fontSize: 18 }}
             onChange={(event, selectedDate) => {
               if (selectedDate) setTempDate(selectedDate);
             }}
