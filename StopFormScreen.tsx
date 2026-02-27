@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { authFetch } from "./src/utils/api";
-import DatePickerModal from "./src/utils/DatePickerModal";
+import DatePickerModal from "./DatePickerModal";
 
 const StopFormScreen = ({ navigation }) => {
   const { t } = useTranslation();
