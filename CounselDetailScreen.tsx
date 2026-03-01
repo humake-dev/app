@@ -149,15 +149,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    height: 50,
-    justifyContent: 'flex-end',
-    paddingRight: 16,
-  },
   closeButton: {
     position: 'absolute',
     right: 8,
-    top: 55,
+    top: 10,
     zIndex: 99,
   },
   scrollView: {

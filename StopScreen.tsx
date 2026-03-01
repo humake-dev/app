@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
+  Alert,
   View,
   Text,
   FlatList,
@@ -8,6 +9,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useFocusEffect } from '@react-navigation/native';
 import { authFetch } from './src/utils/api';
 
 const StopScreen = ({ navigation }) => {
@@ -15,23 +17,66 @@ const StopScreen = ({ navigation }) => {
   const [stops, setStops] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const response = await authFetch(`/stops`, {
+  useFocusEffect(
+  useCallback(() => {
+    // 화면이 포커스될 때마다 실행
+    fetchStops();
+  }, [])
+  );
+
+  const handleDeleteStop = async (stopId) => {
+    try {
+      const response = await authFetch(`/stops/hide/${stopId}`, {
+        method: 'POST',
         headers: {
           "Content-Type": "application/json",
         },
       });
-      const data = await response.json();
-      setStops(data.counsel_list);
-      setLoading(false);
-    };
+      
+      if (response.ok) {
+        // Refresh the messages list after successful deletion
+        fetchStops();
+      }
+    } catch (error) {
+      console.error('Error deleting counsel:', error);
+    }
+  };  
 
-    fetchData().catch(error => {
-      console.error('Error fetching stops:', error);
+  const fetchStops = async () => {
+    try {
+      const response = await authFetch(`/stops`, {
+        headers: { "Content-Type": "application/json" },
+      });
+  
+      const data = await response.json();
+      setStops(data.stop_list);
       setLoading(false);
-    });
-  }, []);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+    const showConfirm = (stopId) => {
+    Alert.alert(
+      '삭제 확인',
+      '정말로 삭제하시겠습니까?',
+      [
+        {
+          text: '취소',
+          onPress: () => console.log('Cancel'),
+          style: 'cancel',
+        },
+        {
+          text: '확인',
+          onPress: () => handleDeleteStop(stopId),
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
 
   if (loading) {
     return (
@@ -41,22 +86,44 @@ const StopScreen = ({ navigation }) => {
     );
   }
 
-  const renderStopItem = ({ item }) => {
-    const handlePress = () => {
-      navigation.navigate('StopDetail', { stop: item });
-    };
-
-    return (
-      <TouchableOpacity onPress={handlePress} style={styles.stopItem}>
-        <View style={styles.stopInfo}>
-          <Text style={styles.stopTitle}>{item.title}</Text>
-          <Text style={styles.stopCreatedAt}>
-            {new Date(item.created_at).toLocaleDateString()}
-          </Text>
-        </View>
-      </TouchableOpacity>
-    );
+const renderStopItem = ({ item }) => {
+  const handlePress = () => {
+    navigation.navigate('StopDetail', { id: item.id });
   };
+
+  return (
+  <View style={styles.stopItem}>
+    <TouchableOpacity onPress={handlePress} style={styles.stopInfo}>
+      <Text style={styles.stopTitle}>
+        {item.stop_start_date} ~ {item.stop_end_date}
+      </Text>
+      <Text style={styles.stopCreatedAt}>
+        {new Date(item.created_at).toLocaleDateString()}
+      </Text>
+    </TouchableOpacity>
+
+    <View style={styles.rightSection}>
+      {item.complete ? (
+        <View style={styles.approvedBadge}>
+          <Text style={styles.approvedText}>승인 됨</Text>
+        </View>
+      ) : (
+        <>
+          <Text style={styles.pendingText}>승인 대기중</Text>
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => showConfirm(item.id)}
+          >
+            <Text style={styles.deleteButtonText}>
+              {t('common.delete')}
+            </Text>
+          </TouchableOpacity>
+        </>
+      )}
+    </View>
+  </View>
+  );
+};
 
   return (
     <View style={styles.container}>
@@ -108,24 +175,6 @@ const styles = StyleSheet.create({
   stopList: {
     padding: 8,
   },
-  stopTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  stopItem: {
-    flexDirection: 'row',
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    marginBottom: 8,
-  },
-  stopInfo: {
-    flex: 1,
-  },
-  stopCreatedAt: {
-    fontSize: 12,
-    color: '#666',
-  },
   addButton: {
     position: 'absolute',
     bottom: 30,
@@ -151,6 +200,72 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     bottom: 3
   },
+stopItem: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: 12,
+  borderBottomWidth: 1,
+  borderBottomColor: '#ccc',
+  marginBottom: 8,
+  marginLeft: 14,
+  marginRight: 14,
+  backgroundColor: '#fff',
+  borderRadius: 8,
+},
+
+stopInfo: {
+  flex: 1,
+},
+
+stopTitle: {
+  fontSize: 16,
+  fontWeight: 'bold',
+},
+
+stopCreatedAt: {
+  fontSize: 12,
+  color: '#666',
+  marginTop: 4,
+},
+
+deleteButton: {
+  backgroundColor: '#ff4444',
+  paddingVertical: 8,
+  paddingHorizontal: 12,
+  borderRadius: 6,
+  marginLeft: 10,
+},
+
+deleteButtonText: {
+  color: 'white',
+  fontSize: 14,
+  fontWeight: '600',
+},
+rightSection: {
+  alignItems: 'flex-end',
+  justifyContent: 'center',
+},
+
+approvedBadge: {
+  backgroundColor: '#E6F4EA',
+  paddingVertical: 6,
+  paddingHorizontal: 12,
+  borderRadius: 20,
+},
+
+approvedText: {
+  color: '#2E7D32',
+  fontWeight: '700',
+  fontSize: 13,
+},
+
+pendingText: {
+  color: '#FF8C00',
+  fontSize: 12,
+  marginBottom: 6,
+  fontWeight: '600',
+},
 });
 
 export default StopScreen;

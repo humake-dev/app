@@ -20,28 +20,67 @@ const StopFormScreen = ({ navigation }) => {
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
   const [content, setContent] = useState("");
+  const [errors, setErrors] = useState({
+  startDate: false,
+  endDate: false,
+  content: false,
+});
 
-  const handleSubmit = async () => {
-    try {
-      const response = await authFetch(`/stops`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          stop_start_date: startDate.toISOString().slice(0, 10),
-          stop_end_date: endDate.toISOString().slice(0, 10),
-          description: content,
-        }),
-      });
+const handleSubmit = async () => {
+  if (!validate()) {
+    return;
+  }
 
-      if (response.ok) {
-        navigation.goBack();
-      } else {
-        throw new Error("Failed");
-      }
-    } catch (error) {
-      Alert.alert("Error", "다시 시도해주세요");
+  try {
+    const response = await authFetch(`/stops`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        stop_start_date: startDate.toISOString().slice(0, 10),
+        stop_end_date: endDate.toISOString().slice(0, 10),
+        description: content,
+      }),
+    });
+
+    if (response.ok) {
+      navigation.goBack();
+    } else {
+      throw new Error("Failed");
     }
+  } catch (error) {
+    Alert.alert("Error", "다시 시도해주세요");
+  }
+};
+
+  const validate = () => {
+  let newErrors = {
+    startDate: false,
+    endDate: false,
+    content: false,
   };
+
+  let isValid = true;
+
+  // 날짜 비교 (시간 제거)
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  start.setHours(0, 0, 0, 0);
+  end.setHours(0, 0, 0, 0);
+
+  if (end < start) {
+    newErrors.endDate = true;
+    isValid = false;
+  }
+
+  if (!content || content.trim().length < 2) {
+    newErrors.content = true;
+    isValid = false;
+  }
+
+  setErrors(newErrors);
+  return isValid;
+};
 
   return (
     <View style={{ flex: 1 }}>
@@ -50,10 +89,14 @@ const StopFormScreen = ({ navigation }) => {
           <Text style={styles.label}>{t('stop.stopPeriod')}</Text>
 
           <View style={styles.dateContainer}>
-            <TouchableOpacity
-              style={[styles.dateButton, styles.dateInput]}
-              onPress={() => setShowStartPicker(true)}
-            >
+<TouchableOpacity
+  style={[
+    styles.dateButton,
+    styles.dateInput,
+    errors.startDate && styles.errorBorder,
+  ]}
+  onPress={() => setShowStartPicker(true)}
+>
               <Text style={styles.dateText}>
                 {startDate.toLocaleDateString("ko-KR")}
               </Text>
@@ -61,24 +104,42 @@ const StopFormScreen = ({ navigation }) => {
 
             <Text style={styles.dateSeparator}>~</Text>
 
-            <TouchableOpacity
-              style={[styles.dateButton, styles.dateInput]}
-              onPress={() => setShowEndPicker(true)}
-            >
+<TouchableOpacity
+  style={[
+    styles.dateButton,
+    styles.dateInput,
+    errors.endDate && styles.errorBorder,
+  ]}
+  onPress={() => setShowEndPicker(true)}
+>
               <Text style={styles.dateText}>
                 {endDate.toLocaleDateString("ko-KR")}
               </Text>
             </TouchableOpacity>
+{errors.endDate && (
+  <Text style={styles.errorText}>
+    종료일은 시작일보다 빠를 수 없습니다
+  </Text>
+)}            
           </View>
 
           <Text style={styles.label}>{t('stop.content')}</Text>
-          <TextInput
-            style={styles.input}
-            value={content}
-            onChangeText={setContent}
-          placeholder={t('stop.contentPlaceholder')}
-          />
-
+<TextInput
+  style={[styles.input, errors.content && styles.errorBorder]}
+  value={content}
+  onChangeText={(text) => {
+    setContent(text);
+    if (text.trim().length >= 2) {
+      setErrors((prev) => ({ ...prev, content: false }));
+    }
+  }}
+  placeholder={t('stop.contentPlaceholder')}
+/>
+{errors.content && (
+  <Text style={styles.errorText}>
+    최소 2자 이상 입력해주세요
+  </Text>
+)}
           <TouchableOpacity
             style={styles.submitButton}
             onPress={handleSubmit}
@@ -146,6 +207,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+errorBorder: {
+  borderWidth: 1,
+  borderColor: "#FF3B30",
+},
+
+errorText: {
+  color: "#FF3B30",
+  marginBottom: 10,
+  marginTop: -10,
+  fontSize: 13,
+},  
 });
 
 export default StopFormScreen;
