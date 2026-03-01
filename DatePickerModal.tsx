@@ -4,39 +4,40 @@ import DateTimePicker, {
   DateTimePickerAndroid,
 } from "@react-native-community/datetimepicker";
 
-interface Props {
-  visible: boolean;
-  date: Date;
-  onConfirm: (date: Date) => void;
-  onCancel: () => void;
-}
-
-const DatePickerModal = ({ visible, date, onConfirm, onCancel }: Props) => {
+const DatePickerModal = ({
+  visible,
+  date,
+  minimumDate,
+  onConfirm,
+  onCancel,
+}) => {
   const [tempDate, setTempDate] = useState(date);
 
   useEffect(() => {
     setTempDate(date);
   }, [date]);
 
-  useEffect(() => {
-    if (Platform.OS === "android" && visible) {
-      DateTimePickerAndroid.open({
-        value: date,
-        mode: "date",
-        is24Hour: true,
-        onChange: (event, selectedDate) => {
-          if (event.type === "set" && selectedDate) {
-            onConfirm(selectedDate);
-          }
-          onCancel();
-        },
-      });
-    }
-  }, [visible]);
+  // 🔥 Android는 visible true 될 때 즉시 open
+  if (Platform.OS === "android" && visible) {
+    DateTimePickerAndroid.open({
+      value: date,
+      mode: "date",
+      is24Hour: true,
+      minimumDate: minimumDate,
+      onChange: (event, selectedDate) => {
+        if (event.type === "set" && selectedDate) {
+          onConfirm(selectedDate);
+        }
+        onCancel();
+      },
+    });
 
-  if (Platform.OS === "android") return null;
+    return null; // Android는 Modal 안 씀
+  }
+
   if (!visible) return null;
 
+  // iOS
   return (
     <Modal transparent animationType="slide">
       <View style={{ flex: 1, justifyContent: "flex-end" }}>
@@ -51,6 +52,7 @@ const DatePickerModal = ({ visible, date, onConfirm, onCancel }: Props) => {
             <TouchableOpacity onPress={onCancel}>
               <Text>취소</Text>
             </TouchableOpacity>
+
             <TouchableOpacity
               onPress={() => {
                 onConfirm(tempDate);
@@ -68,6 +70,7 @@ const DatePickerModal = ({ visible, date, onConfirm, onCancel }: Props) => {
             locale="ko-KR"
             themeVariant="light"
             style={{ color: 'black', fontSize: 18 }}
+            minimumDate={minimumDate}
             onChange={(event, selectedDate) => {
               if (selectedDate) setTempDate(selectedDate);
             }}
