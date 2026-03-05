@@ -143,7 +143,7 @@ const StopFormScreen = ({ navigation }) => {
 
           {errors.content && (
             <Text style={styles.errorText}>
-              최소 2자 이상 입력해주세요
+               {t('counsel.contentValidate')}
             </Text>
           )}
 

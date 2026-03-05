@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   Alert,
   View,
@@ -6,7 +6,7 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
-
+  Animated
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from '@react-navigation/native';
@@ -17,6 +17,10 @@ const CounselScreen = ({ navigation }) => {
   const [counsels, setCounsels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
+const [highlightId, setHighlightId] = useState(null);
+
+const fadeAnim = useRef(new Animated.Value(0)).current;
+const flatListRef = useRef(null);
 
   useFocusEffect(
   useCallback(() => {
@@ -24,6 +28,33 @@ const CounselScreen = ({ navigation }) => {
     fetchCounsels();
   }, [])
   );
+
+  useEffect(() => {
+
+  if (navigation?.getState()?.routes?.slice(-1)[0]?.params?.highlightId) {
+
+    const id = navigation.getState().routes.slice(-1)[0].params.highlightId;
+
+    setHighlightId(id);
+
+    fadeAnim.setValue(1);
+
+    Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration: 1500,
+      useNativeDriver: false
+    }).start();
+
+    setTimeout(() => {
+      flatListRef.current?.scrollToOffset({
+        offset: 0,
+        animated: true
+      });
+    }, 200);
+
+  }
+
+}, []);
 
   const handleDeleteCounsel = async (counselId) => {
     try {
@@ -100,37 +131,74 @@ const fetchCounsels = async () => {
     );
   }  
 
-  const renderCounselItem = ({ item }) => {
-    const handlePress = () => {
-      navigation.navigate('CounselDetail', { id: item.id });
-    };
+const renderCounselItem = ({ item }) => {
 
-    return (
-      <View style={styles.counselItem}>
-      <TouchableOpacity onPress={handlePress} style={styles.counselInfo}>
-          <Text style={styles.counselTitle}>{item.title}</Text>
-          <Text style={styles.counselCreatedAt}>
-            {new Date(item.created_at).toLocaleDateString()}
-          </Text>
-      </TouchableOpacity>
-              <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={() => showConfirm(item.id)}
-            >
-              <Text style={styles.deleteButtonText}>{t('common.delete')}</Text>
-            </TouchableOpacity>
-        </View>
-    );
+  const handlePress = () => {
+    navigation.navigate('CounselDetail', { id: item.id });
   };
+
+  const isHighlight = item.id === highlightId;
+
+  const bgColor = isHighlight
+    ? fadeAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: ["#fff", "#FFF3A0"]
+      })
+    : "#fff";
+
+  return (
+    <Animated.View
+      style={[
+        styles.counselItem,
+        { backgroundColor: bgColor }
+      ]}
+    >
+      
+      <TouchableOpacity onPress={handlePress} style={styles.counselInfo}>
+        <View style={styles.titleRow}>
+          <Text style={styles.counselTitle}>{item.title}</Text>
+
+          {item.has_response ? (
+            <View style={styles.responseBadge}>
+              <Text style={styles.responseBadgeText}>
+                {t('counsel.response')}
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.waitingBadge}>
+              <Text style={styles.waitingBadgeText}>
+                {t('counsel.waiting')}
+              </Text>
+            </View>
+          )}
+
+        </View>
+
+        <Text style={styles.counselCreatedAt}>
+          {new Date(item.created_at).toLocaleDateString()}
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.deleteButton}
+        onPress={() => showConfirm(item.id)}
+      >
+        <Text style={styles.deleteButtonText}>{t('common.delete')}</Text>
+      </TouchableOpacity>
+
+    </Animated.View>
+  );
+};
 
   return (
     <View style={{ flex: 1 }}>
-      <FlatList
-        data={counsels}
-        renderItem={renderCounselItem}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.counselList}
-      />
+<FlatList
+  ref={flatListRef}
+  data={counsels}
+  renderItem={renderCounselItem}
+  keyExtractor={(item) => item.id.toString()}
+  contentContainerStyle={styles.counselList}
+/>
       <TouchableOpacity 
         style={styles.addButton}
         onPress={() => navigation.navigate('CounselForm')}
@@ -243,6 +311,43 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 14,
   },
+rightActions: {
+  flexDirection: "row",
+  alignItems: "center",
+},
+
+responseBadge: {
+  backgroundColor: "#4CAF50",
+  marginTop: 5,
+  paddingHorizontal: 8,
+  paddingVertical: 3,
+  borderRadius: 10,
+  marginRight: 8,
+},
+
+responseBadgeText: {
+  color: "#fff",
+  fontSize: 12,
+  fontWeight: "600",
+},
+titleRow: {
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "space-between"
+},
+waitingBadge: {
+  marginLeft: 8,
+  backgroundColor: "#FFF3CD",
+  paddingHorizontal: 8,
+  paddingVertical: 2,
+  borderRadius: 6
+},
+
+waitingBadgeText: {
+  fontSize: 11,
+  color: "#856404",
+  fontWeight: "600"
+},
 });
 
 export default CounselScreen;

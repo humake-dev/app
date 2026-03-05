@@ -15,9 +15,14 @@ import { authFetch } from "./src/utils/api";
 
 const CounselFormScreen = ({ navigation }) => {
   const { t } = useTranslation();
+  const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [selectedCourse, setSelectedCourse] = useState('default');
   const [showPicker, setShowPicker] = useState(false);
+
+  const [errors, setErrors] = useState({
+    content: false,
+  });
 
   const courses = [
     { label: t('counsel.default'), value: 'default' },
@@ -25,32 +30,55 @@ const CounselFormScreen = ({ navigation }) => {
   ];
   const selectedLabel = courses.find(c => c.value === selectedCourse)?.label ?? '';
 
-  const handleSubmit = async () => {
-    try {   
-      const response = await authFetch('/counsels', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          question_course: selectedCourse,
-          content: content,
-        }),
-      });
-
-      if (response.ok) {
-        // Reset form after successful submission
-        setContent('');
-        setSelectedCourse('default');
-        navigation.goBack();
-      } else {
-        throw new Error('Failed to submit form');
-      }
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      // You might want to show an error message to the user here
-    }
+const validate = () => {
+  let newErrors = {
+    content: false,
   };
+
+  let isValid = true;
+
+  if (!content || content.trim().length < 2) {
+    newErrors.content = true;
+    isValid = false;
+  }
+
+  setErrors(newErrors);
+  return isValid;
+};
+
+const handleSubmit = async () => {
+  if (!validate()) return;
+
+  try {
+    const response = await authFetch('/counsels', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: title,
+        question_course: selectedCourse,
+        content: content,
+      }),
+    });
+
+    if (response.ok) {
+      setContent('');
+      setSelectedCourse('default');
+
+const data = await response.json();
+
+navigation.navigate("Counsel", {
+  highlightId: data.id,
+});
+
+    } else {
+      throw new Error('Failed to submit form');
+    }
+  } catch (error) {
+    console.error('Error submitting form:', error);
+  }
+};
 
   return (
     <ScrollView style={styles.container}>
@@ -127,15 +155,40 @@ const CounselFormScreen = ({ navigation }) => {
           </>
         )}
 
+<Text style={styles.label}>{t('counsel.title')}</Text>
+
+<TextInput
+  style={styles.titleInput}
+  value={title}
+  onChangeText={setTitle}
+  placeholder={t('counsel.titlePlaceholder')}
+  multiline={false}
+  returnKeyType="done"
+  maxLength={80}
+/>
+
+
         <Text style={styles.label}>{t('counsel.content')}</Text>
-        <TextInput
-          style={styles.input}
-          multiline={true}
-          numberOfLines={4}
-          value={content}
-          onChangeText={setContent}
-          placeholder={t('counsel.contentPlaceholder')}
-        />
+<TextInput
+  style={[styles.input, errors.content && styles.errorBorder]}
+  multiline={true}
+  numberOfLines={4}
+  value={content}
+  onChangeText={(text) => {
+    setContent(text);
+
+    if (text.trim().length >= 2) {
+      setErrors((prev) => ({ ...prev, content: false }));
+    }
+  }}
+  placeholder={t('counsel.contentPlaceholder')}
+/>
+
+{errors.content && (
+  <Text style={styles.errorText}>
+    {t('counsel.contentValidate')}
+  </Text>
+)}
 
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.submitButtonText}>{t('common.submit')}</Text>
@@ -213,6 +266,13 @@ iosPickerText: {
   fontSize: 16,
   color: '#333',
 },
+titleInput: {
+  backgroundColor: "#fff",
+  paddingHorizontal: 12,
+  height: 45,
+  borderRadius: 8,
+  marginBottom: 20,
+},
 
 modalOverlay: {
   flex: 1,
@@ -240,6 +300,18 @@ doneText: {
   color: '#007AFF',
   fontWeight: '600',
 },
+
+errorBorder: {
+  borderWidth: 1,
+  borderColor: "#FF3B30",
+},
+
+errorText: {
+  color: "#FF3B30",
+  marginBottom: 12,
+  fontSize: 13,
+},
+
 });
 
 export default CounselFormScreen;

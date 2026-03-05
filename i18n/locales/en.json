@@ -61,11 +61,16 @@
       "counsel":   {
         "add": "Counsel Add",
         "selectCourse": "Select Course",
+        "title" : "title",
+        "titlePlaceholder" : "Please, Insert Title",
         "selectDate": "Select Date",
         "selectOption": "Select Option",
         "content": "Content",
-        "contentPlaceholder": "",
+        "contentPlaceholder": "Please, Insert Content",
         "no_items": "No Counsel",
+        "waiting" : "waiting",        
+        "response" : "reseponse",
+        "contentValidate" : "Please enter at least 2 characters",        
         "default": "default",
         "pt": "pt"
       },

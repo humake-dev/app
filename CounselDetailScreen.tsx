@@ -126,21 +126,49 @@ const CounselDetailScreen = ({ navigation }) => {
           onPress={showConfirm}
         />
       </View>
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.content}>
-          <View style={styles.contentContainer}>
-              <Text style={styles.date}>
-                {new Date(counsel.created_at).toLocaleDateString()}
-              </Text>
-            <Text style={styles.contentText}>{counsel.content}</Text>
-          </View>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <View style={styles.buttonContent}>
-              <Text style={styles.buttonText}>{t('common.backToList')}</Text>
-            </View>
-          </TouchableOpacity>
+<ScrollView style={styles.scrollView}>
+  <View style={styles.content}>
+    
+    {/* 질문 */}
+    <View style={styles.contentContainer}>
+      <Text style={styles.date}>
+        {new Date(counsel.created_at).toLocaleDateString()}
+      </Text>
+
+      <Text style={styles.contentText}>
+        {counsel.content.content}
+      </Text>
+    </View>
+
+    {/* 답변 */}
+    {counsel.response && (
+      <View style={styles.responseContainer}>
+        <View style={styles.responseHeader}>
+          <Ionicons name="chatbubble-ellipses" size={18} color="#2e7d32" />
+          <Text style={styles.responseTitle}>{t('counsel.response')}</Text>
         </View>
-      </ScrollView>
+
+        <Text style={styles.responseText}>
+          {counsel.response.content}
+        </Text>
+
+        <Text style={styles.responseDate}>
+          {new Date(counsel.response.created_at).toLocaleDateString()}
+        </Text>
+      </View>
+    )}
+
+    <TouchableOpacity
+      style={styles.backButton}
+      onPress={() => navigation.goBack()}
+    >
+      <View style={styles.buttonContent}>
+        <Text style={styles.buttonText}>{t('common.backToList')}</Text>
+      </View>
+    </TouchableOpacity>
+
+  </View>
+</ScrollView>
     </View>
   );
 };
@@ -221,7 +249,42 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     marginBottom: 32,
-  }
+  },
+responseContainer: {
+  marginTop: 5,
+  marginBottom: 20,
+  padding: 16,
+  backgroundColor: "#f3f9f4",
+  borderRadius: 10,
+  borderLeftWidth: 4,
+  borderLeftColor: "#4caf50"
+},
+
+responseHeader: {
+  flexDirection: "row",
+  alignItems: "center",
+  marginBottom: 8
+},
+
+responseTitle: {
+  marginLeft: 6,
+  fontWeight: "bold",
+  fontSize: 16,
+  color: "#2e7d32"
+},
+
+responseText: {
+  fontSize: 15,
+  lineHeight: 22,
+  color: "#333"
+},
+
+responseDate: {
+  marginTop: 10,
+  fontSize: 12,
+  color: "#888",
+  textAlign: "right"
+}  
 });
 
 export default CounselDetailScreen;
