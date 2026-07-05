@@ -69,8 +69,8 @@ const StopFormScreen = ({ navigation }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          stop_start_date: startDate.toISOString().slice(0, 10),
-          stop_end_date: endDate.toISOString().slice(0, 10),
+          stop_start_date: formatDate(startDate),
+          stop_end_date: formatDate(endDate),
           description: content,
         }),
       });
@@ -84,6 +84,14 @@ const StopFormScreen = ({ navigation }) => {
       Alert.alert("Error", "다시 시도해주세요");
     }
   };
+
+  const formatDate = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
 
   return (
     <View style={{ flex: 1 }}>
