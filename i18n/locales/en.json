@@ -26,7 +26,13 @@
       "edit" : "edit",
       "barcode_saved" : "Saved!",
       "error_barcode_saved" : "Error saving barcode",
-      "select" : "Select"
+      "select" : "Select",
+      "deleteConfirmTitle": "d",
+      "deleteConfirmMessage": "deleteConfirmMessage",
+      "cancel": "cancel",
+      "confirm": "confirm",
+      "error": "Error",
+      "tryAgain": "try again"
     },
     "tabMenu": {
       "message": "Message",
@@ -84,7 +90,20 @@
         "selectDate": "Select Date",
         "content": "Stop Content",
         "contentPlaceholder": "Stop Content",
-        "no_items": "No Stop"
+        "no_items": "No Stop",
+        "endDateValidate": "The end date cannot be earlier than the start date.",
+        "guideTitle": "Membership Freeze Policy",
+        "guide": {
+        "lessThan3Months": "Less than 3-month membership: 0 days of suspension",
+        "threeMonths": "3-month membership: Up to 15 days of suspension",
+        "sixMonths": "6-month membership: Up to 30 days of suspension",
+        "twelveMonths": "12-month membership: Up to 60 days of suspension",
+        "etc": "*For all other membership types, please contact your branch directly for suspension eligibility."
+        },
+            "status": {
+      "approved": "Approved",
+      "pending": "Pending Approval"
+    }       
       },
       "attendance": {
         "PTcount": "PT Schedules",

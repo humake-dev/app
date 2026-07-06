@@ -53,22 +53,22 @@ const StopDetailScreen = ({ navigation }) => {
     }
   };
 
-  const showConfirm = () => {
+const showConfirm = () => {
   Alert.alert(
-    '삭제 확인',
-    '정말로 삭제하시겠습니까?',
+    t('common.deleteConfirmTitle'),
+    t('common.deleteConfirmMessage'),
     [
       {
-        text: '취소',
+        text: t('common.cancel'),
         onPress: () => console.log('Cancel'),
         style: 'cancel',
       },
       {
-        text: '확인',
+        text: t('common.confirm'),
         onPress: () => hideStop(),
       },
     ],
-    { hideStop: true }
+    { cancelable: true }
   );
 };
 

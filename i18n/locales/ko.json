@@ -26,7 +26,13 @@
       "edit" : "수정",
       "barcode_saved" : "저장되었습니다",
       "error_barcode_saved" : "바코드 저장 애러",
-      "select" : "선택"
+      "select" : "선택",
+      "deleteConfirmTitle": "삭제 확인",
+      "deleteConfirmMessage": "정말로 삭제하시겠습니까?",
+      "cancel": "취소",
+      "confirm": "확인",
+      "error": "오류",
+      "tryAgain": "다시 시도해주세요"
     },
     "tabMenu": {
       "message": "알림",
@@ -83,7 +89,20 @@
       "selectDate": "날짜 선택",
       "content": "휴회 사유",
       "contentPlaceholder": "휴회 사유 간단히 한 줄로 써주세요",
-      "no_items": "휴회가 없습니다"
+      "no_items": "휴회가 없습니다",
+      "endDateValidate": "종료일은 시작일보다 빠를 수 없습니다.",
+      "guideTitle": "회원권에 따른 휴회 가능 일수 안내",
+      "guide": {
+      "lessThan3Months": "3개월권 미만 : 휴회 가능 일수 0일",
+      "threeMonths": "3개월권 : 휴회 가능 일수 15일",
+      "sixMonths": "6개월권 : 휴회 가능 일수 30일",
+      "twelveMonths": "12개월권 : 휴회 가능 일수 60일",
+      "etc": "*그 외 기타 회원권에 따른 휴회 문의는 지점으로 직접 문의 부탁드립니다."
+    },
+        "status": {
+      "approved": "승인됨",
+      "pending": "승인 대기중"
+    }
     },
     "attendance": {
       "PTcount": "PT 일정",

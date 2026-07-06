@@ -58,18 +58,18 @@ const StopScreen = ({ navigation }) => {
     }
   };
 
-    const showConfirm = (stopId) => {
+  const showConfirm =(stopId) => {
     Alert.alert(
-      '삭제 확인',
-      '정말로 삭제하시겠습니까?',
+      t('common.deleteConfirmTitle'),
+      t('common.deleteConfirmMessage'),
       [
         {
-          text: '취소',
+          text: t('common.cancel'),
           onPress: () => console.log('Cancel'),
           style: 'cancel',
         },
         {
-          text: '확인',
+          text: t('common.confirm'),
           onPress: () => handleDeleteStop(stopId),
         },
       ],
@@ -105,11 +105,11 @@ const renderStopItem = ({ item }) => {
     <View style={styles.rightSection}>
       {item.complete ? (
         <View style={styles.approvedBadge}>
-          <Text style={styles.approvedText}>승인 됨</Text>
+          <Text style={styles.approvedText}>{t("stop.status.approved")}</Text>
         </View>
       ) : (
         <>
-          <Text style={styles.pendingText}>승인 대기중</Text>
+          <Text style={styles.pendingText}>{t("stop.status.pending")}</Text>
           <TouchableOpacity
             style={styles.deleteButton}
             onPress={() => showConfirm(item.id)}
@@ -128,14 +128,14 @@ const renderStopItem = ({ item }) => {
   return (
     <View style={styles.container}>
             <View style={styles.infoContainer}>
-        <Text>회원권에 따른 휴회 가능 일수 안내</Text>
-        <View>
-        <Text>3개월권 미만 : 휴회 가능 일수 0일</Text>
-        <Text>3개월권 : 휴회 가능일수 15일</Text>
-        <Text>6개월권 : 휴회 가능일수 30일</Text>
-        <Text>12개월권 : 휴회 가능일수 60일</Text>
-        </View>
-    <Text>*그 외 기타 회원권에 따른 휴회문의는 지점으로 직접 문의 부탁드립니다.</Text>
+    <View>
+      <Text>{t("stop.guide.lessThan3Months")}</Text>
+      <Text>{t("stop.guide.threeMonths")}</Text>
+      <Text>{t("stop.guide.sixMonths")}</Text>
+      <Text>{t("stop.guide.twelveMonths")}</Text>
+    </View>
+
+    <Text>{t("stop.guide.etc")}</Text>
       </View>
       <FlatList
         data={stops}

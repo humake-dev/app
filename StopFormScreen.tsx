@@ -81,7 +81,10 @@ const StopFormScreen = ({ navigation }) => {
         throw new Error("Failed");
       }
     } catch (error) {
-      Alert.alert("Error", "다시 시도해주세요");
+      Alert.alert(
+        t("common.error"),
+        t("common.tryAgain")
+      );
     }
   };
 
@@ -98,6 +101,7 @@ const StopFormScreen = ({ navigation }) => {
       <ScrollView style={styles.container}>
         <View style={styles.formContainer}>
           <Text style={styles.label}>{t("stop.stopPeriod")}</Text>
+          
 
           <View style={styles.dateContainer}>
             <TouchableOpacity
@@ -131,7 +135,7 @@ const StopFormScreen = ({ navigation }) => {
 
           {errors.endDate && (
             <Text style={styles.errorText}>
-              종료일은 시작일보다 빠를 수 없습니다
+               {t("stop.endDateValidate")}
             </Text>
           )}
 
