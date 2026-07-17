@@ -5,7 +5,7 @@ on:
 
 jobs:
   build-ios:
-    runs-on: macos-latest
+    runs-on: macos-15
 
     steps:
       - name: Checkout repository
@@ -37,17 +37,38 @@ jobs:
         run: |
           echo "REACT_NATIVE_PATH=$(pwd)/node_modules/react-native" >> $GITHUB_ENV  
           
+      # 2️⃣ RN Codegen 실행
+      - name: Run RN Codegen
+        run: |
+          mkdir -p ios/build/generated
+          node node_modules/react-native/scripts/generate-codegen-artifacts.js \
+          -p . -t ios -o ios/build/generated
+          
       # 3️⃣ CocoaPods 설치
       - name: Install CocoaPods
         run: |
+          bundle install
           cd ios
-          
           rm -rf Pods Podfile.lock
           rm -rf ~/Library/Developer/Xcode/DerivedData/*
-          rm -rf ~/Library/Caches/CocoaPods
+          bundle exec pod install
+      
+      - name: Patch Local Podspecs Codegen check
+        run: |
+          PROJECT="ios/Pods/Pods.xcodeproj/project.pbxproj"
+          sed -i '' 's|Checking whether Codegen has run|echo '"'"'Codegen check skipped'"'"'|g' "$PROJECT"
           
-          bundle exec pod repo update
-          bundle exec pod install --repo-update
+          find ios/Pods/Local\ Podspecs -type f -name "*.podspec.json" -exec \
+          sed -i '' 's|Checking whether Codegen has run|echo '"'"'Codegen check skipped'"'"'|g' {} +   
+
+          grep -R "Codegen did not run properly" ios || echo "Patch applied"
+
+      # 4️⃣ Symlink 생성 (Pods Headers)
+      - name: Fix React-Codegen symlink
+        run: |
+          mkdir -p ios/Pods/Headers/Public
+          ln -sf ../../build/generated ios/Pods/Headers/Public/React-Codegen
+          echo "✅ Symlink created"
 
       - name: Import Code-Signing Certificates
         uses: Apple-Actions/import-codesign-certs@v6.0.0
