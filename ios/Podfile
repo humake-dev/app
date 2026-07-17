@@ -43,6 +43,7 @@ target 'humake' do
       target.build_configurations.each do |config|
         config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.1'
         config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'gnu++20'
+        config.build_settings['CLANG_CXX_LIBRARY'] = 'libc++'
       end
     end
   end
