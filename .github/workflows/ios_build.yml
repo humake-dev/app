@@ -42,6 +42,9 @@ jobs:
       - name: Install CocoaPods
         run: |
           bundle install
+          
+          export RCT_NEW_ARCH_ENABLED=0
+
           cd ios
           rm -rf Pods Podfile.lock
           rm -rf ~/Library/Developer/Xcode/DerivedData/*
