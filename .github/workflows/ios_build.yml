@@ -40,7 +40,6 @@ jobs:
       # 2️⃣ RN Codegen 실행
       - name: Run RN Codegen
         run: |
-          mkdir -p ios/build/generated
           node node_modules/react-native/scripts/generate-codegen-artifacts.js \
           -p . -t ios -o ios/build/generated
           
