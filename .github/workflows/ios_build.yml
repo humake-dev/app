@@ -53,10 +53,13 @@ jobs:
         run: |
           bundle install
           
+          rm -rf ~/Library/Developer/Xcode/DerivedData/*
+          
           cd ios
-          rm -rf Pods Podfile.lock
-          pod repo update
-          bundle exec pod install
+          rm -rf Pods
+          rm -f Podfile.lock
+          
+          bundle exec pod install --repo-update
       
       - name: Patch Local Podspecs Codegen check
         run: |
