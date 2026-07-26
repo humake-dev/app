@@ -66,13 +66,6 @@ jobs:
 
           grep -R "Codegen did not run properly" ios || echo "Patch applied"
 
-      # 4️⃣ Symlink 생성 (Pods Headers)
-      - name: Fix React-Codegen symlink
-        run: |
-          mkdir -p ios/Pods/Headers/Public
-          ln -sf ../../build/generated ios/Pods/Headers/Public/React-Codegen
-          echo "✅ Symlink created"
-
       - name: Import Code-Signing Certificates
         uses: Apple-Actions/import-codesign-certs@v6.0.0
         with:
