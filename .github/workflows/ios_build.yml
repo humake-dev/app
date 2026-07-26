@@ -6,7 +6,7 @@ on:
 jobs:
   build-ios:
     runs-on: macos-latest
-
+    
     steps:
       - uses: actions/checkout@v4
 
@@ -15,7 +15,6 @@ jobs:
         with:
           xcode-version: "26.0"    
 
-    steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
