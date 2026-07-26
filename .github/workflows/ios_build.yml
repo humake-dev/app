@@ -5,7 +5,15 @@ on:
 
 jobs:
   build-ios:
-    runs-on: macos-lastest
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "26.0"    
 
     steps:
       - name: Checkout repository
@@ -48,10 +56,10 @@ jobs:
       - name: Install CocoaPods
         run: |
           bundle install
-
+          
           cd ios
           rm -rf Pods Podfile.lock
-          rm -rf ~/Library/Developer/Xcode/DerivedData/*
+          pod repo update
           bundle exec pod install
       
       - name: Patch Local Podspecs Codegen check
@@ -134,7 +142,7 @@ jobs:
             DEVELOPMENT_TEAM=7FGDKUA4PZ \
             PRODUCT_BUNDLE_IDENTIFIER=kr.co.humake \
             PROVISIONING_PROFILE=5fb10f42-9454-4eb8-9c41-11ff94617b2f \
-            CODE_SIGN_IDENTITY="iPhone Distribution" \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
             archive \
             -verbose | tee xcodebuild.log
 
