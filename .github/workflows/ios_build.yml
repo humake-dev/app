@@ -44,7 +44,9 @@ jobs:
         run: |
           echo "REACT_NATIVE_PATH=$(pwd)/node_modules/react-native" >> $GITHUB_ENV  
           
-          
+      - name: Disable New Architecture
+        run: |
+          echo "RCT_NEW_ARCH_ENABLED=0" >> $GITHUB_ENV          
           
       # 3️⃣ CocoaPods 설치
       - name: Install CocoaPods
