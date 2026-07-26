@@ -45,8 +45,8 @@ jobs:
           echo "REACT_NATIVE_PATH=$(pwd)/node_modules/react-native" >> $GITHUB_ENV                   
           
       - name: Find setToolbarMenuElementOptions
-        run: |  
-        grep -R -n "setToolbarMenuElementOptions" node_modules/react-native-screens || true
+        run: | 
+          grep -R -n "setToolbarMenuElementOptions" node_modules/react-native-screens || true
           
       # 3️⃣ CocoaPods 설치
       - name: Install CocoaPods
