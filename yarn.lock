@@ -6430,10 +6430,10 @@ react-native-vector-icons@^10.2.0:
     prop-types "^15.7.2"
     yargs "^16.1.1"
 
-react-native-view-shot@^4.0.3:
-  version "4.0.3"
-  resolved "https://registry.npmjs.org/react-native-view-shot/-/react-native-view-shot-4.0.3.tgz"
-  integrity sha512-USNjYmED7C0me02c1DxKA0074Hw+y/nxo+xJKlffMvfUWWzL5ELh/TJA/pTnVqFurIrzthZDPtDM7aBFJuhrHQ==
+react-native-view-shot@^5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/react-native-view-shot/-/react-native-view-shot-5.1.1.tgz#07559817efae56c95aa62475346565b62cf715a5"
+  integrity sha512-jOTLQrMGNBgv/nRA81VR2x2AdiCGoCjc63c9a5P4A0gStCbh9oDeJ6W+GtRxxQmxXXf6LDSrvG+mmWYulIrOkg==
   dependencies:
     html2canvas "^1.4.1"
 
