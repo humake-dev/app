@@ -32,10 +32,6 @@ jobs:
         with:
           ruby-version: '3.3.8'
           bundler-cache: true
-      - name: Debug CocoaPods
-        run: |
-          pod --version
-          ruby --version
           
       # 3️⃣ CocoaPods 설치
       - name: Install CocoaPods
