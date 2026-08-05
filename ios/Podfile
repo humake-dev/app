@@ -26,7 +26,7 @@ target 'humake' do
   pod 'FirebaseCoreInternal', :modular_headers => true
 
   use_react_native!(
-    :new_arch_enabled => false
+    :new_arch_enabled => false,
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
