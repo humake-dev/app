@@ -37,15 +37,12 @@ jobs:
       - name: Install CocoaPods
         run: |
           cd ios
-          
           export BUNDLE_GEMFILE=Gemfile
           export NODE_BINARY=$(which node)
-          
-          bundle install
-          
-          rm -rf Pods
-          rm -f Podfile.lock
-          bundle exec pod install --repo-update
+          export RCT_NEW_ARCH_ENABLED=0
+          rm -rf Pods Podfile.lock
+          pod install --repo-update
+        #bundle exec pod install
 
       
       - name: Patch Local Podspecs Codegen check
