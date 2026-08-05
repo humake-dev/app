@@ -31,15 +31,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3.8'
-          bundler-cache: true
-
-      - name: Check RN Pods script
-        run: |
-          node -p 'require.resolve("react-native/scripts/react_native_pods.rb")'
-          
-      - name: Search React-RCTFabric
-        run: |
-          grep -R "React-RCTFabric" node_modules/react-native/scripts/cocoapods          
+          bundler-cache: true   
           
       # 3️⃣ CocoaPods 설치
       - name: Install CocoaPods
