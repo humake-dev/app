@@ -5,7 +5,7 @@ on:
 
 jobs:
   build-ios:
-    runs-on: macos-15
+    runs-on: macos-latest
 
     steps:
       - name: Checkout repository
@@ -37,15 +37,23 @@ jobs:
         run: |
           echo "REACT_NATIVE_PATH=$(pwd)/node_modules/react-native" >> $GITHUB_ENV  
           
+      # 2️⃣ RN Codegen 실행
+      - name: Run RN Codegen
+        run: |
+          mkdir -p ios/build/generated
+          node node_modules/react-native/scripts/generate-codegen-artifacts.js \
+          -p . -t ios -o ios/build/generated
+          
       # 3️⃣ CocoaPods 설치
       - name: Install CocoaPods
         run: |
-          export RCT_NEW_ARCH_ENABLED=0
-          bundle install
           cd ios
+          export BUNDLE_GEMFILE=Gemfile
+          export NODE_BINARY=$(which node)
+          export RCT_NEW_ARCH_ENABLED=0
           rm -rf Pods Podfile.lock
-          rm -rf ~/Library/Developer/Xcode/DerivedData/*
-          bundle exec pod install
+          pod install --repo-update
+        #bundle exec pod install
       
       - name: Patch Local Podspecs Codegen check
         run: |
