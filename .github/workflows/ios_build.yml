@@ -32,24 +32,10 @@ jobs:
         with:
           ruby-version: '3.2'
           bundler-cache: true
-
-      - name: Debug RN
+      - name: Debug CocoaPods
         run: |
-          node -v
-          yarn -v
-          npm ls react-native
-          
-          echo "===== React-RCTFabric ====="
-          ls -l node_modules/react-native/React/React-RCTFabric.podspec
-          
-          echo "===== RN version ====="
-          node -p "require('./node_modules/react-native/package.json').version"
-          
-          echo "===== Podfile ====="
-          cat ios/Podfile
-          
-          echo "===== react_native_pods.rb ====="
-          grep -n "React-RCTFabric" node_modules/react-native/scripts/react_native_pods.rb
+          pod --version
+          ruby --version
           
       # 3️⃣ CocoaPods 설치
       - name: Install CocoaPods
