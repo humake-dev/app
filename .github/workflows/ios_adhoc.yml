@@ -50,7 +50,6 @@ jobs:
           cd ios
           export BUNDLE_GEMFILE=Gemfile
           export NODE_BINARY=$(which node)
-          export RCT_NEW_ARCH_ENABLED=0
           rm -rf Pods Podfile.lock
           pod install --repo-update
         #bundle exec pod install
