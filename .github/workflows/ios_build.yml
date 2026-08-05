@@ -46,6 +46,11 @@ jobs:
           
       # 3️⃣ CocoaPods 설치
       - name: Install CocoaPods
+      - run: rm -rf node_modules
+      - run: rm -rf ios/Pods
+      - run: rm -rf ios/build
+      - run: rm -rf ~/Library/Caches/CocoaPods
+      - run: npm ci
         run: |
           cd ios
           export BUNDLE_GEMFILE=Gemfile
