@@ -59,6 +59,15 @@ jobs:
         with:
           ruby-version: '3.3.8'
           bundler-cache: true
+          
+      - name: Show toolchain
+        run: |
+          node --version
+          which node
+          ruby --version
+          bundle --version
+          pod --version
+          xcodebuild -version          
 
       - name: Install CocoaPods
         working-directory: ios
