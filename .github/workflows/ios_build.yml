@@ -5,7 +5,7 @@ on:
 
 jobs:
   build-ios:
-    runs-on: macos-latest
+    runs-on: macos-15
 
     steps:
       - name: Checkout repository
@@ -43,6 +43,17 @@ jobs:
         with:
           ruby-version: '3.3.8'
           bundler-cache: true
+          
+      - name: Select Xcode 26
+        run: |
+          XCODE_PATH=$(find /Applications -maxdepth 1 -type d -name 'Xcode_26*.app' | sort -V | head -n 1)
+          
+          echo "Selected Xcode: $XCODE_PATH"
+          
+          sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
+          
+          xcodebuild -version
+          xcode-select -p          
           
       - name: Show toolchain
         run: |
