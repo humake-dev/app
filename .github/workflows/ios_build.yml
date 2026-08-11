@@ -11,22 +11,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Select Xcode 26
-        run: |
-          echo "=== Installed Xcodes ==="
-          ls -la /Applications | grep Xcode || true
-
-          sudo xcode-select -s /Applications/Xcode_26.6.app/Contents/Developer
-
-          echo "=== Selected Xcode ==="
-          xcode-select -p
-
-          echo "=== Xcode Version ==="
-          xcodebuild -version
-
-          echo "=== iOS SDK ==="
-          xcrun --sdk iphoneos --show-sdk-version
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
