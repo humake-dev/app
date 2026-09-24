@@ -1,4 +1,8 @@
 {
   "name": "humake",
-  "displayName": "humake"
+  "displayName": "humake",
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-5400903051441488~7531950124",
+    "ios_app_id": "ca-app-pub-5400903051441488~8318418182"
+  }
 }

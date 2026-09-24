@@ -29,6 +29,11 @@ import { useMessageContext } from "./MessageContext";
 import Barcode from '@kichiyaki/react-native-barcode-generator';
 import { captureRef } from 'react-native-view-shot';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
+import {
+  BannerAd,
+  BannerAdSize,
+} from 'react-native-google-mobile-ads';
+import { ADMOB_BANNER_ID } from './Config';
 
 const HomeScreen = ({navigation, route, attendanceTotal, reservationTotal, enrollInfo}) => {
     const { t } = useTranslation();
@@ -43,14 +48,10 @@ const HomeScreen = ({navigation, route, attendanceTotal, reservationTotal, enrol
     const windowWidth = Dimensions.get('window').width;
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const originalBrightnessRef = useRef(null);    
-    const [branch, setBranch] = useState();    
+    const [branch, setBranch] = useState();
+    const { user, appMode } = useUser();
 
-    const userContext = useUser();
-    const user = userContext?.user;
-    
     const LAST_TAB_KEY = 'lastTab';
-
-
     
     useEffect(() => {
       if (route.params?.targetTab === 'first') {
@@ -60,6 +61,12 @@ const HomeScreen = ({navigation, route, attendanceTotal, reservationTotal, enrol
 
 useEffect(() => {
   const fetchBranch = async () => {
+
+    if (appMode === 'guest') {
+      setBranch({ id: 1 });
+      return;
+    }
+
     try {
       const response = await authFetch(`/branches/me`, {
         headers: {
@@ -68,23 +75,20 @@ useEffect(() => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch trainers data');
+        throw new Error('Failed to fetch branch data');
       }
 
-
-
       const data = await response.json();
-      console.log(data);      
+
       setBranch(data);
 
-
     } catch (error) {
-      console.error('Error fetching trainers:', error);
+      console.error('Error fetching branch:', error);
     }
   };
 
   fetchBranch();
-}, []);
+}, [appMode]);
 
     
       // 앱 시작 시 저장된 탭 인덱스 로딩
@@ -241,10 +245,18 @@ useEffect(() => {
                   </Text>
               )}
             />
-          )}
+    )}
+  />
+
+  {/* AdMob Banner */}
+      <View style={styles.adContainer}>
+        <BannerAd
+          unitId={ADMOB_BANNER_ID}
+          size={BannerAdSize.BANNER}
         />
-  </View>
-  </View>
+      </View>
+</View>
+</View>
   );
 };
 
@@ -606,85 +618,127 @@ const downloadBarcode = async () => {
   }
 };
 
-    return (
-      <View style={styles.tabContent}>
-                <TouchableOpacity 
-            style={styles.fullScreenButton}
-            onPress={() => navigation.navigate('BarcodeScreen')}
-          >
-<Ionicons name="expand" size={24} color="#fff" />
-          </TouchableOpacity>
-        <View style={{ 
-          alignItems: 'center', 
-          marginTop: 30, 
-          flex: 1,
-          justifyContent: 'flex-start'
-        }}>
-        {user && user.access_card && user.access_card.card_no ? (
-          <View style={{ 
-            alignItems: 'center', 
-            padding: 30,
-            backgroundColor: '#fff',
-            borderRadius: 10,
-            elevation: 5,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.25,
-            shadowRadius: 3.84,
-            width: '90%', 
-            maxWidth: 400
-          }}>
-<View
-  ref={viewShotRef}
-  collapsable={false}
-  style={{ backgroundColor: 'white', padding: 20 }}
->
-            <Barcode 
-              value={user.access_card.card_no} 
-              format="CODE128" 
-              options={{
-                width: 3, 
-                height: 150, 
-                margin: 20,
-                displayValue: true,
-                fontSize: 24, 
-                fontOptions: "bold",
-                font: "Arial",
-                textMargin: 10,
-                textColor: '#000'
-              }}
-            />
-            </View>
-            <TouchableOpacity 
-              style={{
-                marginTop: 20,
-                padding: 10,
-                backgroundColor: '#007AFF',
-                borderRadius: 5,
-                paddingHorizontal: 20
-              }}
-              onPress={downloadBarcode}
-            >
-              <Text style={{
-                color: '#fff',
-                fontSize: 16,
-                fontWeight: 'bold'
-              }}>
-                {t('common.download_barcode')}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-            <Text style={{ 
-              color: '#666',
-              fontSize: 18,
-              marginTop: 20
-            }}>Loading...</Text>
-          )}
-        </View>
+return (
+  <View style={styles.tabContent}>
 
-      </View>
-    );
+{user && (
+    <TouchableOpacity
+      style={styles.fullScreenButton}
+      onPress={() => navigation.navigate('BarcodeScreen')}
+    >
+      <Ionicons name="expand" size={24} color="#fff" />
+    </TouchableOpacity>
+)}
+    <View
+      style={{
+        alignItems: 'center',
+        marginTop: 30,
+        flex: 1,
+        justifyContent: 'flex-start',
+      }}
+    >
+
+      {/* 로그인 상태 */}
+      {user ? (
+
+        <>
+            <>
+              <View
+                style={{
+                  alignItems: 'center',
+                  padding: 30,
+                  backgroundColor: '#fff',
+                  borderRadius: 10,
+                  elevation: 5,
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 3.84,
+                  width: '90%',
+                  maxWidth: 400,
+                }}
+              >
+                <View
+                  ref={viewShotRef}
+                  collapsable={false}
+                  style={{
+                    backgroundColor: 'white',
+                    padding: 20,
+                  }}
+                >
+                  <Barcode
+                    value={user.access_card.card_no}
+                    format="CODE128"
+                    options={{
+                      width: 3,
+                      height: 150,
+                      margin: 20,
+                      displayValue: true,
+                      fontSize: 24,
+                      fontOptions: 'bold',
+                      font: 'Arial',
+                      textMargin: 10,
+                      textColor: '#000',
+                    }}
+                  />
+                </View>
+              </View>
+
+              {/* 바코드 다운로드 */}
+              <TouchableOpacity
+                style={{
+                  marginTop: 20,
+                  padding: 10,
+                  backgroundColor: '#007AFF',
+                  borderRadius: 5,
+                  paddingHorizontal: 20,
+                }}
+                onPress={downloadBarcode}
+              >
+                <Text
+                  style={{
+                    color: '#fff',
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                  }}
+                >
+                  {t('common.download_barcode')}
+                </Text>
+              </TouchableOpacity>
+            </>
+
+
+        </>
+
+      ) : (
+
+        /* 로그인하지 않은 경우 */
+        <TouchableOpacity
+          style={{
+            marginTop: 20,
+            padding: 10,
+            backgroundColor: '#007AFF',
+            borderRadius: 5,
+            paddingHorizontal: 20,
+          }}
+          onPress={() => navigation.navigate('Login')}
+        >
+          <Text
+            style={{
+              color: '#fff',
+              fontSize: 16,
+              fontWeight: 'bold',
+            }}
+          >
+            {t('common.login')}
+          </Text>
+        </TouchableOpacity>
+
+      )}
+
+    </View>
+  </View>
+);
   };
 
   const styles = StyleSheet.create({
@@ -941,7 +995,13 @@ enrollInfoHighlight: {
   fontSize: 20,
   fontWeight: '700',
   color: '#ff8d1d',
-}
+},
+adContainer: {
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingVertical: 5,
+  backgroundColor: '#fff',
+},
 });
 
 
