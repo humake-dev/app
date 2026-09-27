@@ -162,9 +162,6 @@ const LoginScreen = () => {
         userContext.setUser(userData);
       }
 
-
-      navigation.navigate('Home');
-
     } catch (error) {
       Alert.alert("Error", t('login.fail'));
       console.error(error);

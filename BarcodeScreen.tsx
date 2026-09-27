@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Dimensions, SafeAreaView } from 'react-native';
+import { View, StyleSheet,  SafeAreaView } from 'react-native';
 import Barcode from '@kichiyaki/react-native-barcode-generator';
 import { useUser } from './UserContext';
 import DeviceBrightness from '@adrianso/react-native-device-brightness';
@@ -12,7 +12,6 @@ const BarcodeScreen = () => {
     const user = userContext?.user;
     
     const [brightness, setBrightness] = useState();
-    const [changeBrightness, setChangeBrightness] = useState(false);
 
     useEffect(() => {
       if(Platform.OS == 'ios') {

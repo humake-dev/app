@@ -20,7 +20,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Lightbox from 'react-native-lightbox-v2';
 import MessageScreen from './MessageScreen';
 import NoticeScreen from './NoticeScreen';
-import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { uploadProfileImageFlow } from './src/utils/profileImageUploader';
 import { authFetch } from './src/utils/api';
@@ -38,6 +37,8 @@ import { ADMOB_BANNER_ID } from './Config';
 const HomeScreen = ({navigation, route, attendanceTotal, reservationTotal, enrollInfo}) => {
     const { t } = useTranslation();
     const [index, setIndex] = useState(1);
+
+
 
     const [routes] = useState([
       { key: 'first', title: t('tabMenu.message') },
@@ -577,6 +578,17 @@ resizeMode="cover"
   const ThirdRoute = ({navigation, t, user}) => {
     const viewShotRef = useRef();
 
+    const {
+      setUser,
+      useGuest,
+      setUseGuest,
+      hasCompletedStart,
+      setHasCompletedStart,
+      isLoggedIn,
+      appMode,
+      isLoading,
+    } = useUser();
+
 const requestPermission = async () => {
   if (Platform.OS === 'android') {
     if (Platform.Version >= 33) {
@@ -721,7 +733,11 @@ return (
             borderRadius: 5,
             paddingHorizontal: 20,
           }}
-          onPress={() => navigation.navigate('Login')}
+                          onPress={() => {
+                            setUser(null);
+                            setUseGuest(false);
+                            setHasCompletedStart(false);
+                          }}
         >
           <Text
             style={{
@@ -730,7 +746,7 @@ return (
               fontWeight: 'bold',
             }}
           >
-            {t('common.login')}
+            {t('menu.login')}
           </Text>
         </TouchableOpacity>
 
