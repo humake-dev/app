@@ -1,10 +1,12 @@
-import db from './database';
+import {getDatabase} from './database';
 
 /**
  * 프로필 DB 초기화
  */
 export async function initializeProfileDatabase() {
-  await db.executeAsync(`
+  const db = await getDatabase();
+
+  await db.executeSql(`
     CREATE TABLE IF NOT EXISTS body_reference (
       age_group TEXT,
       gender TEXT,
@@ -14,7 +16,7 @@ export async function initializeProfileDatabase() {
     )
   `);
 
-  await db.executeAsync(`
+  await db.executeSql(`
     CREATE TABLE IF NOT EXISTS user_profile (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       age_group TEXT,
@@ -38,7 +40,9 @@ export async function getBodyReference(
     return null;
   }
 
-  const { results } = await db.executeAsync(
+  const db = await getDatabase();
+
+  const [result] = await db.executeSql(
     `
       SELECT
         average_height,
@@ -51,12 +55,16 @@ export async function getBodyReference(
     [ageGroup, gender],
   );
 
-  return results[0]
-    ? {
-        height: Number(results[0].average_height),
-        weight: Number(results[0].average_weight),
-      }
-    : null;
+  if (result.rows.length === 0) {
+    return null;
+  }
+
+  const row = result.rows.item(0);
+
+  return {
+    height: Number(row.average_height),
+    weight: Number(row.average_weight),
+  };
 }
 
 /**
@@ -73,13 +81,15 @@ export async function saveUserProfile({
   height: number | null;
   weight: number | null;
 }) {
+  const db = await getDatabase();
+
   const now = new Date().toISOString();
 
-  await db.executeAsync(`
+  await db.executeSql(`
     DELETE FROM user_profile
   `);
 
-  await db.executeAsync(
+  await db.executeSql(
     `
       INSERT INTO user_profile (
         age_group,
@@ -140,13 +150,15 @@ const BODY_REFERENCE = [
  * 평균 신장 / 체중 기준값 입력
  */
 export async function seedBodyReference() {
+  const db = await getDatabase();
+
   for (const [
     ageGroup,
     gender,
     averageHeight,
     averageWeight,
   ] of BODY_REFERENCE) {
-    await db.executeAsync(
+    await db.executeSql(
       `
         INSERT OR IGNORE INTO body_reference (
           age_group,
@@ -173,3 +185,4 @@ export async function initializeProfileDatabaseWithSeed() {
   await initializeProfileDatabase();
   await seedBodyReference();
 }
+

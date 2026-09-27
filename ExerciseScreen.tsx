@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   ScrollView,
@@ -10,24 +10,39 @@ import {
   ActivityIndicator,
 } from 'react-native';
 
-import db from './src/database/database';
-import { initializeExerciseDatabaseWithSeed } from './src/database/exerciseDatabase';
+import {getDatabase} from './src/database/database';
+import {
+  initializeExerciseDatabaseWithSeed,
+} from './src/database/exerciseDatabase';
 
 const ExerciseScreen = () => {
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(
+    null,
+  );
+
   const [categories, setCategories] = useState<any[]>([]);
   const [exercises, setExercises] = useState<any[]>([]);
-  const [selectedExercise, setSelectedExercise] = useState<any | null>(null);
+  const [selectedExercise, setSelectedExercise] = useState<any | null>(
+    null,
+  );
+
   const [loading, setLoading] = useState(true);
 
   /**
    * ExerciseScreen 최초 진입 시
-   * 운동 DB 초기화 → seed → 카테고리 조회
+   *
+   * 1. 운동 DB 초기화
+   * 2. 기본 데이터 확인 및 삽입
+   * 3. 카테고리 조회
+   * 4. 첫 번째 카테고리 자동 선택
    */
   useEffect(() => {
     const init = async () => {
       try {
         setLoading(true);
+
+        // SQLite DB 연결
+        await getDatabase();
 
         // 운동 DB 초기화 + seed
         await initializeExerciseDatabaseWithSeed();
@@ -60,41 +75,61 @@ const ExerciseScreen = () => {
     }
 
     const loadExercises = async () => {
-      const data = await fetchExercises(selectedCategory);
+      try {
+        const data = await fetchExercises(selectedCategory);
 
-      setExercises(data);
-      setSelectedExercise(null);
+        setExercises(data);
+        setSelectedExercise(null);
+      } catch (error) {
+        console.error('운동 목록 조회 실패:', error);
+        setExercises([]);
+      }
     };
 
     loadExercises();
   }, [selectedCategory]);
 
+  /**
+   * 카테고리 조회
+   */
   const fetchCategories = async () => {
     try {
       console.log('카테고리 조회 시작');
 
-      const result = await db.executeAsync(`
+      const db = await getDatabase();
+
+      const [result] = await db.executeSql(`
         SELECT *
         FROM exercise_categories
         ORDER BY id ASC
       `);
 
-      const categories = result.rows?._array ?? [];
+      const categories = [];
+
+      for (let i = 0; i < result.rows.length; i++) {
+        categories.push(result.rows.item(i));
+      }
 
       console.log('카테고리 조회 성공:', categories);
 
       return categories;
     } catch (error) {
       console.error('카테고리 조회 실패:', error);
+
       return [];
     }
   };
 
+  /**
+   * 운동 조회
+   */
   const fetchExercises = async (categoryId: number) => {
     try {
       console.log('운동 조회 시작:', categoryId);
 
-      const result = await db.executeAsync(
+      const db = await getDatabase();
+
+      const [result] = await db.executeSql(
         `
           SELECT
             e.*,
@@ -114,17 +149,25 @@ const ExerciseScreen = () => {
         [categoryId],
       );
 
-      const exercises = result.rows?._array ?? [];
+      const exercises = [];
+
+      for (let i = 0; i < result.rows.length; i++) {
+        exercises.push(result.rows.item(i));
+      }
 
       console.log('운동 조회 성공:', exercises);
 
       return exercises;
     } catch (error) {
       console.error('운동 조회 실패:', error);
+
       return [];
     }
   };
 
+  /**
+   * 카테고리 아이템
+   */
   const renderCategoryItem = (category: any) => (
     <TouchableOpacity
       key={category.id}
@@ -147,7 +190,10 @@ const ExerciseScreen = () => {
     </TouchableOpacity>
   );
 
-  const renderExerciseItem = ({ item }: { item: any }) => (
+  /**
+   * 운동 아이템
+   */
+  const renderExerciseItem = ({item}: {item: any}) => (
     <TouchableOpacity
       style={styles.exerciseItem}
       onPress={() => setSelectedExercise(item)}
@@ -185,6 +231,9 @@ const ExerciseScreen = () => {
     </TouchableOpacity>
   );
 
+  /**
+   * 운동 상세
+   */
   const renderExerciseDetail = () => {
     if (!selectedExercise) {
       return null;
@@ -226,10 +275,14 @@ const ExerciseScreen = () => {
     );
   };
 
+  /**
+   * 로딩
+   */
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" />
+
         <Text style={styles.loadingText}>
           운동 정보를 준비하고 있습니다...
         </Text>
@@ -237,6 +290,9 @@ const ExerciseScreen = () => {
     );
   }
 
+  /**
+   * 화면
+   */
   return (
     <View style={styles.container}>
       <ScrollView
@@ -253,7 +309,7 @@ const ExerciseScreen = () => {
       ) : (
         <FlatList
           data={exercises}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={item => item.id.toString()}
           contentContainerStyle={styles.listContent}
           renderItem={renderExerciseItem}
         />
@@ -382,3 +438,4 @@ const styles = StyleSheet.create({
 });
 
 export default ExerciseScreen;
+

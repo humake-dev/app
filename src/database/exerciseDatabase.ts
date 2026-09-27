@@ -1,4 +1,4 @@
-import db from './database';
+import {getDatabase} from './database';
 
 
 /**
@@ -3764,7 +3764,9 @@ const exercisePictures = [
  * DB 스키마 초기화
  */
 export async function initializeExerciseDatabase() {
-  await db.executeAsync(`
+  const db = await getDatabase();
+
+  await db.executeSql(`
     CREATE TABLE IF NOT EXISTS exercise_categories (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT NOT NULL,
@@ -3774,7 +3776,7 @@ export async function initializeExerciseDatabase() {
     )
   `);
 
-  await db.executeAsync(`
+  await db.executeSql(`
     CREATE TABLE IF NOT EXISTS exercises (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       exercise_category_id INTEGER NOT NULL,
@@ -3787,7 +3789,7 @@ export async function initializeExerciseDatabase() {
     )
   `);
 
-  await db.executeAsync(`
+  await db.executeSql(`
     CREATE TABLE IF NOT EXISTS exercise_pictures (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       exercise_id INTEGER NOT NULL,
@@ -3803,14 +3805,16 @@ export async function initializeExerciseDatabase() {
  * 초기 데이터가 이미 존재하는지 확인
  */
 async function hasExerciseData() {
-  const { results } = await db.executeAsync(`
+  const db = await getDatabase();
+
+  const [result] = await db.executeSql(`
     SELECT
       (SELECT COUNT(*) FROM exercise_categories) AS category_count,
       (SELECT COUNT(*) FROM exercises) AS exercise_count,
       (SELECT COUNT(*) FROM exercise_pictures) AS picture_count
   `);
 
-  const row = results[0];
+  const row = result.rows.item(0);
 
   return (
     Number(row?.category_count ?? 0) > 0 ||
@@ -3825,15 +3829,17 @@ async function hasExerciseData() {
  * 이미 데이터가 하나라도 있으면 다시 삽입하지 않는다.
  */
 export async function seedExerciseDatabase() {
+  const db = await getDatabase();
+
   if (await hasExerciseData()) {
     return;
   }
 
-  await db.executeAsync('BEGIN TRANSACTION');
+  await db.executeSql('BEGIN TRANSACTION');
 
   try {
     for (const category of exerciseCategories) {
-      await db.executeAsync(
+      await db.executeSql(
         `
           INSERT INTO exercise_categories (
             id,
@@ -3855,7 +3861,7 @@ export async function seedExerciseDatabase() {
     }
 
     for (const exercise of exercises) {
-      await db.executeAsync(
+      await db.executeSql(
         `
           INSERT INTO exercises (
             id,
@@ -3883,7 +3889,7 @@ export async function seedExerciseDatabase() {
     }
 
     for (const picture of exercisePictures) {
-      await db.executeAsync(
+      await db.executeSql(
         `
           INSERT INTO exercise_pictures (
             id,
@@ -3906,9 +3912,9 @@ export async function seedExerciseDatabase() {
       );
     }
 
-    await db.executeAsync('COMMIT');
+    await db.executeSql('COMMIT');
   } catch (error) {
-    await db.executeAsync('ROLLBACK');
+    await db.executeSql('ROLLBACK');
     throw error;
   }
 }
