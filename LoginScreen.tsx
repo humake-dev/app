@@ -15,7 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BASE_URL } from './Config';
-import UserContext from './UserContext';
+import UserContext from './src/contexts/UserContext';
 
 // ============================================================
 // LoginScreen

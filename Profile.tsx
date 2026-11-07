@@ -18,7 +18,7 @@ import {
 import {
   getBodyReference,
 } from './src/database/profileDatabse';
-import { useUser } from './UserContext';
+import { useUser } from './src/contexts/UserContext';
 // ============================================================
 // Types
 // ============================================================

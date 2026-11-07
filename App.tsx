@@ -50,8 +50,9 @@ import UserScreen from './UserScreen';
 import i18n from './i18n/i18n';
 import { useTranslation } from 'react-i18next'; 
 import {Icon} from 'react-native-elements';
-import { UserProvider,useUser } from './UserContext';
-import { MessageProvider } from "./MessageContext";
+import { UserProvider,useUser } from './src/contexts/UserContext';
+import { MessageProvider } from "./src/contexts/MessageContext";
+import { NoticeProvider } from "./src/contexts/NoticeContext";
 import BarcodeScreen from './BarcodeScreen';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import messaging from '@react-native-firebase/messaging';
@@ -413,6 +414,7 @@ const loginCheck = async () => {
 
 return (
         <MessageProvider>
+          <NoticeProvider>
           <StatusBar barStyle="dark-content" />
 
           <NavigationContainer
@@ -1016,7 +1018,7 @@ return (
             )}
 
           </NavigationContainer>
-
+          </NoticeProvider>
         </MessageProvider>
 );
 };

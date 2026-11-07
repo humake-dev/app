@@ -9,7 +9,7 @@ import {
   RefreshControl
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useMessageContext } from './MessageContext';
+import { useMessageContext } from './src/contexts/MessageContext';
 
 const MessageScreen = ({ navigation }) => {
   const { t } = useTranslation();

@@ -9,8 +9,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useMessageContext } from './MessageContext';
+import { useMessageContext } from './src/contexts/MessageContext';
 import { authFetch } from './src/utils/api';
 
 const MessageDetailScreen = ({ navigation }) => {
@@ -18,7 +17,12 @@ const MessageDetailScreen = ({ navigation }) => {
   const route = useRoute();
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { handleDeleteMessage } = useMessageContext();  
+const {
+  messages,
+  handleDeleteMessage,
+} = useMessageContext();
+
+
 
   // 상담 ID가 없을 때
   if (!route.params?.id) {
@@ -51,43 +55,24 @@ const MessageDetailScreen = ({ navigation }) => {
     }
   };
 
-  const fetchMessage = async () => {
-    try {
-            const response = await authFetch(`/messages/${route.params.id}`, {
-              headers: {
-                "Content-Type": "application/json",
-              },
-            });
+  useEffect(() => {
+  if (!route.params?.id) {
+    setLoading(false);
+    return;
+  }
 
-      if (response.ok) {
-        const data = await response.json();
+  const data = messages.find(
+    item => String(item.id) === String(route.params.id)
+  );
 
-        // Always mark as read when viewing the message
-        if(data.readtime === null){
-          fetchMessageRead();
-        }
-
-        console.log(data);
-
-        setMessage(data);
-      } else {
-        throw new Error('Failed to fetch message data');
-      }
-    } catch (error) {
-      console.error('Error fetching message:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  setMessage(data || null);
+  setLoading(false);
+}, [messages, route.params?.id]);
 
   const goBackToList = () => {
     navigation.setParams({ refresh: true });
   };
 
-  useEffect(() => {
-    fetchMessage();
-  }, [navigation, route.params.id]);
 
   if (loading) {
     return (

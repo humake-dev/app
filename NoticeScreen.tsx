@@ -1,10 +1,5 @@
 
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-} from 'react';
+import React from 'react';
 
 import {
   View,
@@ -16,139 +11,18 @@ import {
   RefreshControl,
 } from 'react-native';
 
-import NetInfo from '@react-native-community/netinfo';
 import { useTranslation } from 'react-i18next';
-
-import { authFetch } from './src/utils/api';
-
-import {
-  getNotices,
-  saveNotices,
-  initializeNoticeTable,
-} from './src/database/noticeDatabase';
+import { useNoticeContext } from './src/contexts/NoticeContext';
 
 const NoticeScreen = ({ navigation }) => {
   const { t } = useTranslation();
 
-  const [notices, setNotices] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-
-  const syncingRef = useRef(false);
-  const mountedRef = useRef(true);
-
-  // 서버 동기화
-  const syncNotices = useCallback(async () => {
-    if (syncingRef.current) return;
-
-    syncingRef.current = true;
-
-    try {
-      const response = await authFetch('/notices', {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        return;
-      }
-
-      const data = await response.json();
-
-      if (!Array.isArray(data.notice_list)) {
-        return;
-      }
-
-      // SQLite 갱신
-      await saveNotices(data.notice_list);
-
-      // 갱신된 SQLite 데이터 다시 조회
-      const localNotices = await getNotices();
-
-      if (mountedRef.current) {
-        setNotices(localNotices);
-      }
-
-    } catch (error) {
-      console.log('Notice sync failed:', error);
-      // 오류 발생 시 기존 SQLite 데이터 유지
-    } finally {
-      syncingRef.current = false;
-      if (mountedRef.current) {
-        setRefreshing(false);
-      }
-    }
-  }, []);
-
-  // 로컬 데이터 먼저 조회
-  const loadLocalNotices = useCallback(async () => {
-    try {
-      await initializeNoticeTable();
-
-      const localNotices = await getNotices();
-
-      if (mountedRef.current) {
-        setNotices(localNotices);
-        setLoading(false);
-      }
-
-    } catch (error) {
-      console.error('SQLite read error:', error);
-
-      if (mountedRef.current) {
-        setLoading(false);
-      }
-    }
-  }, []);
-
-  // 수동 새로고침
-  const handleRefresh = useCallback(async () => {
-    const state = await NetInfo.fetch();
-
-    if (
-      state.isConnected &&
-      state.isInternetReachable !== false
-    ) {
-      setRefreshing(true);
-      await syncNotices();
-    }
-  }, [syncNotices]);
-
-  useEffect(() => {
-    mountedRef.current = true;
-
-    // 네트워크 연결 감지
-    const unsubscribe = NetInfo.addEventListener((state) => {
-      if (
-        state.isConnected &&
-        state.isInternetReachable !== false
-      ) {
-        syncNotices();
-      }
-    });
-
-    // SQLite 먼저 읽고 서버 동기화
-    const initialize = async () => {
-      await loadLocalNotices();
-
-      const state = await NetInfo.fetch();
-
-      if (
-        state.isConnected &&
-        state.isInternetReachable !== false
-      ) {
-        syncNotices();
-      }
-    };
-
-    initialize();
-
-    return () => {
-      mountedRef.current = false;
-      unsubscribe();
-    };
-  }, [loadLocalNotices, syncNotices]);
+  const {
+    notices,
+    loading,
+    refreshing,
+    refreshNotices,
+  } = useNoticeContext();
 
   const renderNoticeItem = ({ item }) => {
     return (
@@ -185,7 +59,7 @@ const NoticeScreen = ({ navigation }) => {
       <FlatList
         data={notices}
         renderItem={renderNoticeItem}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={item => String(item.id)}
         contentContainerStyle={
           notices.length === 0
             ? styles.emptyContainer
@@ -194,7 +68,7 @@ const NoticeScreen = ({ navigation }) => {
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={handleRefresh}
+            onRefresh={refreshNotices}
           />
         }
         ListEmptyComponent={

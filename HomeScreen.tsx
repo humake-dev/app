@@ -15,7 +15,7 @@ import {
 import {Trans, useTranslation} from 'react-i18next';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import DeviceBrightness from '@adrianso/react-native-device-brightness';
-import { useUser } from './UserContext';
+import { useUser } from './src/contexts/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Lightbox from 'react-native-lightbox-v2';
 import MessageScreen from './MessageScreen';
@@ -24,7 +24,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { uploadProfileImageFlow } from './src/utils/profileImageUploader';
 import { authFetch } from './src/utils/api';
 import i18n from './i18n/i18n';
-import { useMessageContext } from "./MessageContext";
+import { useMessageContext } from "./src/contexts/MessageContext";
 import Barcode from '@kichiyaki/react-native-barcode-generator';
 import { captureRef } from 'react-native-view-shot';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';

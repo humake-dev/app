@@ -10,14 +10,14 @@ import React, {
 
 import NetInfo from '@react-native-community/netinfo';
 
-import { authFetch } from './src/utils/api';
+import { authFetch } from '../utils/api';
 
 import {
   initializeMessageTable,
   getMessages,
   saveMessages,
   deleteMessageFromDB,
-} from './src/database/messageDatabase';
+} from '../database/messageDatabase';
 
 const MessageContext = createContext(null);
 

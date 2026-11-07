@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet,  SafeAreaView } from 'react-native';
 import Barcode from '@kichiyaki/react-native-barcode-generator';
-import { useUser } from './UserContext';
+import { useUser } from './src/contexts/UserContext';
 import DeviceBrightness from '@adrianso/react-native-device-brightness';
 import { useState } from 'react';
 import { useEffect } from 'react';

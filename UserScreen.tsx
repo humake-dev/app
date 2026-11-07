@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { useNavigation } from '@react-navigation/native';
 import Lightbox from 'react-native-lightbox-v2';
-import { useUser } from './UserContext';
+import { useUser } from './src/contexts/UserContext';
 import { authFetch } from './src/utils/api';
 import { formatDate } from './src/utils/helper';
 import { uploadProfileImageFlow } from './src/utils/profileImageUploader';

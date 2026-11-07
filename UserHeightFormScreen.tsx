@@ -8,7 +8,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useUser } from './UserContext';
+import { useUser } from './src/contexts/UserContext';
 import { authFetch, fetchUser } from './src/utils/api';
 
 const UserHeightFormScreen = ({ navigation }) => {

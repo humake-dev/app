@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React from 'react';
 import {
   View,
   Text,
@@ -7,79 +8,81 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
+
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { authFetch } from './src/utils/api';
+import { useNoticeContext } from './src/contexts/NoticeContext';
 
-const NoticeDetailScreen = ({ navigation }) => {
+const NoticeDetailScreen = () => {
   const { t } = useTranslation();
   const route = useRoute();
-  const [notice, setNotice] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
 
-  /*const fetchNoticeRead = async () => {
-    try {
-      const response = await authFetch(`${BASE_URL}/notices/read/${route.params.id}`, {
-        method: 'POST',
-      });
+  const {
+    notices,
+    loading,
+  } = useNoticeContext();
 
-      if (response.ok) {
-      } else {
-        throw new Error('Failed to fetch message data');
-      }
-    } catch (error) {
-      console.error('Error fetching message:', error);
-    }
-  }; */
+  // 공지사항 ID로 Context 데이터 조회
+  const notice = notices.find(
+    item => String(item.id) === String(route.params?.id)
+  );
 
-  const fetchNotice= async () => {
-    try {
-      const response = await authFetch(`/notices/${route.params.id}`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-
-        // Always mark as read when viewing the message
-        // fetchNoticeRead();
-
-        setNotice(data);
-      } else {
-        throw new Error('Failed to fetch notice data');
-      }
-    } catch (error) {
-      console.error('Error fetching notice:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const goBackToList = () => {
-    navigation.setParams({ refresh: true });
-  };
-
-  useEffect(() => {
-    fetchNotice();
-  }, [navigation, route.params.id]);
-
-  if (loading) {
+  // ID가 없을 때
+  if (!route.params?.id) {
     return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#000" />
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorTitle}>
+          {t('common.error')}
+        </Text>
+
+        <Text style={styles.errorMessage}>
+          {t('message.noMessage')}
+        </Text>
+
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.buttonText}>
+            {t('common.backToList')}
+          </Text>
+        </TouchableOpacity>
       </View>
     );
   }
 
+  // Context 초기 로딩 대기
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator
+          size="large"
+          color="#007AFF"
+        />
+      </View>
+    );
+  }
+
+  // 공지사항이 없는 경우
   if (!notice) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorTitle}>{t('common.error')}</Text>
-        <Text style={styles.errorMessage}>{t('message.noMessage')}</Text>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Text style={styles.buttonText}>{t('common.backToList')}</Text>
+        <Text style={styles.errorTitle}>
+          {t('common.error')}
+        </Text>
+
+        <Text style={styles.errorMessage}>
+          {t('message.noMessage')}
+        </Text>
+
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.buttonText}>
+            {t('common.backToList')}
+          </Text>
         </TouchableOpacity>
       </View>
     );
@@ -90,12 +93,23 @@ const NoticeDetailScreen = ({ navigation }) => {
       <ScrollView style={styles.scrollView}>
         <View style={styles.content}>
           <View style={styles.contentContainer}>
-            <Text style={styles.title}>{notice.title}</Text>
-            <Text style={styles.contentText}>{notice.content}</Text>
+            <Text style={styles.title}>
+              {notice.title}
+            </Text>
+
+            <Text style={styles.contentText}>
+              {notice.content}
+            </Text>
           </View>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
             <View style={styles.buttonContent}>
-              <Text style={styles.buttonText}>{t('common.backToList')}</Text>
+              <Text style={styles.buttonText}>
+                {t('common.backToList')}
+              </Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -106,7 +120,7 @@ const NoticeDetailScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
   },
   scrollView: {
     flex: 1,
@@ -127,6 +141,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 16,
   },
   contentText: {
     fontSize: 16,
@@ -169,7 +189,7 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     marginBottom: 32,
-  }
+  },
 });
 
 export default NoticeDetailScreen;
