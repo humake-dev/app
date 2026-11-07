@@ -3,13 +3,14 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "android:dev": "ENVFILE=.env.development npx react-native run-android",
-    "android:prod": "ENVFILE=.env npx react-native run-android",
+    "android:dev": "cross-env ENVFILE=.env.development npx react-native run-android",
+    "android:prod": "cross-env ENVFILE=.env npx react-native run-android",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@adrianso/react-native-device-brightness": "^1.2.7",
@@ -17,6 +18,7 @@
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-camera-roll/camera-roll": "^7.10.2",
     "@react-native-community/datetimepicker": "^8.3.0",
+    "@react-native-community/netinfo": "^12.0.1",
     "@react-native-firebase/app": "^23.8.6",
     "@react-native-firebase/messaging": "^23.8.6",
     "@react-native-picker/picker": "^2.11.0",
@@ -25,6 +27,7 @@
     "@react-navigation/stack": "^7.2.1",
     "base-64": "^1.0.0",
     "buffer": "^6.0.3",
+    "cross-env": "^10.1.0",
     "i18next": "^25.8.4",
     "install": "^0.13.0",
     "jwt-decode": "^4.0.0",

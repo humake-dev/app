@@ -1,4 +1,3 @@
-// i18n/locales/ko.json
 {
     "common": {
       "back": "뒤로 가기",
@@ -105,6 +104,7 @@
     }
     },
     "attendance": {
+      "title": "출석",
       "PTcount": "PT 일정",
       "count": "출석"
     },
@@ -119,7 +119,18 @@
       "bmi": "BMI",
       "period_day": "일간",
       "period_week": "주간",
-      "period_month": "월간"
+      "period_month": "월간",
+      "date_week": "{{year}}년 {{week}}주",
+      "date_month": "{{year}}년 {{month}}월",
+      "recent_measurement": "최근 측정: {{date}}",
+      "average_period": "최근 기간 평균: {{weight}} {{unit}}",
+      "unit_kg": "kg",
+      "bmi_status": {
+        "normal": "정상",
+        "underweight": "저체중",
+        "overweight": "과체중",
+        "obese": "비만"
+      }
     },
     "user_height": {
       "height": "키(신장)",
@@ -135,9 +146,11 @@
         "today": "오늘",
         "monthFormat": "yyyy년 M월"
       },      
-    "pt": { "statusConfirmed" : "예약",
-            "statusPending" :   "완료확인중",         
-            "statusCompleted" : "완료" },      
+    "pt": { 
+      "schedules" : "PT 일정",
+      "statusConfirmed" : "예약",
+      "statusPending" :   "완료확인중",         
+      "statusCompleted" : "완료" },      
   "deadline": {
     "remaining": "종료일 ({{date}})까지 <1>{{days}}</1>일 남았습니다"
   }      

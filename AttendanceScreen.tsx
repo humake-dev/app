@@ -3,6 +3,7 @@ import { View, StyleSheet, Text, FlatList, TouchableOpacity,ActivityIndicator, A
 import { useTranslation } from 'react-i18next';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { authFetch } from "./src/utils/api";
+import { formatSelectedDate } from './src/utils/helper';
 
 const AttendanceScreen = ({ navigation }) => {
   const { t, i18n } = useTranslation();
@@ -146,6 +147,9 @@ if (data.total > 0) {
 };
 
 
+
+
+
   const onDayPress = (day) => {
   const todayStr = new Date().toLocaleDateString('en-CA');
 
@@ -247,7 +251,7 @@ dayComponent={({ date, state }) => {
 
               
               <View style={styles.scheduleHeader}>
-                <Text style={styles.scheduleHeaderText}>출석 현황 ({selectedDate})</Text>
+                <Text style={styles.scheduleHeaderText}>{t('attendance.title')} ({formatSelectedDate(selectedDate,i18n)})</Text>
               </View>
               
               {loading ? (

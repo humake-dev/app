@@ -5,14 +5,22 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator
+  ActivityIndicator,
+  RefreshControl
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useMessageContext } from './MessageContext';
 
 const MessageScreen = ({ navigation }) => {
   const { t } = useTranslation();
-  const { messages, total, loading, handleDeleteMessage } = useMessageContext();
+const {
+  messages,
+  total,
+  loading,
+  refreshing,
+  handleDeleteMessage,
+  refreshMessages,
+} = useMessageContext();
 
   if (loading) {
     return (
@@ -55,13 +63,27 @@ const MessageScreen = ({ navigation }) => {
 
   return (
     <View style={{ flex: 1 }}>
-      <FlatList
-        data={messages}
-        renderItem={renderMessageItem}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.messageList}
-        style={{ flexGrow: 1 }}
-      />
+<FlatList
+  data={messages}
+  renderItem={renderMessageItem}
+  keyExtractor={(item) => item.id.toString()}
+  contentContainerStyle={
+    messages.length === 0
+      ? { flexGrow: 1, justifyContent: 'center' }
+      : styles.messageList
+  }
+  refreshControl={
+    <RefreshControl
+      refreshing={refreshing}
+      onRefresh={refreshMessages}
+    />
+  }
+  ListEmptyComponent={
+    <Text style={styles.noMessagesText}>
+      {t('message.no_items')}
+    </Text>
+  }
+/>
     </View>
   );
 };

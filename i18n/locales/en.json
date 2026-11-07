@@ -1,5 +1,4 @@
-  // i18n/locales/en.json
-  {
+{
     "common": {
       "back": "Back",
       "home": "Back to Home",
@@ -106,6 +105,7 @@
     }       
       },
       "attendance": {
+        "title": "Attendance",
         "PTcount": "PT Schedules",
         "count": "Attendance"
       },
@@ -120,7 +120,18 @@
         "bmi": "BMI",
         "period_day": "Daily",
         "period_week": "Weekly",
-        "period_month": "Monthly"
+        "period_month": "Monthly",
+    "date_week": "Week {{week}}, {{year}}",
+    "date_month": "{{month}}/{{year}}",
+    "recent_measurement": "Latest measurement: {{date}}",
+    "average_period": "Period average: {{weight}} {{unit}}",
+    "unit_kg": "kg",
+    "bmi_status": {
+      "normal": "Normal",
+      "underweight": "Underweight",
+      "overweight": "Overweight",
+      "obese": "Obese"
+    }
       },
       "user_height": {
         "required" : "Enter height required",
@@ -145,7 +156,9 @@
         "today": "Today",
         "monthFormat": "MMMM yyyy"
       },
-    "pt": { "statusConfirmed" : "예약",
+    "pt": { 
+    "schedules" : "PT Schedules",
+    "statusConfirmed" : "예약",
             "statusPending" :   "완료확인중",         
             "statusCompleted" : "완료" },          
     "deadline": {

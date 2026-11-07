@@ -11,9 +11,14 @@ import {
 } from 'react-native';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {saveUserProfile, getBodyReference } from './src/database/profileDatabse';
+import {
+  saveUserProfile,
+} from './src/storage/profileStorage';
+
+import {
+  getBodyReference,
+} from './src/database/profileDatabse';
 import { useUser } from './UserContext';
-import AsyncStorage from "@react-native-async-storage/async-storage";
 // ============================================================
 // Types
 // ============================================================
@@ -858,27 +863,18 @@ const back = () => {
 
 const saveProfile = async () => {
   try {
-    await saveUserProfile({
+    const profile = {
       ageGroup,
       gender: gender ?? 'unknown',
       height,
       weight,
-    });
+    };
 
-    console.log('Profile saved', {
-      ageGroup,
-      gender: gender ?? 'unknown',
-      height,
-      weight,
-    });
+    await saveUserProfile(profile);
 
-    // TODO:
-    // AsyncStorage에 hasCompletedStart 저장
-    // App.tsx의 onComplete() 호출
-    await AsyncStorage.setItem('hasCompletedStart', 'true');
+    console.log('Profile saved', profile);
 
     setHasCompletedStart(true);
-
   } catch (error) {
     console.error('Profile save failed:', error);
   }

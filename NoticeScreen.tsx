@@ -1,87 +1,207 @@
-import React, { useState, useEffect, useCallback } from 'react';
+
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+} from 'react';
+
 import {
   View,
   Text,
   FlatList,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
+
+import NetInfo from '@react-native-community/netinfo';
 import { useTranslation } from 'react-i18next';
+
 import { authFetch } from './src/utils/api';
 
-const NoticeScreen = ({ navigation, route }) => {
+import {
+  getNotices,
+  saveNotices,
+  initializeNoticeTable,
+} from './src/database/noticeDatabase';
+
+const NoticeScreen = ({ navigation }) => {
   const { t } = useTranslation();
+
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [total, setTotal] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const fetchNotices = useCallback(async () => {
+  const syncingRef = useRef(false);
+  const mountedRef = useRef(true);
+
+  // 서버 동기화
+  const syncNotices = useCallback(async () => {
+    if (syncingRef.current) return;
+
+    syncingRef.current = true;
+
     try {
-      const response = await authFetch(`/notices`, {
+      const response = await authFetch('/notices', {
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       });
 
-      if(response.ok){
-        const data = await response.json();
-
-        setTotal(data.total);
-
-        if(data.total) {
-          setNotices(data.notice_list);
-        }
-        setLoading(false);
+      if (!response.ok) {
+        return;
       }
+
+      const data = await response.json();
+
+      if (!Array.isArray(data.notice_list)) {
+        return;
+      }
+
+      // SQLite 갱신
+      await saveNotices(data.notice_list);
+
+      // 갱신된 SQLite 데이터 다시 조회
+      const localNotices = await getNotices();
+
+      if (mountedRef.current) {
+        setNotices(localNotices);
+      }
+
     } catch (error) {
-      console.error('Error fetching notices:', error);
-      setLoading(false);
+      console.log('Notice sync failed:', error);
+      // 오류 발생 시 기존 SQLite 데이터 유지
+    } finally {
+      syncingRef.current = false;
+      if (mountedRef.current) {
+        setRefreshing(false);
+      }
     }
   }, []);
 
-  useEffect(() => {
-    fetchNotices();
+  // 로컬 데이터 먼저 조회
+  const loadLocalNotices = useCallback(async () => {
+    try {
+      await initializeNoticeTable();
+
+      const localNotices = await getNotices();
+
+      if (mountedRef.current) {
+        setNotices(localNotices);
+        setLoading(false);
+      }
+
+    } catch (error) {
+      console.error('SQLite read error:', error);
+
+      if (mountedRef.current) {
+        setLoading(false);
+      }
+    }
   }, []);
 
-  if (loading) {
-    return (
-      <View>
-        <ActivityIndicator size="large" color="#007AFF" style={styles.loader} />
-      </View>
-    );
-  }
+  // 수동 새로고침
+  const handleRefresh = useCallback(async () => {
+    const state = await NetInfo.fetch();
 
-  if (total === 0) {
-    return (
-      <View>
-        <Text style={styles.noNoticesText}>{t('notice.no_items')}</Text>
-      </View>
-    );
-  }
+    if (
+      state.isConnected &&
+      state.isInternetReachable !== false
+    ) {
+      setRefreshing(true);
+      await syncNotices();
+    }
+  }, [syncNotices]);
 
-  const renderNoticeItem = ({ item }) => {
-    const handlePress = () => {
-      navigation.navigate('NoticeDetail', { id: item.id});
+  useEffect(() => {
+    mountedRef.current = true;
+
+    // 네트워크 연결 감지
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      if (
+        state.isConnected &&
+        state.isInternetReachable !== false
+      ) {
+        syncNotices();
+      }
+    });
+
+    // SQLite 먼저 읽고 서버 동기화
+    const initialize = async () => {
+      await loadLocalNotices();
+
+      const state = await NetInfo.fetch();
+
+      if (
+        state.isConnected &&
+        state.isInternetReachable !== false
+      ) {
+        syncNotices();
+      }
     };
 
+    initialize();
+
+    return () => {
+      mountedRef.current = false;
+      unsubscribe();
+    };
+  }, [loadLocalNotices, syncNotices]);
+
+  const renderNoticeItem = ({ item }) => {
     return (
       <View style={styles.noticeItem}>
-        <TouchableOpacity onPress={handlePress} style={styles.noticeInfo}>
-          <Text style={styles.noticeTitle}>{item.title}</Text>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('NoticeDetail', {
+              id: item.id,
+            });
+          }}
+          style={styles.noticeInfo}
+        >
+          <Text style={styles.noticeTitle}>
+            {item.title}
+          </Text>
         </TouchableOpacity>
       </View>
     );
   };
 
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator
+          size="large"
+          color="#007AFF"
+        />
+      </View>
+    );
+  }
+
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
       <FlatList
         data={notices}
         renderItem={renderNoticeItem}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.noticeList}
-        style={{ flexGrow: 1 }}
+        contentContainerStyle={
+          notices.length === 0
+            ? styles.emptyContainer
+            : styles.noticeList
+        }
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+          />
+        }
+        ListEmptyComponent={
+          <Text style={styles.noNoticesText}>
+            {t('notice.no_items')}
+          </Text>
+        }
       />
     </View>
   );
@@ -90,7 +210,18 @@ const NoticeScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noticeList: {
     padding: 16,
+  },
+  emptyContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   noticeItem: {
     padding: 16,
@@ -98,15 +229,13 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ddd',
     marginBottom: 8,
   },
+  noticeInfo: {
+    flex: 1,
+  },
   noticeTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
-  },
-  noticeDate: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 4,
   },
   noNoticesText: {
     fontSize: 16,

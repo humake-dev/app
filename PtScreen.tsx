@@ -3,6 +3,7 @@ import { View, StyleSheet, Text, FlatList, TouchableOpacity,ActivityIndicator, A
 import { useTranslation } from 'react-i18next';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { authFetch } from './src/utils/api';
+import { formatSelectedDate } from './src/utils/helper';
 
 const PtScreen = ({ navigation }) => {
   const { t, i18n } = useTranslation();
@@ -60,6 +61,8 @@ const statusTextMap: Record<string, string> = {
 };
 
   const today = new Date();
+
+
 
   const formatDate = (date: Date) =>
   date.toISOString().split('T')[0];
@@ -277,7 +280,7 @@ const statusTextMap: Record<string, string> = {
       />
       
       <View style={styles.scheduleHeader}>
-        <Text style={styles.scheduleHeaderText}>PT 일정 ({selectedDate})</Text>
+        <Text style={styles.scheduleHeaderText}>{t('pt.schedules')} ({formatSelectedDate(selectedDate,i18n)})</Text>
       </View>
       
       {loading ? (

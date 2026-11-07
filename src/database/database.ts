@@ -25,3 +25,5 @@ export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
 
   return database;
 }
+
+
