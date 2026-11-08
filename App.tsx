@@ -514,12 +514,14 @@ return (
                     }}
                   >
                     {(props) => (
-                      <HomeScreen
-                        {...props}
-                        attendanceTotal={attendanceTotal}
-                        reservationTotal={reservationTotal}
-                        enrollInfo={enrollInfo}
-                      />
+<HomeScreen
+  {...props}
+  attendanceTotal={attendanceTotal}
+  reservationTotal={reservationTotal}
+  enrollInfo={enrollInfo}
+  isMenuOpen={isMenuOpen}
+  toggleMenu={toggleMenu}
+/>
                     )}
                   </Stack.Screen>
 
@@ -722,12 +724,14 @@ return (
                     }}
                   >
                     {(props) => (
-                      <HomeScreen
-                        {...props}
-                        attendanceTotal={attendanceTotal}
-                        reservationTotal={reservationTotal}
-                        enrollInfo={enrollInfo}
-                      />
+<HomeScreen
+  {...props}
+  attendanceTotal={attendanceTotal}
+  reservationTotal={reservationTotal}
+  enrollInfo={enrollInfo}
+  isMenuOpen={isMenuOpen}
+  toggleMenu={toggleMenu}
+/>
                     )}
                   </Stack.Screen>
 

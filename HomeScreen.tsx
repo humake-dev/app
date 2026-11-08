@@ -32,9 +32,13 @@ import {
   BannerAd,
   BannerAdSize,
 } from 'react-native-google-mobile-ads';
+import {
+  Gesture,
+  GestureDetector,
+} from 'react-native-gesture-handler';
 import { ADMOB_BANNER_ID } from './Config';
 
-const HomeScreen = ({navigation, route, attendanceTotal, reservationTotal, enrollInfo}) => {
+const HomeScreen = ({navigation, route, isMenuOpen,  toggleMenu, attendanceTotal, reservationTotal, enrollInfo}) => {
     const { t } = useTranslation();
     const [index, setIndex] = useState(1);
 
@@ -203,12 +207,35 @@ useEffect(() => {
     return () => subscription?.remove();
   }, []);
 
+  const getDrawerNavigation = () => {
+  let current = navigation;
+
+  while (current) {
+    if (current.getState?.()?.type === 'drawer') {
+      return current;
+    }
+
+    current = current.getParent?.();
+  }
+
+  return null;
+};
+
+const mainImageGesture = Gesture.Pan()
+  .activeOffsetX(-30)
+  .failOffsetY([-20, 20])
+  .onEnd((event) => {
+    if (event.translationX < -60 && !isMenuOpen) {
+      toggleMenu();
+    }
+  })
+  .runOnJS(true);
     
   // 나머지 코드는 기존과 동일
   return (
     <View style={styles.container}>
       <View style={styles.imageContainer}>
-
+<GestureDetector gesture={mainImageGesture}>
             {branch?.picture?.picture_url ? (
               <Image
                 source={{uri: `https://humake.blob.core.windows.net/humake/branch/${branch.id}/${branch.picture.picture_url}`}}
@@ -223,7 +250,7 @@ useEffect(() => {
     />
             )}
 
-
+</GestureDetector>
   </View>
       {/* Tab View */}
       <View style={styles.tabContainer}>
