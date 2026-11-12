@@ -79,4 +79,3 @@ yarn-error.log
 
 android/*.keystore
 android/*.jks
-android/gradle.properties

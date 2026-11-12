@@ -40,8 +40,6 @@ import CounselFormScreen from './CounselFormScreen';
 import StopScreen from './StopScreen';
 import StopDetailScreen from './StopDetailScreen';
 import StopFormScreen from './StopFormScreen';
-import NoticeDetailScreen from './NoticeDetailScreen';
-import MessageDetailScreen from './MessageDetailScreen';
 import UserWeightScreen from './UserWeightScreen';
 import UserWeightFormScreen from './UserWeightFormScreen';
 import UserHeightFormScreen from './UserHeightFormScreen';
@@ -604,18 +602,6 @@ return (
                   />
 
                   <Stack.Screen
-                    name="NoticeDetail"
-                    component={NoticeDetailScreen}
-                    options={{ title: t('menu.notice') }}
-                  />
-
-                  <Stack.Screen
-                    name="MessageDetail"
-                    component={MessageDetailScreen}
-                    options={{ title: t('menu.message') }}
-                  />
-
-                  <Stack.Screen
                     name="User"
                     component={UserScreen}
                     options={{ title: t('menu.user') }}
@@ -811,18 +797,6 @@ return (
                     name="StopDetail"
                     component={StopDetailScreen}
                     options={{ title: t('menu.stop') }}
-                  />
-
-                  <Stack.Screen
-                    name="NoticeDetail"
-                    component={NoticeDetailScreen}
-                    options={{ title: t('menu.notice') }}
-                  />
-
-                  <Stack.Screen
-                    name="MessageDetail"
-                    component={MessageDetailScreen}
-                    options={{ title: t('menu.message') }}
                   />
 
                   <Stack.Screen

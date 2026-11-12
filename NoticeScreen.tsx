@@ -1,6 +1,4 @@
-
 import React from 'react';
-
 import {
   View,
   Text,
@@ -8,9 +6,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  RefreshControl,
+  RefreshControl
 } from 'react-native';
-
 import { useTranslation } from 'react-i18next';
 import { useNoticeContext } from './src/contexts/NoticeContext';
 
@@ -23,6 +20,17 @@ const NoticeScreen = ({ navigation }) => {
     refreshing,
     refreshNotices,
   } = useNoticeContext();
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator
+          size="large"
+          color="#007AFF"
+        />
+      </View>
+    );
+  }
 
   const renderNoticeItem = ({ item }) => {
     return (
@@ -42,17 +50,6 @@ const NoticeScreen = ({ navigation }) => {
       </View>
     );
   };
-
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator
-          size="large"
-          color="#007AFF"
-        />
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>

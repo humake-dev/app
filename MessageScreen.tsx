@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -13,26 +13,30 @@ import { useMessageContext } from './src/contexts/MessageContext';
 
 const MessageScreen = ({ navigation }) => {
   const { t } = useTranslation();
-const {
-  messages,
-  total,
-  loading,
-  refreshing,
-  handleDeleteMessage,
-  refreshMessages,
-} = useMessageContext();
+  
+  const {
+    messages,
+    total,
+    loading,
+    refreshing,
+    handleDeleteMessage,
+    refreshMessages,
+  } = useMessageContext();
 
   if (loading) {
     return (
-      <View>
-        <ActivityIndicator size="large" color="#007AFF" style={styles.loader} />
+      <View style={styles.center}>
+        <ActivityIndicator
+          size="large"
+          color="#007AFF"
+        />
       </View>
     );
   }
 
   if (total === 0) {
     return (
-      <View>
+      <View style={styles.emptyContainer}>
         <Text style={styles.noMessagesText}>{t('message.no_items')}</Text>
       </View>
     );
@@ -62,16 +66,16 @@ const {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
 <FlatList
   data={messages}
   renderItem={renderMessageItem}
   keyExtractor={(item) => item.id.toString()}
-  contentContainerStyle={
-    messages.length === 0
-      ? { flexGrow: 1, justifyContent: 'center' }
-      : styles.messageList
-  }
+        contentContainerStyle={
+          messages.length === 0
+            ? styles.emptyContainer
+            : styles.messageList
+        }
   refreshControl={
     <RefreshControl
       refreshing={refreshing}
@@ -89,6 +93,20 @@ const {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+    emptyContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
   noMessagesText: {
     fontSize: 16,
     color: '#666',
