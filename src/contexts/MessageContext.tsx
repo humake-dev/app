@@ -139,11 +139,9 @@ export const MessageProvider = ({ children }) => {
       if (mountedRef.current) {
         setRefreshing(false);
        }
-
-      return false;
     }
 
-  }, []);
+  }, [syncMessages]);
 
 
   // 서버에서 공지사항 동기화
