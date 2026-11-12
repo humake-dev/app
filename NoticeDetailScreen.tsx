@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -18,53 +17,47 @@ const NoticeDetailScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
 
-  const {
-    notices,
-    loading,
-  } = useNoticeContext();
+  const { fetchNoticeDetail } = useNoticeContext();
 
-  // 공지사항 ID로 Context 데이터 조회
-  const notice = notices.find(
-    item => String(item.id) === String(route.params?.id)
-  );
+  const [notice, setNotice] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // ID가 없을 때
-  if (!route.params?.id) {
-    return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorTitle}>
-          {t('common.error')}
-        </Text>
+  useEffect(() => {
+    let mounted = true;
 
-        <Text style={styles.errorMessage}>
-          {t('message.noMessage')}
-        </Text>
+    const loadNotice = async () => {
+      try {
+        const data = await fetchNoticeDetail(route.params?.id);
 
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.buttonText}>
-            {t('common.backToList')}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+        if (mounted) {
+          setNotice(data);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
 
-  // Context 초기 로딩 대기
+    if (route.params?.id) {
+      loadNotice();
+    } else {
+      setLoading(false);
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, [route.params?.id, fetchNoticeDetail]);
+
   if (loading) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator
-          size="large"
-          color="#007AFF"
-        />
+        <ActivityIndicator size="large" color="#007AFF" />
       </View>
     );
   }
 
-  // 공지사항이 없는 경우
   if (!notice) {
     return (
       <View style={styles.errorContainer}>
@@ -106,11 +99,9 @@ const NoticeDetailScreen = () => {
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
-            <View style={styles.buttonContent}>
-              <Text style={styles.buttonText}>
-                {t('common.backToList')}
-              </Text>
-            </View>
+            <Text style={styles.buttonText}>
+              {t('common.backToList')}
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

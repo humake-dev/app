@@ -67,3 +67,31 @@ export const saveNotices = async (notices: any[]) => {
     );
   });
 };
+
+  // ID로 공지사항 조회
+export const getNoticeById = async (id) => {
+  const db = await getDatabase();
+
+  const [result] = await db.executeSql(
+    'SELECT * FROM notices WHERE id = ? LIMIT 1',
+    [Number(id)]
+  );
+
+  return result.rows.length > 0
+    ? result.rows.item(0)
+    : null;
+};
+
+// 공지사항 상세 내용 저장
+export const saveNoticeDetail = async (id, detail) => {
+  const db = await getDatabase();
+
+  const [result] = await db.executeSql(
+    `UPDATE notices
+     SET content = ?
+     WHERE id = ?`,
+    [detail.content ?? '', Number(id)]
+  );
+
+  return result.rowsAffected > 0;
+};

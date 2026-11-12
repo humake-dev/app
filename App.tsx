@@ -43,6 +43,8 @@ import StopFormScreen from './StopFormScreen';
 import UserWeightScreen from './UserWeightScreen';
 import UserWeightFormScreen from './UserWeightFormScreen';
 import UserHeightFormScreen from './UserHeightFormScreen';
+import NoticeDetailScreen from './NoticeDetailScreen';
+import MessageDetailScreen from './MessageDetailScreen';
 import ExerciseScreen from './ExerciseScreen';
 import UserScreen from './UserScreen';
 import i18n from './i18n/i18n';
@@ -600,6 +602,18 @@ return (
                     component={StopDetailScreen}
                     options={{ title: t('menu.stop') }}
                   />
+                  
+                  <Stack.Screen
+                    name="NoticeDetail"
+                    component={NoticeDetailScreen}
+                    options={{ title: t('menu.notice') }}
+                  />
+
+                  <Stack.Screen
+                    name="MessageDetail"
+                    component={MessageDetailScreen}
+                    options={{ title: t('menu.message') }}
+                  />
 
                   <Stack.Screen
                     name="User"
@@ -797,6 +811,18 @@ return (
                     name="StopDetail"
                     component={StopDetailScreen}
                     options={{ title: t('menu.stop') }}
+                  />
+
+                  <Stack.Screen
+                    name="NoticeDetail"
+                    component={NoticeDetailScreen}
+                    options={{ title: t('menu.notice') }}
+                  />
+
+                  <Stack.Screen
+                    name="MessageDetail"
+                    component={MessageDetailScreen}
+                    options={{ title: t('menu.message') }}
                   />
 
                   <Stack.Screen

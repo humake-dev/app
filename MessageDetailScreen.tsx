@@ -15,6 +15,9 @@ import { authFetch } from './src/utils/api';
 const MessageDetailScreen = ({ navigation }) => {
   const { t } = useTranslation();
   const route = useRoute();
+
+  const { fetchMessageDetail } = useMessageContext();
+
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(true);
 const {
@@ -22,7 +25,33 @@ const {
   handleDeleteMessage,
 } = useMessageContext();
 
+  useEffect(() => {
+    let mounted = true;
 
+    const loadMessage = async () => {
+      try {
+        const data = await fetchMessageDetail(route.params?.id);
+
+        if (mounted) {
+          setMessage(data);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    if (route.params?.id) {
+      loadMessage();
+    } else {
+      setLoading(false);
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, [route.params?.id, fetchMessageDetail]);
 
   // 상담 ID가 없을 때
   if (!route.params?.id) {
