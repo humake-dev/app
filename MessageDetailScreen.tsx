@@ -16,14 +16,10 @@ const MessageDetailScreen = ({ navigation }) => {
   const { t } = useTranslation();
   const route = useRoute();
 
-  const { fetchMessageDetail } = useMessageContext();
+  const { messages,fetchMessageDetail } = useMessageContext();
 
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(true);
-const {
-  messages,
-  handleDeleteMessage,
-} = useMessageContext();
 
   useEffect(() => {
     let mounted = true;

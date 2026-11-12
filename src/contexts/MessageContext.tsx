@@ -17,6 +17,7 @@ import {
   saveMessages,
   saveMessageDetail,
   getMessageById,
+  deleteMessageFromDB
 } from '../database/messageDatabase';
 
 const MessageContext = createContext(null);
@@ -109,6 +110,41 @@ export const MessageProvider = ({ children }) => {
       console.error('Error loading local messages:', error);
     }
   }, []);
+
+   // 메시지 삭제
+  const handleDeleteMessage = useCallback(async (messageId) => {
+     try {
+      const response = await authFetch(
+        `/messages/hide/${messageId}`,
+        {
+          method: 'POST',
+        }
+      );
+
+      if (response.ok) {        // 서버 삭제 성공 후 SQLite 삭제
+        await deleteMessageFromDB(messageId);
+
+        const localMessages = await getMessages();
+
+        if (mountedRef.current) {
+          setMessages(localMessages);
+          setTotal(localMessages.length);
+        }
+      }
+      await syncMessages();
+    } catch (error) {
+      console.error('Error deleting message:', error);
+      return false;          
+    } finally {
+      if (mountedRef.current) {
+        setRefreshing(false);
+       }
+
+      return false;
+    }
+
+  }, []);
+
 
   // 서버에서 공지사항 동기화
   const syncMessages = useCallback(async () => {
@@ -222,12 +258,15 @@ export const MessageProvider = ({ children }) => {
         fetchMessages,
         refreshMessages,
         fetchMessageDetail, // 추가
+        handleDeleteMessage
       }}
     >
       {children}
     </MessageContext.Provider>
   );
 };
+
+
 
 export const useMessageContext = () => {
   const context = useContext(MessageContext);
