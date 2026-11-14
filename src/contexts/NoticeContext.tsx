@@ -31,67 +31,78 @@ export const NoticeProvider = ({ children }) => {
   const mountedRef = useRef(false);
 
 
-  // 공지사항 상세 조회
-  const fetchNoticeDetail = useCallback(async (id: string) => {
-    const noticeId = String(id);
+// 공지사항 상세 조회 (SQLite 우선)
+const fetchNoticeDetail = useCallback(async (id) => {
+  const noticeId = String(id);
 
-    try {
-      // 1. SQLite에 저장된 상세 내용 확인
-      const localNotice = notices.find(
-        item => String(item.id) === noticeId
+  // 1. SQLite에서 먼저 조회
+  let localNotice = null;
+
+  try {
+    localNotice = await getNoticeById(noticeId);
+  } catch (error) {
+    console.error('SQLite notice lookup error:', error);
+  }
+
+  // 2. 네트워크 확인
+  let isOnline = false;
+
+  try {
+    const networkState = await NetInfo.fetch();
+
+    isOnline =
+      networkState.isConnected === true &&
+      networkState.isInternetReachable !== false;
+  } catch (error) {
+    console.error('Network check error:', error);
+  }
+
+  // 3. 오프라인이면 SQLite 데이터 반환
+  if (!isOnline) {
+    return localNotice;
+  }
+
+  // 4. 온라인이면 서버에서 최신 데이터 조회
+  try {
+    const response = await authFetch(`/notices/${noticeId}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    const detail = data.notice || data;
+
+    // 5. SQLite에 상세 데이터 저장
+    await saveNoticeDetail(noticeId, detail);
+
+    // 6. SQLite에서 최신 데이터 조회
+    const updatedNotice = await getNoticeById(noticeId);
+
+    // 7. Context 목록 갱신
+    if (mountedRef.current && updatedNotice) {
+      setNotices(prev =>
+        prev.map(item =>
+          String(item.id) === noticeId
+            ? updatedNotice
+            : item
+        )
       );
+    }
 
-      // 2. 오프라인이면 기존 SQLite 데이터 반환
-      const networkState = await NetInfo.fetch();
+    return updatedNotice || localNotice;
 
-      const isOnline =
-        networkState.isConnected &&
-        networkState.isInternetReachable !== false;
+  } catch (error) {
+    console.error('Server notice detail error:', error);
 
-      if (!isOnline) {
-        return localNotice || null;
-      }
-
-      // 3. 서버에서 상세 내용 조회
-      const response = await authFetch(`/notices/${noticeId}`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch notice detail');
-      }
-
-      const data = await response.json();
-
-      // API 응답 구조에 따라 조정
-      const detail = data.notice || data;
-
-      // 4. SQLite에 상세 내용 저장
-      await saveNoticeDetail(noticeId, detail);
-
-      // 5. SQLite에서 최신 데이터 조회
-      const updatedNotice = await getNoticeById(noticeId);
-
-      // 6. Context 갱신
-      if (mountedRef.current && updatedNotice) {
-        setNotices(prev =>
-          prev.map(item =>
-            String(item.id) === noticeId
-              ? updatedNotice
-              : item
-          )
-        );
-      }
-
-      return updatedNotice;
-
-} catch (error) {
-  console.error('Error fetching notice detail:', error);
-  return null;
-}
-  }, [notices]);
+    // 서버 오류 시 SQLite 데이터 사용
+    return localNotice;
+  }
+}, []);
 
 
   // SQLite에서 공지사항 로딩

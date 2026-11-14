@@ -31,68 +31,78 @@ export const MessageProvider = ({ children }) => {
   const syncingRef = useRef(false);
   const mountedRef = useRef(false);
 
+// 공지사항 상세 조회 (SQLite 우선)
+const fetchMessageDetail = useCallback(async (id) => {
+  const messageId = String(id);
 
-  // 공지사항 상세 조회
-  const fetchMessageDetail = useCallback(async (id: string) => {
-    const messageId = String(id);
+  // 1. SQLite에서 먼저 조회
+  let localMessage = null;
 
-    try {
-      // 1. SQLite에 저장된 상세 내용 확인
-      const localMessage = messages.find(
-        item => String(item.id) === messageId
+  try {
+    localMessage = await getMessageById(messageId);
+  } catch (error) {
+    console.error('SQLite message lookup error:', error);
+  }
+
+  // 2. 네트워크 확인
+  let isOnline = false;
+
+  try {
+    const networkState = await NetInfo.fetch();
+
+    isOnline =
+      networkState.isConnected === true &&
+      networkState.isInternetReachable !== false;
+  } catch (error) {
+    console.error('Network check error:', error);
+  }
+
+  // 3. 오프라인이면 SQLite 데이터 반환
+  if (!isOnline) {
+    return localMessage;
+  }
+
+  // 4. 온라인이면 서버에서 최신 데이터 조회
+  try {
+    const response = await authFetch(`/messages/${messageId}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    const detail = data.message || data;
+
+    // 5. SQLite에 상세 데이터 저장
+    await saveMessageDetail(messageId, detail);
+
+    // 6. SQLite에서 최신 데이터 조회
+    const updatedMessage = await getMessageById(messageId);
+
+    // 7. Context 목록 갱신
+    if (mountedRef.current && updatedMessage) {
+      setMessages(prev =>
+        prev.map(item =>
+          String(item.id) === messageId
+            ? updatedMessage
+            : item
+        )
       );
+    }
 
-      // 2. 오프라인이면 기존 SQLite 데이터 반환
-      const networkState = await NetInfo.fetch();
+    return updatedMessage || localMessage;
 
-      const isOnline =
-        networkState.isConnected &&
-        networkState.isInternetReachable !== false;
+  } catch (error) {
+    console.error('Server message detail error:', error);
 
-      if (!isOnline) {
-        return localMessage || null;
-      }
-
-      // 3. 서버에서 상세 내용 조회
-      const response = await authFetch(`/messages/${messageId}`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch message detail');
-      }
-
-      const data = await response.json();
-
-      // API 응답 구조에 따라 조정
-      const detail = data.message || data;
-
-      // 4. SQLite에 상세 내용 저장
-      await saveMessageDetail(messageId, detail);
-
-      // 5. SQLite에서 최신 데이터 조회
-      const updatedMessage = await getMessageById(messageId);
-
-      // 6. Context 갱신Fmessages
-      if (mountedRef.current && updatedMessage) {
-        setMessages(prev =>
-          prev.map(item =>
-            String(item.id) === messageId
-              ? updatedMessage
-              : item
-          )
-        );
-      }
-
-      return updatedMessage;
-
-} catch (error) {
-  console.error('Error fetching message detail:', error);
-  return null;
-}
-  }, [messages]);
+    // 서버 오류 시 SQLite 데이터 사용
+    return localMessage;
+  }
+}, []);
 
 
   // SQLite에서 공지사항 로딩
