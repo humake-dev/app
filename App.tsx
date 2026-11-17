@@ -23,6 +23,7 @@ import {
   ActivityIndicator
 } from 'react-native';
 
+import { SafeAreaProvider ,SafeAreaView } from 'react-native-safe-area-context';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import 'react-native-gesture-handler';
@@ -413,6 +414,7 @@ const loginCheck = async () => {
 
 
 return (
+  <SafeAreaProvider>
         <MessageProvider>
           <NoticeProvider>
           <StatusBar barStyle="dark-content" />
@@ -647,7 +649,7 @@ return (
                   Profile 작성 완료 → Home
                   ===================================================== */}
               {appMode === 'guest' && (
-                <>
+                <SafeAreaView>
                   <Stack.Screen
                     name="Home"
                     options={{
@@ -842,7 +844,7 @@ return (
                     component={ExerciseScreen}
                      options={{ title: t('menu.exercise') }}
                   />
-                </>
+                </SafeAreaView>
               )}
 
 
@@ -869,7 +871,7 @@ return (
                   }}
                 >
                   {(props) => (
-                    <LoginScreen />
+                      <LoginScreen />
                   )}
                 </Stack.Screen>
               )}
@@ -1024,6 +1026,7 @@ return (
           </NavigationContainer>
           </NoticeProvider>
         </MessageProvider>
+        </SafeAreaProvider>
 );
 };
 

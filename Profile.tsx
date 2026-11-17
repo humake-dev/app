@@ -4,7 +4,6 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   Pressable,
-  SafeAreaView,
   StyleSheet,
   Text,
   View,
@@ -897,7 +896,7 @@ const saveProfile = async () => {
   // ----------------------------------------------------------
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
 
       {/* Progress */}
 
@@ -1009,7 +1008,7 @@ const saveProfile = async () => {
   </Pressable>
 
 </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

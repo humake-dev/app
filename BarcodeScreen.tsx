@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet,  SafeAreaView } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import Barcode from '@kichiyaki/react-native-barcode-generator';
 import { useUser } from './src/contexts/UserContext';
 import DeviceBrightness from '@adrianso/react-native-device-brightness';
@@ -27,7 +27,7 @@ const BarcodeScreen = () => {
   
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.content}>
             <Barcode 
               value={user.access_card.card_no} 
@@ -45,7 +45,7 @@ const BarcodeScreen = () => {
               }}
             />
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
