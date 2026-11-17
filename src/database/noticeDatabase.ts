@@ -44,14 +44,16 @@ export const saveNotices = async (notices: any[]) => {
   return new Promise<void>((resolve, reject) => {
     db.transaction(
       (tx) => {
-        // 서버의 전체 공지사항 목록으로 교체
-        tx.executeSql('DELETE FROM notices');
-
         notices.forEach((item) => {
           tx.executeSql(
-            `INSERT OR REPLACE INTO notices
+            `INSERT INTO notices
               (id, title, content, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?)`,
+             VALUES (?, ?, ?, ?, ?)
+             ON CONFLICT(id) DO UPDATE SET
+               title = excluded.title,
+               content = COALESCE(excluded.content, notices.content),
+               created_at = excluded.created_at,
+               updated_at = excluded.updated_at`,
             [
               item.id,
               item.title ?? '',

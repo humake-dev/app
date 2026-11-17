@@ -36,7 +36,7 @@ export const getMessages = async () => {
 };
 
 // 서버 메시지 목록으로 SQLite 갱신
-export const saveMessages = async (messages: any[]) => {
+export const saveMessages = async (notices: any[]) => {
   const db = await getDatabase();
 
   await initializeMessageTable();
@@ -44,13 +44,16 @@ export const saveMessages = async (messages: any[]) => {
   return new Promise<void>((resolve, reject) => {
     db.transaction(
       (tx) => {
-        tx.executeSql('DELETE FROM messages');
-
-        messages.forEach((item) => {
+        notices.forEach((item) => {
           tx.executeSql(
-            `INSERT OR REPLACE INTO messages
+            `INSERT INTO messages
               (id, title, content, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?)`,
+             VALUES (?, ?, ?, ?, ?)
+             ON CONFLICT(id) DO UPDATE SET
+               title = excluded.title,
+               content = COALESCE(excluded.content, notices.content),
+               created_at = excluded.created_at,
+               updated_at = excluded.updated_at`,
             [
               item.id,
               item.title ?? '',
