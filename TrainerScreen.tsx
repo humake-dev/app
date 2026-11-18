@@ -94,7 +94,7 @@ useEffect(() => {
     
   
     return (
-      <View style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1 }}>
       <FlatList
         data={trainers}
         renderItem={renderTrainerItem}
@@ -102,7 +102,7 @@ useEffect(() => {
         contentContainerStyle={styles.trainerList}
         style={{ flexGrow: 1 }} 
       />
-    </View>
+    </ScrollView>
     );
 };
 

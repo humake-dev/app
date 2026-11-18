@@ -36,6 +36,7 @@ import {
   Gesture,
   GestureDetector,
 } from 'react-native-gesture-handler';
+import AppText from './src/components/appText';
 import { ADMOB_BANNER_ID } from './Config';
 
 const HomeScreen = ({navigation, route, isMenuOpen,  toggleMenu, attendanceTotal, reservationTotal, enrollInfo}) => {
@@ -268,9 +269,9 @@ const mainImageGesture = Gesture.Pan()
               tabStyle={styles.tab}
               labelStyle={styles.tabLabel}
               renderLabel={({ route, focused }) => (
-                <Text style={[styles.tabLabel, { opacity: focused ? 1 : 0.7 }]}>
+                <AppText style={[styles.tabLabel, { opacity: focused ? 1 : 0.7 }]}>
                   {route.title}
-                  </Text>
+                  </AppText>
               )}
             />
     )}
@@ -326,14 +327,14 @@ prevCategoryRef.current = selectedCategory;
               setSelectedCategory(1)
             }}
           >
-            <Text
+            <AppText
               style={[
                 styles.categoryText,
                 selectedCategory === 1 && styles.categoryTextActive,
               ]}
             >
             {t('menu.message')}
-            </Text>
+            </AppText>
           </TouchableOpacity>
           <TouchableOpacity 
             style={[
@@ -344,14 +345,14 @@ prevCategoryRef.current = selectedCategory;
               setSelectedCategory(2)
             }}
           >
-            <Text
+            <AppText
               style={[
                 styles.categoryText,
                 selectedCategory === 2 && styles.categoryTextActive,
               ]}
             >
             {t('menu.notice')}
-            </Text>
+            </AppText>
           </TouchableOpacity>
         </ScrollView>
       </View>
@@ -419,7 +420,7 @@ const renderEnrollInfo = (enrollInfo) => {
   if (!enrollInfo || !enrollInfo.total) {
     return (
       <View style={styles.enrollInfoContainer}>
-        <Text style={styles.enrollInfoText}>{t('user.enroll_info_failed')}</Text>
+        <AppText style={styles.enrollInfoText}>{t('user.enroll_info_failed')}</AppText>
       </View>
     );
   }
@@ -430,16 +431,16 @@ const renderEnrollInfo = (enrollInfo) => {
 
   return (
     <View style={styles.enrollInfoContainer}>
-      <Text style={styles.enrollInfoText}>
+      <AppText style={styles.enrollInfoText}>
         <Trans
           i18nKey="deadline.remaining"
           values={{ date: formattedDate, days: Math.max(0, diffDays) }}
           components={[
-            <Text key="date" />,
-            <Text key="days" style={styles.enrollInfoHighlight} />
+            <AppText key="date" />,
+            <AppText key="days" style={styles.enrollInfoHighlight} />
           ]}
         />
-      </Text>
+      </AppText>
     </View>
   );
 };
@@ -519,21 +520,21 @@ resizeMode="cover"
           )}
 {user?.trainer ? (
   <View style={styles.imageButtonTextWrapper}>
-    <Text style={styles.imageButtonText}>
+    <AppText style={styles.imageButtonText}>
       {t('menu.my_trainer')}
-    </Text>
-    <Text style={[styles.imageButtonText, styles.highlightText]}>
+    </AppText>
+    <AppText style={[styles.imageButtonText, styles.highlightText]}>
       {user.trainer.name}
-    </Text>
+    </AppText>
   </View>
 ) : (
   <View style={styles.imageButtonTextWrapper}>
-    <Text style={styles.imageButtonText}>
+    <AppText style={styles.imageButtonText}>
       {t('menu.my_trainer')}
-    </Text>
-    <Text style={[styles.imageButtonText, styles.highlightText]}>
+    </AppText>
+    <AppText style={[styles.imageButtonText, styles.highlightText]}>
       {t('common.none')}
-    </Text>
+    </AppText>
   </View>
 )}
           </TouchableOpacity>
@@ -545,8 +546,8 @@ resizeMode="cover"
               source={require('./assets/attendance.png')}
               style={styles.imageIcon}
             />
-            <Text style={styles.imageButtonText}>{t('menu.attendance')}({monthStr})</Text>
-            <Text style={[styles.imageButtonText,{textAlign: 'center', color: '#ff8d1d'}]}>{attendanceTotal} {t('common.times')}</Text>
+            <AppText style={styles.imageButtonText}>{t('menu.attendance')}({monthStr})</AppText>
+            <AppText style={[styles.imageButtonText,{textAlign: 'center', color: '#ff8d1d'}]}>{attendanceTotal} {t('common.times')}</AppText>
           </TouchableOpacity>
           
           <TouchableOpacity
@@ -556,11 +557,11 @@ resizeMode="cover"
               source={require('./assets/user_weight.png')}
               style={styles.imageIcon}
             />
-            <Text style={styles.imageButtonText}>{t('menu.user_weight')}</Text>
+            <AppText style={styles.imageButtonText}>{t('menu.user_weight')}</AppText>
             {user?.user_weight ? (
-            <Text style={[styles.imageButtonText,{textAlign: 'center', color: '#ff8d1d'}]}>{user.user_weight?.weight}kg</Text>            
+            <AppText style={[styles.imageButtonText,{textAlign: 'center', color: '#ff8d1d'}]}>{user.user_weight?.weight}kg</AppText>            
             ) : (
-            <Text style={[styles.imageButtonText,{textAlign: 'center', color: '#ff8d1d'}]}>{t('common.none')}</Text>            
+            <AppText style={[styles.imageButtonText,{textAlign: 'center', color: '#ff8d1d'}]}>{t('common.none')}</AppText>            
             )}
           </TouchableOpacity>
 
@@ -572,8 +573,8 @@ resizeMode="cover"
               source={require('./assets/pt.png')}
               style={styles.imageIcon}
             />
-            <Text style={styles.imageButtonText}>{t('menu.pt')}({monthStr})</Text>
-            <Text style={[styles.imageButtonText,{textAlign: 'center', color: '#ff8d1d'}]}>{reservationTotal} {t('common.times')}</Text>
+            <AppText style={styles.imageButtonText}>{t('menu.pt')}({monthStr})</AppText>
+            <AppText style={[styles.imageButtonText,{textAlign: 'center', color: '#ff8d1d'}]}>{reservationTotal} {t('common.times')}</AppText>
           </TouchableOpacity>
   
           <TouchableOpacity
@@ -583,7 +584,7 @@ resizeMode="cover"
               source={require('./assets/stop.png')}
               style={styles.imageIcon}
             />
-            <Text style={styles.imageButtonText}>{t('menu.stop')}</Text>
+            <AppText style={styles.imageButtonText}>{t('menu.stop')}</AppText>
           </TouchableOpacity>
   
           <TouchableOpacity
@@ -593,7 +594,7 @@ resizeMode="cover"
               source={require('./assets/counsel.png')}
               style={styles.imageIcon}
             />
-            <Text style={styles.imageButtonText}>{t('menu.counsel')}</Text>
+            <AppText style={styles.imageButtonText}>{t('menu.counsel')}</AppText>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -766,7 +767,7 @@ return (
                             setHasCompletedStart(false);
                           }}
         >
-          <Text
+          <AppText
             style={{
               color: '#fff',
               fontSize: 16,
@@ -774,7 +775,7 @@ return (
             }}
           >
             {t('menu.login')}
-          </Text>
+          </AppText>
         </TouchableOpacity>
 
       )}
