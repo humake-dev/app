@@ -649,7 +649,7 @@ return (
                   Profile 작성 완료 → Home
                   ===================================================== */}
               {appMode === 'guest' && (
-                <SafeAreaView>
+                <>
                   <Stack.Screen
                     name="Home"
                     options={{
@@ -844,7 +844,7 @@ return (
                     component={ExerciseScreen}
                      options={{ title: t('menu.exercise') }}
                   />
-                </SafeAreaView>
+                </>
               )}
 
 
