@@ -32,7 +32,7 @@ import * as Keychain from 'react-native-keychain';
 
 const BIOMETRIC_SERVICE = 'bluescan.biometric';
 const BIOMETRIC_ENABLED_KEY = '@Common:biometric_enabled';
-
+const SKIP_AUTO_BIOMETRIC_KEY = '@Common:skip_auto_biometric';
 // ============================================================
 // LoginScreen
 // ============================================================
@@ -291,22 +291,32 @@ const LoginScreen = () => {
       }
 
       // 생체인증 활성화 여부 확인
-      const enabled = await AsyncStorage.getItem(
-        BIOMETRIC_ENABLED_KEY
-      );
+const enabled = await AsyncStorage.getItem(
+  BIOMETRIC_ENABLED_KEY
+);
 
-      if (enabled === 'true') {
-        setBiometricEnabled(true);
+const skipAutoBiometric = await AsyncStorage.getItem(
+  SKIP_AUTO_BIOMETRIC_KEY
+);
 
-        const supported = await checkBiometric();
+if (enabled === 'true') {
+  setBiometricEnabled(true);
 
-        if (supported && !biometricAttempted.current) {
-          biometricAttempted.current = true;
+  const supported = await checkBiometric();
 
-          // 앱 로그인 화면 진입 시 자동 실행
-          await loginWithBiometric();
-        }
-      }
+  if (
+    supported &&
+    !biometricAttempted.current &&
+    skipAutoBiometric !== 'true'
+  ) {
+    biometricAttempted.current = true;
+
+    await loginWithBiometric();
+  }
+}
+
+// 화면 진입 시 skip 플래그는 소비하고 삭제
+await AsyncStorage.removeItem(SKIP_AUTO_BIOMETRIC_KEY);
 
     } catch (error) {
       console.log('Initialize login error:', error);
@@ -425,6 +435,10 @@ const LoginScreen = () => {
       await AsyncStorage.setItem(
         'accessToken',
         data.access_token
+      );
+
+      await AsyncStorage.removeItem(
+        SKIP_AUTO_BIOMETRIC_KEY
       );
 
       // Refresh Token은 생체인증 활성화 시에만 Keychain에 저장
