@@ -62,27 +62,32 @@ const UserScreen = () => {
   }, []);
 
 const renderEnrollItem = ({ item }) => {
-const isQuantityType = item.lesson_type === 4;
-const remainCount = item.quantity - item.use_quantity;
+  const isQuantityType = item.lesson_type === 4;
+  const remainCount = item.quantity - item.use_quantity;
 
+  // 종료일이 현재 날짜보다 이전인지 확인
+  const isExpired = item.end_date
+    ? new Date(item.end_date).setHours(0, 0, 0, 0) <
+      new Date().setHours(0, 0, 0, 0)
+    : false;
 
-return (
-<View style={styles.itemBox}>
-<Text style={styles.itemText}>{item.product_title}</Text>
+  return (
+    <View style={styles.itemBox}>
+      <Text style={[styles.itemText, isExpired && styles.disabledText]}>
+        {item.product_title}
+      </Text>
 
+      <Text style={[styles.itemText, isExpired && styles.disabledText]}>
+        {isQuantityType
+          ? `${remainCount}회 남음`
+          : `${formatDate(item.start_date)} ~ ${formatDate(item.end_date)}`}
+      </Text>
 
-{isQuantityType ? (
-<Text style={styles.itemText}>{remainCount}회 남음</Text>
-) : (
-<Text style={styles.itemText}>
-{formatDate(item.start_date)} ~ {formatDate(item.end_date)}
-</Text>
-)}
-
-
-<Text style={styles.itemText}>{item.trainer_name? (item.trainer_name): "-" }</Text>
-</View>
-);
+      <Text style={[styles.itemText, isExpired && styles.disabledText]}>
+        {item.trainer_name || "-"}
+      </Text>
+    </View>
+  );
 };
 
   return (
@@ -500,7 +505,10 @@ addButton: {
   itemText: {
     flex: 1,
     textAlign: 'center',
-  },  
+  }, 
+  disabledText: {
+  color: '#aaa',
+},
 });
 
 export default UserScreen;

@@ -82,8 +82,8 @@ android {
         applicationId "kr.co.humake"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 33
-        versionName "5.7"
+        versionCode 34
+        versionName "5.8"
     }
     signingConfigs {
         debug {
