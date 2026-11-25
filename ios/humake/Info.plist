@@ -45,8 +45,6 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
-	<key>NSFaceIDUsageDescription</key>
-	<string>생체인증을 사용하여 안전하게 로그인합니다.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>$(PRODUCT_NAME) 사진을 찍어서 프로필 사진을 만듭니다</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
@@ -57,14 +55,10 @@
 	<true/>
 	<key>UIAppFonts</key>
 	<array>
+	    <string>MaterialCommunityIcons.ttf</string>
 		<string>Pretendard-Regular.otf</string>
-		<string>Pretendard-Black.otf</string>
-		<string>Pretendard-Medium.otf</string>
-		<string>Pretendard-Light.otf</string>
 		<string>Pretendard-ExtraBold.otf</string>
 		<string>Pretendard-Bold.otf</string>
-		<string>Pretendard-Thin.otf</string>
-		<string>Pretendard-ExtraLight.otf</string>
 		<string>Pretendard-SemiBold.otf</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
